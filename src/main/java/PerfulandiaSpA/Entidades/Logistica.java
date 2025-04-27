@@ -1,23 +1,19 @@
 package PerfulandiaSpA.Entidades;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "CLIENTE")
-public class Cliente {
+@Table(name = "LOGISTICA")
+public class Logistica {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
     private Long id;
 
     @Column(name = "NOMBRE", nullable = false, length = 100)
     private String nombre;
-
-    @Column(name = "CORREO", nullable = false, length = 100)
-    private String correo;
-
-    @Column(name = "DIRECCION", nullable = false)
-    private String direccion;
 
     @Column(name = "TELEFONO", length = 20)
     private String telefono;
@@ -36,22 +32,6 @@ public class Cliente {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
     }
 
     public String getTelefono() {
