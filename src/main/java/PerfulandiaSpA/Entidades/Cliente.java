@@ -8,6 +8,7 @@ public class Cliente extends Persona {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false)
+    private String a;
 
 
 }
