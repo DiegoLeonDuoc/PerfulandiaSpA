@@ -27,17 +27,14 @@ public class Reabastecimiento {
     private String estadoReabas;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_SUC", nullable = false)
     private Sucursal idSuc;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PROD", nullable = false)
     private Producto idProd;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PROV", nullable = false)
     private Proveedor idProv;
 

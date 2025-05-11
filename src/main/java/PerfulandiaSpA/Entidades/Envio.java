@@ -19,7 +19,6 @@ public class Envio {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PEDIDO")
     private Pedido idPedido;
 
@@ -46,7 +45,6 @@ public class Envio {
     private Long costoEnvio;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_SUC", nullable = false)
     private Sucursal idSuc;
 

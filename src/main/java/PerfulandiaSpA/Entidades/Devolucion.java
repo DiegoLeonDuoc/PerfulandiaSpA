@@ -16,12 +16,10 @@ public class Devolucion {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PEDIDO", nullable = false)
     private Pedido idPedido;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PROD_PEDIDO", nullable = false)
     private ProductosPedido idProdPedido;
 

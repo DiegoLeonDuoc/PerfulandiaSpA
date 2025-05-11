@@ -30,7 +30,6 @@ public class Descuento {
     private OffsetDateTime fecFinDescuento;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PROD")
     private Producto idProd;
 

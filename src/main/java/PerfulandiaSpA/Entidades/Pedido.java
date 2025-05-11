@@ -18,7 +18,6 @@ public class Pedido {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_SUC", nullable = false)
     private Sucursal idSuc;
 
@@ -44,7 +43,6 @@ public class Pedido {
     private String anotaciones;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "RUT_US", nullable = false)
     private Cliente rutUs;
 

@@ -1,25 +1,23 @@
 package PerfulandiaSpA.Entidades;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
+@Entity
 @Getter
 @Setter
-@Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "CLIENTE")
-public class Cliente {
-    @Id
-    @Column(name = "RUT_US", nullable = false)
-    private Integer id;
+@PrimaryKeyJoinColumn(name = "rut_us")
+public class Cliente extends Usuario{
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
-    @JoinColumn(name = "RUT_US", nullable = false)
-    private Usuario usuario;
+    @Id
+    @Column(name = "rut_us", nullable = false)
+    private int rutUs;
 
     @Column(name = "ESTADO_CUENTA", nullable = false, length = 20)
     private String estadoCuenta;

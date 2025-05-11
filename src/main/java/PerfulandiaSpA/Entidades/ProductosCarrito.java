@@ -16,12 +16,10 @@ public class ProductosCarrito {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PROD", nullable = false)
     private Producto idProd;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_CARR", nullable = false)
     private Carrito idCarr;
 

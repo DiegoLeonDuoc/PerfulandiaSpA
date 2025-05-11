@@ -27,7 +27,6 @@ public class HorarioTrabajo {
     private LocalDate horCierre;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_SUC", nullable = false)
     private Sucursal idSuc;
 

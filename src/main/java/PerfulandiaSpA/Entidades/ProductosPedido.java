@@ -28,17 +28,14 @@ public class ProductosPedido {
     private Long precioTotalProd;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_DESCUENTO")
     private Descuento idDescuento;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PEDIDO", nullable = false)
     private Pedido idPedido;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "ID_PROD", nullable = false)
     private Producto idProd;
 

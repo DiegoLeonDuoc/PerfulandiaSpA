@@ -16,7 +16,6 @@ public class Carrito {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JoinColumn(name = "RUT_US", nullable = false)
     private Cliente rutUs;
 
