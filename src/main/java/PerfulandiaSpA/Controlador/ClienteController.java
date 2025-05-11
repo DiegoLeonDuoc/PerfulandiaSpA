@@ -24,9 +24,9 @@ public class ClienteController {
         return clienteService.getClientesJSON();
     }
 
-    @GetMapping("/{rut}")
-    public String getClienteByRut(@PathVariable int rut){
-        return clienteService.getClienteByRut(rut);
+    @GetMapping("/{id}")
+    public String getClienteByRut(@PathVariable int id){
+        return clienteService.getClienteByRut(id);
     }
 
     @PostMapping
@@ -34,12 +34,21 @@ public class ClienteController {
         return clienteService.saveCliente(cliente);
     }
 
-    @DeleteMapping("/{rut}")
-    public String deleteCliente(@PathVariable int rut){
-        return clienteService.deleteCliente(rut);
+//    @DeleteMapping("/{id}")
+//    public String deleteCliente(@PathVariable int id){
+//        return clienteService.deleteCliente(id);
+//    }
+
+    @DeleteMapping("/{id}")
+    public String deleteUsuario(@PathVariable int id) {
+        if (clienteService.getClienteByRut(id) == null) {
+            return "No se encontro el cliente con el id: " + id;
+        }else{
+            return clienteService.deleteCliente(id);
+        }
     }
 
-    @PutMapping("/{rut}")
-    public String updateCliente(@RequestBody Cliente cliente, @PathVariable int rut) {return clienteService.updateCliente(cliente, rut);}
+    @PutMapping("/{id}")
+    public String updateCliente(@RequestBody Cliente cliente, @PathVariable int id) {return clienteService.updateCliente(cliente, id);}
 
 }

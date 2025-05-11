@@ -13,13 +13,13 @@ import lombok.Setter;
 @Table(name = "SUCURSAL")
 public class Sucursal {
     @Id
-    @Column(name = "ID_SUC", nullable = false)
+    @Column(name = "ID_SUCURSAL", nullable = false)
     private Long id;
 
-    @Column(name = "NOM_SUC", nullable = false, length = 50)
-    private String nomSuc;
+    @Column(name = "NOMBRE_SUCURSAL", nullable = false, length = 50)
+    private String nombreSucursal;
 
-    @Column(name = "DIR_SUC", nullable = false, length = 100)
-    private String dirSuc;
+    @Column(name = "DIRECCION_SUCURSAL", nullable = false, length = 100)
+    private String direccionSucursal;
 
 }

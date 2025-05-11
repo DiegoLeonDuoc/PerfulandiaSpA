@@ -1,26 +1,28 @@
 package PerfulandiaSpA.Entidades;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-@Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 @Table(name = "EMPLEADO")
-@PrimaryKeyJoinColumn(name = "rut_us")
-public class Empleado extends Usuario{
-
+public class Empleado {
     @Id
-    @Column(name = "rut_us", nullable = false)
-    private int rutUs;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_EMPLEADO", nullable = false)
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_suc", nullable = false)
-    private Sucursal sucursal;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "RUT_USUARIO", referencedColumnName = "RUT_USUARIO")
+    private Usuario usuarioAsociado;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    private Sucursal sucursalAsociada;
 
 }

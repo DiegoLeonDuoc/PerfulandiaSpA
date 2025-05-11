@@ -19,11 +19,13 @@ public class Stock {
     private Long cantStock;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_PROD", nullable = false)
-    private Producto idProd;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_PRODUCTO", nullable = false)
+    private Producto idProducto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_SUC", nullable = false)
-    private Sucursal idSuc;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    private Sucursal idSucursal;
 
 }

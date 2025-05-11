@@ -2,6 +2,7 @@ package PerfulandiaSpA.Servicio;
 
 import PerfulandiaSpA.Entidades.Cliente;
 import PerfulandiaSpA.Repositorio.ClienteRepository;
+import PerfulandiaSpA.Repositorio.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,19 +13,28 @@ public class ClienteService {
 
     @Autowired
     ClienteRepository clienteRepository;
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     public String saveCliente(Cliente cliente) {
         clienteRepository.save(cliente);
         return "Cliente agregado con éxito";
     }
 
-    public String deleteCliente(int rut) {
-        clienteRepository.deleteById(rut);
-        return "Cliente eliminado con éxito";
+    public String deleteCliente(int id) {
+        //return String.valueOf(usuarioRepository.existsById(id));
+        for (Cliente cliente : clienteRepository.findAll()) {
+            if (cliente.getId() == id) {
+                clienteRepository.delete(cliente);
+                return "Usuario eliminado con éxito";
+            }
+        }
+        return "Usuario no eliminado";
+
     }
 
-    public String updateCliente(Cliente cliente, int rut) {
-        if (clienteRepository.existsById(rut)) {
+    public String updateCliente(Cliente cliente, int id) {
+        if (clienteRepository.existsById(id)) {
            clienteRepository.save(cliente);
            return "Cliente actualizado con éxito";
         }
@@ -34,7 +44,7 @@ public class ClienteService {
     public String getClientes() {
         String output = "";
         for (Cliente cliente : clienteRepository.findAll()) {
-            output += datosCliente(output, cliente);
+            output = datosCliente(output, cliente);
         }
 
         if (output.isEmpty()) {
@@ -46,30 +56,30 @@ public class ClienteService {
     }
 
     public List<Cliente> getClientesJSON() {
-
         return clienteRepository.findAll();
     }
 
     private String datosCliente(String output, Cliente cliente) {
-        output+="RUT: "+cliente.getRutUs()+"-"+cliente.getDvUs()+"\n";
-        output+="Nombre completo: "+cliente.getNomUs()+" ";
-        if (cliente.getNom2Us() != null) {
-            output+=cliente.getNom2Us()+" ";
+        output += "ID: " + cliente.getId() + "\n";
+        output+="RUT: "+cliente.getUsuarioAsociado().getRutUsuario()+"-"+cliente.getUsuarioAsociado().getDvUsuario()+"\n";
+        output+="Nombre completo: "+cliente.getUsuarioAsociado().getNomUsuario()+" ";
+        if (cliente.getUsuarioAsociado().getNom2Usuario() != null) {
+            output+=cliente.getUsuarioAsociado().getNom2Usuario()+" ";
         }
-        output+=cliente.getApPat();
-        if (cliente.getNom2Us() != null) {
-            output+=" "+cliente.getApMat()+"\n";
+        output+=cliente.getUsuarioAsociado().getApellidoPaterno();
+        if (cliente.getUsuarioAsociado().getApellidoMaterno() != null) {
+            output+=" "+cliente.getUsuarioAsociado().getApellidoMaterno()+"\n";
         } else {
             output+="\n";
         }
-        output+="Sexo: "+cliente.getSexoUs()+"\n";
-        output+="Fecha de nacimiento: "+cliente.getFecNac().toString()+"\n";
-        output+="Dirección: "+cliente.getDirUs()+"\n";
-        output+="Número de teléfono: +569"+cliente.getTel1Us()+"\n";
-        if (cliente.getTel2Us() != null) {
-            output+="Teléfono extra: +569"+cliente.getTel2Us()+"\n";
+        output+="Sexo: "+cliente.getUsuarioAsociado().getSexoUsuario()+"\n";
+        output+="Fecha de nacimiento: "+cliente.getUsuarioAsociado().getFechaNacimiento().toString()+"\n";
+        output+="Dirección: "+cliente.getUsuarioAsociado().getDirUsuario()+"\n";
+        output+="Número de teléfono: +569"+cliente.getUsuarioAsociado().getTelefonoUsuario()+"\n";
+        if (cliente.getUsuarioAsociado().getTel2Usuario() != null) {
+            output+="Teléfono extra: +569"+cliente.getUsuarioAsociado().getTel2Usuario()+"\n";
         }
-        output+="Email: "+cliente.getEmailUs()+"\n";
+        output+="Email: "+cliente.getUsuarioAsociado().getEmailUsuario()+"\n";
         output+="Estado de la cuenta: "+cliente.getEstadoCuenta()+"\n";
         return output;
     }

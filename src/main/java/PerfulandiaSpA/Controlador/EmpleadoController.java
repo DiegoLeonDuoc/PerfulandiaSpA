@@ -24,9 +24,9 @@ public class EmpleadoController {
         return empleadoService.getEmpleadosJSON();
     }
 
-    @GetMapping("/{rut}")
-    public String getEmpleadoByRut(@PathVariable int rut){
-        return empleadoService.getEmpleadoByRut(rut);
+    @GetMapping("/{id}")
+    public String getEmpleadoByRut(@PathVariable int id){
+        return empleadoService.getEmpleadoByRut(id);
     }
 
     @PostMapping
@@ -34,12 +34,12 @@ public class EmpleadoController {
         return empleadoService.saveEmpleado(empleado);
     }
 
-    @DeleteMapping("/{rut}")
-    public String deleteEmpleado(@PathVariable int rut){
-        return empleadoService.deleteEmpleado(rut);
+    @DeleteMapping("/{id}")
+    public String deleteEmpleado(@PathVariable int id){
+        return empleadoService.deleteEmpleado(id);
     }
 
-    @PutMapping("/{rut}")
-    public String updateEmpleado(@RequestBody Empleado empleado, @PathVariable int rut) {return empleadoService.updateEmpleado(empleado, rut);}
+    @PutMapping("/{id}")
+    public String updateEmpleado(@RequestBody Empleado empleado, @PathVariable int id) {return empleadoService.updateEmpleado(empleado, id);}
 
 }

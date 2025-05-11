@@ -1,56 +1,75 @@
 package PerfulandiaSpA.Entidades;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Date;
+import org.hibernate.annotations.ColumnDefault;
 
-@Entity
+import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Setter
+@Entity
 @Table(name = "USUARIO")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
-
     @Id
-    @Column(name = "rut_us")
-    private int rutUs;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_USUARIO", nullable = false)
+    private Long id;
 
-    @Column(name = "dv_us", nullable = false)
-    private String dvUs;
+    @Column(name = "RUT_USUARIO", nullable = false)
+    private Integer rutUsuario;
 
-    @Column(name = "nom_us", nullable = false)
-    private String nomUs;
+    @Column(name = "DV_USUARIO", nullable = false, length = 1)
+    private char dvUsuario;
 
-    @Column(name = "nom2_us")
-    private String nom2Us;
+    @Column(name = "NOM_USUARIO", nullable = false, length = 30)
+    private String nomUsuario;
 
-    @Column(name = "ap_pat", nullable = false)
-    private String apPat;
+    @Column(name = "NOM2_USUARIO", length = 30)
+    private String nom2Usuario;
 
-    @Column(name = "ap_mat")
-    private String apMat;
+    @Column(name = "APELLIDO_PATERNO", nullable = false, length = 30)
+    private String apellidoPaterno;
 
-    @Column(name = "sexo_us", nullable = false)
-    private String sexoUs;
+    @Column(name = "APELLIDO_MATERNO", length = 30)
+    private String apellidoMaterno;
 
-    @Column(name = "dir_us", nullable = false)
-    private String dirUs;
+    @Column(name = "SEXO_USUARIO", nullable = false, length = 1)
+    private char sexoUsuario;
 
-    @Column(name = "fec_nac", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date fecNac;
+    @Column(name = "DIR_USUARIO", nullable = false, length = 100)
+    private String dirUsuario;
 
-    @Column(name = "tel1_us", nullable = false)
-    private Long tel1Us;
+    @Column(name = "FECHA_NACIMIENTO", nullable = false)
+    private LocalDate fechaNacimiento;
 
-    @Column(name = "tel2_us")
-    private Long tel2Us;
+    @Column(name = "TELEFONO_USUARIO", nullable = false)
+    private Integer telefonoUsuario;
 
-    @Column(name = "email_us", nullable = false)
-    private String emailUs;
+    @Column(name = "TEL2_USUARIO")
+    private Integer tel2Usuario;
 
-    @Column(name = "pass_us", nullable = false)
-    private String passUs;
+    @Column(name = "EMAIL_USUARIO", nullable = false, length = 100)
+    private String emailUsuario;
+
+    @Column(name = "PASS_USUARIO", nullable = false, length = 200)
+    private String passUsuario;
+
+    @ColumnDefault("'CLIENTE'")
+    @Column(name = "TIPO_USUARIO", nullable = false, length = 20)
+    private String tipoUsuario;
+
+    @OneToMany(mappedBy = "id")
+    private Set<Cliente> clientes = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "id")
+    private Set<Empleado> empleados = new LinkedHashSet<>();
+
+    @OneToOne(mappedBy = "usuarioAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cliente cliente;
+
+
 }

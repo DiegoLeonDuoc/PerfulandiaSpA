@@ -12,11 +12,13 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "CARRITO")
 public class Carrito {
     @Id
-    @Column(name = "ID_CARR", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID_CARRITO", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "RUT_US", nullable = false)
-    private Cliente rutUs;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_CLIENTE", nullable = false)
+    private Cliente idCliente;
 
 }

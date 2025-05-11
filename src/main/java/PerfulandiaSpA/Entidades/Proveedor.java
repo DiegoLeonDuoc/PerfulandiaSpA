@@ -13,16 +13,16 @@ import lombok.Setter;
 @Table(name = "PROVEEDOR")
 public class Proveedor {
     @Id
-    @Column(name = "ID_PROV", nullable = false)
+    @Column(name = "ID_PROVEEDOR", nullable = false)
     private Long id;
 
-    @Column(name = "NOM_PROV", nullable = false, length = 100)
-    private String nomProv;
+    @Column(name = "NOMBRE_PROVEEDOR", nullable = false, length = 100)
+    private String nombreProveedor;
 
-    @Column(name = "TEL_CONTACTO_PROV", nullable = false)
-    private Integer telContactoProv;
+    @Column(name = "TELEFONO_PROVEEDOR", nullable = false)
+    private Integer telefonoProveedor;
 
-    @Column(name = "EMAIL_PROV", nullable = false, length = 50)
-    private String emailProv;
+    @Column(name = "EMAIL_PROVEEDOR", nullable = false, length = 50)
+    private String emailProveedor;
 
 }

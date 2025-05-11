@@ -14,20 +14,21 @@ import java.time.LocalDate;
 @Table(name = "HORARIO_TRABAJO")
 public class HorarioTrabajo {
     @Id
-    @Column(name = "ID_HOR", nullable = false)
+    @Column(name = "ID_HORARIO", nullable = false)
     private Long id;
 
-    @Column(name = "DIA_SEM", nullable = false)
-    private Boolean diaSem = false;
+    @Column(name = "DIA_SEMANA", nullable = false)
+    private Boolean diaSemana = false;
 
-    @Column(name = "HOR_APERTURA", nullable = false)
-    private LocalDate horApertura;
+    @Column(name = "HORARIO_APERTURA", nullable = false)
+    private LocalDate horarioApertura;
 
-    @Column(name = "HOR_CIERRE", nullable = false)
-    private LocalDate horCierre;
+    @Column(name = "HORARIO_CIERRE", nullable = false)
+    private LocalDate horarioCierre;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_SUC", nullable = false)
-    private Sucursal idSuc;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    private Sucursal idSucursal;
 
 }

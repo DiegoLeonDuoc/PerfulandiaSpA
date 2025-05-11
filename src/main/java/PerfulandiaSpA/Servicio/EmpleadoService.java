@@ -18,13 +18,13 @@ public class EmpleadoService {
         return "Empleado agregado con éxito";
     }
 
-    public String deleteEmpleado(int rut) {
-        empleadoRepository.deleteById(rut);
+    public String deleteEmpleado(int id) {
+        empleadoRepository.deleteById(id);
         return "Empleado eliminado con éxito";
     }
 
-    public String updateEmpleado(Empleado empleado, int rut) {
-        if (empleadoRepository.existsById(rut)) {
+    public String updateEmpleado(Empleado empleado, int id) {
+        if (empleadoRepository.existsById(id)) {
             empleadoRepository.save(empleado);
             return "Empleado actualizado con éxito";
         }
@@ -50,28 +50,28 @@ public class EmpleadoService {
     }
 
     private String datosEmpleado(String output, Empleado empleado) {
-        output+="RUT: "+empleado.getRutUs()+"-"+empleado.getDvUs()+"\n";
-        output+="Nombre completo: "+empleado.getNomUs()+" ";
-        if (empleado.getNom2Us() != null) {
-            output+=empleado.getNom2Us()+" ";
+        output+="RUT: "+empleado.getUsuarioAsociado().getRutUsuario()+"-"+empleado.getUsuarioAsociado().getDvUsuario()+"\n";
+        output+="Nombre completo: "+empleado.getUsuarioAsociado().getNomUsuario()+" ";
+        if (empleado.getUsuarioAsociado().getNom2Usuario() != null) {
+            output+=empleado.getUsuarioAsociado().getNom2Usuario()+" ";
         }
-        output+=empleado.getApPat();
-        if (empleado.getNom2Us() != null) {
-            output+=" "+empleado.getApMat()+"\n";
+        output+=empleado.getUsuarioAsociado().getApellidoPaterno();
+        if (empleado.getUsuarioAsociado().getApellidoMaterno() != null) {
+            output+=" "+empleado.getUsuarioAsociado().getApellidoMaterno()+"\n";
         } else {
             output+="\n";
         }
-        output+="Sexo: "+empleado.getSexoUs()+"\n";
-        output+="Fecha de nacimiento: "+empleado.getFecNac().toString()+"\n";
-        output+="Dirección: "+empleado.getDirUs()+"\n";
-        output+="Número de teléfono: +569"+empleado.getTel1Us()+"\n";
-        if (empleado.getTel2Us() != null) {
-            output+="Teléfono extra: +569"+empleado.getTel2Us()+"\n";
+        output+="Sexo: "+empleado.getUsuarioAsociado().getSexoUsuario()+"\n";
+        output+="Fecha de nacimiento: "+empleado.getUsuarioAsociado().getFechaNacimiento().toString()+"\n";
+        output+="Dirección: "+empleado.getUsuarioAsociado().getDirUsuario()+"\n";
+        output+="Número de teléfono: +569"+empleado.getUsuarioAsociado().getTelefonoUsuario()+"\n";
+        if (empleado.getUsuarioAsociado().getTel2Usuario() != null) {
+            output+="Teléfono extra: +569"+empleado.getUsuarioAsociado().getTel2Usuario()+"\n";
         }
-        output+="Email: "+empleado.getEmailUs()+"\n";
-        output+="ID Sucursal: "+empleado.getSucursal().getId()+"\n";
-        output+="Nombre Sucursal: "+empleado.getSucursal().getNomSuc()+"\n";
-        output+="Dirección Sucursal: "+empleado.getSucursal().getDirSuc()+"\n";
+        output+="Email: "+empleado.getUsuarioAsociado().getEmailUsuario()+"\n";
+        output+="ID Sucursal: "+empleado.getSucursalAsociada().getId()+"\n";
+        output+="Nombre Sucursal: "+empleado.getSucursalAsociada().getNombreSucursal()+"\n";
+        output+="Dirección Sucursal: "+empleado.getSucursalAsociada().getDireccionSucursal()+"\n";
         return output;
     }
 

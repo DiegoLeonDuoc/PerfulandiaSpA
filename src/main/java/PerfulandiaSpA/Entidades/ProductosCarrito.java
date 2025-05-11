@@ -12,16 +12,18 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "PRODUCTOS_CARRITO")
 public class ProductosCarrito {
     @Id
-    @Column(name = "ID_PROD_CARR", nullable = false)
+    @Column(name = "ID_PRODUCTO_CARR", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_PROD", nullable = false)
-    private Producto idProd;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_PRODUCTO", nullable = false)
+    private Producto idProducto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_CARR", nullable = false)
-    private Carrito idCarr;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_CARRITO", nullable = false)
+    private Carrito idCarrito;
 
     @Column(name = "CANT_PROD", nullable = false)
     private Long cantProd;

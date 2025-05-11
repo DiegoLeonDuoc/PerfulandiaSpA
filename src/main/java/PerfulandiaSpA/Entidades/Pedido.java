@@ -18,8 +18,9 @@ public class Pedido {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_SUC", nullable = false)
-    private Sucursal idSuc;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    private Sucursal idSucursal;
 
     @Column(name = "FEC_PEDIDO", nullable = false)
     private LocalDate fecPedido;
@@ -43,7 +44,8 @@ public class Pedido {
     private String anotaciones;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "RUT_US", nullable = false)
-    private Cliente rutUs;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_CLIENTE", nullable = false)
+    private Cliente idCliente;
 
 }

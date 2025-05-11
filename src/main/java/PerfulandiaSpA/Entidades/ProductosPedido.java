@@ -12,7 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "PRODUCTOS_PEDIDO")
 public class ProductosPedido {
     @Id
-    @Column(name = "ID_PROD_PEDIDO", nullable = false)
+    @Column(name = "ID_PRODUCTO_PEDIDO", nullable = false)
     private Long id;
 
     @Column(name = "CANT_PROD", nullable = false)
@@ -28,15 +28,18 @@ public class ProductosPedido {
     private Long precioTotalProd;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_DESCUENTO")
     private Descuento idDescuento;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PEDIDO", nullable = false)
     private Pedido idPedido;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "ID_PROD", nullable = false)
-    private Producto idProd;
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_PRODUCTO", nullable = false)
+    private Producto idProducto;
 
 }
