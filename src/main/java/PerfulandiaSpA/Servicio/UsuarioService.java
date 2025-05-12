@@ -1,6 +1,12 @@
 package PerfulandiaSpA.Servicio;
 
+import PerfulandiaSpA.Entidades.Cliente;
+import PerfulandiaSpA.Entidades.Empleado;
+import PerfulandiaSpA.Entidades.Sucursal;
 import PerfulandiaSpA.Entidades.Usuario;
+import PerfulandiaSpA.Repositorio.ClienteRepository;
+import PerfulandiaSpA.Repositorio.EmpleadoRepository;
+import PerfulandiaSpA.Repositorio.SucursalRepository;
 import PerfulandiaSpA.Repositorio.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +19,31 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
+    @Autowired
+    ClienteRepository clienteRepository;
+
+    @Autowired
+    EmpleadoRepository empleadoRepository;
+
+//    @Autowired
+//    SucursalRepository sucursalRepository;
+
     public String saveUsuario(Usuario usuario) {
         usuarioRepository.save(usuario);
+        if (usuario.getTipoUsuario().equals("CLIENTE")) {
+            Cliente cliente = new Cliente();
+            cliente.setUsuarioAsociado(usuario);
+            cliente.setEstadoCuenta("ACTIVO");
+            clienteRepository.save(cliente);
+        } else if (usuario.getTipoUsuario().equals("EMPLEADO")) {
+            Empleado empleado = new Empleado();
+            Sucursal sucursal = new Sucursal();
+
+            empleado.setUsuarioAsociado(usuario);
+            empleado.setSucursalAsociada(sucursal);
+            empleadoRepository.save(empleado);
+        }
+
         return "Usuario agregado con éxito";
     }
 
@@ -53,7 +82,6 @@ public class UsuarioService {
     }
 
     public List<Usuario> getUsuariosJSON() {
-
         return usuarioRepository.findAll();
     }
 

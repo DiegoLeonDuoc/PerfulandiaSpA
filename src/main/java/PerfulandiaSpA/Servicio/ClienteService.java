@@ -21,26 +21,6 @@ public class ClienteService {
         return "Cliente agregado con éxito";
     }
 
-    public String deleteCliente(int id) {
-        //return String.valueOf(usuarioRepository.existsById(id));
-        for (Cliente cliente : clienteRepository.findAll()) {
-            if (cliente.getId() == id) {
-                clienteRepository.delete(cliente);
-                return "Usuario eliminado con éxito";
-            }
-        }
-        return "Usuario no eliminado";
-
-    }
-
-    public String updateCliente(Cliente cliente, int id) {
-        if (clienteRepository.existsById(id)) {
-           clienteRepository.save(cliente);
-           return "Cliente actualizado con éxito";
-        }
-        return "Cliente no encontrado";
-    }
-
     public String getClientes() {
         String output = "";
         for (Cliente cliente : clienteRepository.findAll()) {
@@ -57,6 +37,37 @@ public class ClienteService {
 
     public List<Cliente> getClientesJSON() {
         return clienteRepository.findAll();
+    }
+
+    public String getClienteByRut(int id) {
+        String output = "";
+        if (clienteRepository.existsById(id)) {
+            Cliente cliente = clienteRepository.findById(id).get();
+            output = datosCliente(output, cliente);
+            return output;
+        }else{
+            return "Cliente no encontrado";
+        }
+    }
+
+    public String updateCliente(Cliente cliente, int id) {
+        if (clienteRepository.existsById(id)) {
+           clienteRepository.save(cliente);
+           return "Cliente actualizado con éxito";
+        }
+        return "Cliente no encontrado";
+    }
+
+    public String deleteCliente(int id) {
+        //return String.valueOf(usuarioRepository.existsById(id));
+        for (Cliente cliente : clienteRepository.findAll()) {
+            if (cliente.getId() == id) {
+                clienteRepository.delete(cliente);
+                return "Usuario eliminado con éxito";
+            }
+        }
+        return "Usuario no eliminado";
+
     }
 
     private String datosCliente(String output, Cliente cliente) {
@@ -83,18 +94,4 @@ public class ClienteService {
         output+="Estado de la cuenta: "+cliente.getEstadoCuenta()+"\n";
         return output;
     }
-
-    public String getClienteByRut(int id) {
-        String output = "";
-        if (clienteRepository.existsById(id)) {
-            Cliente cliente = clienteRepository.findById(id).get();
-            output = datosCliente(output, cliente);
-            return output;
-        }else{
-            return "Cliente no encontrado";
-        }
-    }
-
-
-
 }
