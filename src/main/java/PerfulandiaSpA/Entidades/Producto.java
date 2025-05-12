@@ -4,30 +4,28 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "PRODUCTO")
 public class Producto {
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "ID_PRODUCTO", nullable = false)
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "COD_BARR_PROD", nullable = false)
+    private Long codBarrProd;
 
-    @Column(name = "DESCRIPCION")
-    private String descripcion;
+    @Column(name = "NOM_PROD", nullable = false, length = 50)
+    private String nomProd;
 
-    @Column(name = "PRECIO", nullable = false)
-    private Long precio;
+    @Column(name = "DESCRIP_PROD", length = 200)
+    private String descripProd;
 
-    @Column(name = "STOCK", nullable = false)
-    private Long stock;
+    @Column(name = "PRECIO_PROD", nullable = false)
+    private Long precioProd;
 
 }

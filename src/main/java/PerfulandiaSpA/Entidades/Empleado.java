@@ -9,19 +9,20 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @Setter
 @Entity
-@Table(name = "CLIENTE")
-public class Cliente {
+@Table(name = "EMPLEADO")
+public class Empleado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_CLIENTE", nullable = false)
+    @Column(name = "ID_EMPLEADO", nullable = false)
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "RUT_USUARIO", referencedColumnName = "RUT_USUARIO")
     private Usuario usuarioAsociado;
 
-
-    @Column(name = "ESTADO_CUENTA", nullable = false, length = 20)
-    private String estadoCuenta;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    private Sucursal sucursalAsociada;
 
 }

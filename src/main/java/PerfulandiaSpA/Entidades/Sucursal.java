@@ -4,24 +4,22 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "SUCURSAL")
 public class Sucursal {
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "ID_SUCURSAL", nullable = false)
     private Long id;
 
-    @Column(name = "NOMBRE", nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "NOMBRE_SUCURSAL", nullable = false, length = 50)
+    private String nombreSucursal;
 
-    @Column(name = "DIRECCION", nullable = false)
-    private String direccion;
+    @Column(name = "DIRECCION_SUCURSAL", nullable = false, length = 100)
+    private String direccionSucursal;
 
 }
