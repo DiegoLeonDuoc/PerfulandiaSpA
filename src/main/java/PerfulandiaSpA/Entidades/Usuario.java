@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -17,9 +15,9 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_USUARIO", nullable = false)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "RUT_USUARIO", nullable = false)
+    @Column(name = "RUT", nullable = false)
     private Integer rutUsuario;
 
     @Column(name = "DV_USUARIO", nullable = false, length = 1)
@@ -61,15 +59,6 @@ public class Usuario {
     @ColumnDefault("'CLIENTE'")
     @Column(name = "TIPO_USUARIO", nullable = false, length = 20)
     private String tipoUsuario;
-
-    @OneToMany(mappedBy = "id")
-    private Set<Cliente> clientes = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "id")
-    private Set<Empleado> empleados = new LinkedHashSet<>();
-
-    @OneToOne(mappedBy = "usuarioAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Cliente cliente;
 
 
 }

@@ -17,11 +17,10 @@ public class Cliente {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "RUT_USUARIO", referencedColumnName = "RUT_USUARIO")
+    @JoinColumn(name = "RUT", referencedColumnName = "RUT")
     private Usuario usuarioAsociado;
 
 
     @Column(name = "ESTADO_CUENTA", nullable = false, length = 20)
     private String estadoCuenta;
-
 }

@@ -17,12 +17,11 @@ public class Empleado {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "RUT_USUARIO", referencedColumnName = "RUT_USUARIO")
+    @JoinColumn(name = "RUT", referencedColumnName = "RUT")
     private Usuario usuarioAsociado;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
     private Sucursal sucursalAsociada;
-
 }

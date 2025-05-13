@@ -2,7 +2,6 @@ package PerfulandiaSpA.Servicio;
 
 import PerfulandiaSpA.Entidades.Cliente;
 import PerfulandiaSpA.Entidades.Empleado;
-import PerfulandiaSpA.Entidades.Sucursal;
 import PerfulandiaSpA.Entidades.Usuario;
 import PerfulandiaSpA.Repositorio.ClienteRepository;
 import PerfulandiaSpA.Repositorio.EmpleadoRepository;
@@ -25,8 +24,8 @@ public class UsuarioService {
     @Autowired
     EmpleadoRepository empleadoRepository;
 
-//    @Autowired
-//    SucursalRepository sucursalRepository;
+    @Autowired
+    SucursalRepository sucursalRepository;
 
     public String saveUsuario(Usuario usuario) {
         usuarioRepository.save(usuario);
@@ -37,26 +36,35 @@ public class UsuarioService {
             clienteRepository.save(cliente);
         } else if (usuario.getTipoUsuario().equals("EMPLEADO")) {
             Empleado empleado = new Empleado();
-            Sucursal sucursal = new Sucursal();
-
             empleado.setUsuarioAsociado(usuario);
-            empleado.setSucursalAsociada(sucursal);
+            empleado.setSucursalAsociada(sucursalRepository.getById(1));
             empleadoRepository.save(empleado);
         }
-
         return "Usuario agregado con éxito";
     }
 
     public String deleteUsuario(int id) {
-        //return String.valueOf(usuarioRepository.existsById(id));
         for (Usuario usuario : usuarioRepository.findAll()) {
             if (usuario.getId() == id) {
+                if (usuario.getTipoUsuario().equals("CLIENTE")) {
+                    for (Cliente cliente : clienteRepository.findAll()) {
+                        if (cliente.getUsuarioAsociado().getId() == id) {
+                            clienteRepository.delete(cliente);
+                        }
+                    }
+                }
+                else if (usuario.getTipoUsuario().equals("EMPLEADO")) {
+                    for (Empleado empleado : empleadoRepository.findAll()) {
+                        if (empleado.getUsuarioAsociado().getId() == id) {
+                            empleadoRepository.delete(empleado);
+                        }
+                    }
+                }
                 usuarioRepository.delete(usuario);
                 return "Usuario eliminado con éxito";
             }
         }
         return "Usuario no eliminado";
-
     }
 
     public String updateUsuario(Usuario usuario, int id) {
@@ -106,6 +114,24 @@ public class UsuarioService {
             output += "Teléfono extra: +569" + usuario.getTel2Usuario() + "\n";
         }
         output += "Email: " + usuario.getEmailUsuario() + "\n";
+        if (usuario.getTipoUsuario().equals("CLIENTE")) {
+            for (Cliente cliente : clienteRepository.findAll()) {
+                if (cliente.getUsuarioAsociado().getId() == usuario.getId()) {
+                    output += "Estado de cuenta: " + cliente.getEstadoCuenta() + "\n";
+                    break;
+                }
+            }
+        } else if (usuario.getTipoUsuario().equals("EMPLEADO")) {
+            for (Empleado empleado : empleadoRepository.findAll()) {
+                if (empleado.getUsuarioAsociado().getId() == usuario.getRutUsuario()) {
+                    output += "ID Sucursal: " + empleado.getSucursalAsociada().getId() + "\n";
+                    output += "Nombre Sucursal: " + empleado.getSucursalAsociada().getNombreSucursal() + "\n";
+                    output += "Dirección Sucursal: " + empleado.getSucursalAsociada().getDireccionSucursal() + "\n";
+                    break;
+                }
+            }
+        }
+        output += "\n";
         return output;
     }
 
