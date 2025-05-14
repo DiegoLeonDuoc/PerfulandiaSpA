@@ -3,7 +3,6 @@ package PerfulandiaSpA.Entidades;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -11,13 +10,11 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "USUARIO")
+@DiscriminatorColumn(name="TIPO_USUARIO", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Usuario {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_USUARIO", nullable = false)
-    private Integer id;
-
-    @Column(name = "RUT", nullable = false)
+    @Column(name = "RUT_USUARIO", nullable = false)
     private Integer rutUsuario;
 
     @Column(name = "DV_USUARIO", nullable = false, length = 1)
@@ -56,9 +53,8 @@ public class Usuario {
     @Column(name = "PASS_USUARIO", nullable = false, length = 200)
     private String passUsuario;
 
-    @ColumnDefault("'CLIENTE'")
-    @Column(name = "TIPO_USUARIO", nullable = false, length = 20)
-    private String tipoUsuario;
-
+//    @ColumnDefault("'CLIENTE'")
+//    @Column(name = "TIPO_USUARIO", nullable = false, length = 20)
+//    private String tipoUsuario;
 
 }

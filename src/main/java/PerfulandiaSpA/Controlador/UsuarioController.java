@@ -24,9 +24,9 @@ public class UsuarioController {
         return usuarioService.getUsuariosJSON();
     }
 
-    @GetMapping("/{id}")
-    public String getUsuarioByRut(@PathVariable int id){
-        return usuarioService.getUsuarioByRut(id);
+    @GetMapping("/{rut}")
+    public String getUsuarioByRut(@PathVariable int rut){
+        return usuarioService.getUsuarioByRut(rut);
     }
 
     @PostMapping
@@ -34,21 +34,21 @@ public class UsuarioController {
         return usuarioService.saveUsuario(usuario);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUsuario(@PathVariable int id){
-        return usuarioService.deleteUsuario(id);
+    @DeleteMapping("/{rut}")
+    public String deleteUsuario(@PathVariable int rut){
+        return usuarioService.deleteUsuario(rut);
     }
 
-//    @DeleteMapping("/{id}")
-//    public String deleteUsuario(@PathVariable int id) {
-//        if (usuarioService.getUsuarioByRut(id) == null) {
-//            return "No se encontro el usuario con el id: " + id;
+//    @DeleteMapping("/{rut}")
+//    public String deleteUsuario(@PathVariable int rut) {
+//        if (usuarioService.getUsuarioByRut(rut) == null) {
+//            return "No se encontro el usuario con el rut: " + rut;
 //        }else{
-//            return usuarioService.deleteUsuario(id);
+//            return usuarioService.deleteUsuario(rut);
 //        }
 //    }
 
-    @PutMapping("/{id}")
-    public String updateUsuario(@RequestBody Usuario usuario, @PathVariable int id) {return usuarioService.updateUsuario(usuario, id);}
+    @PutMapping("/{rut}")
+    public String updateUsuario(@RequestBody Usuario usuario, @PathVariable int rut) {return usuarioService.updateUsuario(usuario, rut);}
 
 }
