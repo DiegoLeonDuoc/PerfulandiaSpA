@@ -28,11 +28,11 @@ public class ClienteController {
     public String getClienteByRut(@PathVariable int rut){
         return clienteService.getClienteByRut(rut);
     }
-//
-//    @PostMapping
-//    public String addCliente(@RequestBody Cliente cliente){
-//        return clienteService.saveCliente(cliente);
-//    }
+
+    @PostMapping
+    public String addCliente(@RequestBody Cliente cliente){
+        return clienteService.addCliente(cliente);
+    }
 
     @DeleteMapping("/{rut}")
     public String deleteCliente(@PathVariable int rut){
