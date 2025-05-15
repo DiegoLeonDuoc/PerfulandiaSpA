@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Proveedor {
     @Id
     @Column(name = "ID_PROVEEDOR", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "NOMBRE_PROVEEDOR", nullable = false, length = 100)
     private String nombreProveedor;
