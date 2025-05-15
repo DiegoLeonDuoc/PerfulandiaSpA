@@ -29,7 +29,7 @@ public class HorarioTrabajoService {
 
     // MÉTODO DELETE
     // Elimina un horario de trabajo por su ID
-    public String deleteHorarioTrabajo(Integer id) {
+    public String deleteHorarioTrabajo(int id) {
         if (horarioTrabajoRepository.existsById(id)) {
             horarioTrabajoRepository.deleteById(id);
             return "Horario de trabajo eliminado con éxito";
@@ -39,7 +39,7 @@ public class HorarioTrabajoService {
 
     // MÉTODO UPDATE
     // Actualiza un horario de trabajo si existe su ID
-    public String updateHorarioTrabajo(HorarioTrabajo horario, Integer id) {
+    public String updateHorarioTrabajo(HorarioTrabajo horario, int id) {
         if (horarioTrabajoRepository.existsById(id)) {
             horario.setId(id); // Asegura que el ID coincida
             horarioTrabajoRepository.save(horario); // Realiza el update
@@ -70,7 +70,7 @@ public class HorarioTrabajoService {
     }
 
     // MÉTODO READ (BUSCAR POR ID)
-    public String getHorarioTrabajoById(Integer id) {
+    public String getHorarioTrabajoById(int id) {
         if (horarioTrabajoRepository.existsById(id)) {
             HorarioTrabajo horario = horarioTrabajoRepository.findById(id).get();
             return datosHorario("", horario); // Retorna los datos formateados
