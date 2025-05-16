@@ -7,28 +7,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service // Declara esta clase como un servicio de Spring (componente de lógica de negocio)
+@Service
 public class HorarioTrabajoService {
 
-    // Inyección del repositorio de horarios
+
     @Autowired
     HorarioTrabajoRepository horarioTrabajoRepository;
 
     // Inyección del repositorio de sucursales (necesaria para asociar la sucursal al horario)
     @Autowired
-    SucursalRepository sucursalRepository;
+     SucursalRepository sucursalRepository;
 
     // MÉTODO CREATE
-    // Guarda un nuevo horario de trabajo
+    // Guardar new horario de trabajo
     public String saveHorarioTrabajo(HorarioTrabajo horario) {
-        horarioTrabajoRepository.save(horario); // Guarda el horario
+        horarioTrabajoRepository.save(horario); // Guardao
         return "Horario de trabajo agregado con éxito";
     }
 
     // MÉTODO DELETE
-    // Elimina un horario de trabajo por su ID
+    // Elimina horario de trabajo por ID
     public String deleteHorarioTrabajo(int id) {
         if (horarioTrabajoRepository.existsById(id)) {
             horarioTrabajoRepository.deleteById(id);
@@ -38,22 +37,21 @@ public class HorarioTrabajoService {
     }
 
     // MÉTODO UPDATE
-    // Actualiza un horario de trabajo si existe su ID
-    public String updateHorarioTrabajo(HorarioTrabajo horario, int id) {
+    // Actualizar horario de trabajo por ID
+    public String updateHorarioTrabajo(HorarioTrabajo horario, int id) { 
         if (horarioTrabajoRepository.existsById(id)) {
-            horario.setId(id); // Asegura que el ID coincida
-            horarioTrabajoRepository.save(horario); // Realiza el update
+            horario.setId(id); //posiciona en bd antes de la actualizacion
+            horarioTrabajoRepository.save(horario);
             return "Horario de trabajo actualizado con éxito";
         }
         return "Horario de trabajo no encontrado";
     }
 
-    // MÉTODO READ (LISTAR TODOS)
-    // Devuelve todos los horarios de trabajo como texto formateado
+    // MÉTODO READ (LISTAR TODOS en ToString)
     public String getHorariosTrabajo() {
         String output = "";
         for (HorarioTrabajo horario : horarioTrabajoRepository.findAll()) {
-            output = datosHorario(output, horario); // Formatea los datos
+            output = datosHorario(output, horario); // Formateo d datos
         }
 
         if (output.isEmpty()) {
@@ -64,7 +62,7 @@ public class HorarioTrabajoService {
     }
 
     // MÉTODO READ (LISTAR TODOS EN JSON)
-    // Ideal para controladores REST (retorna lista cruda)
+    // Ideal para REST (retorna lista cruda/paraOcupar)
     public List<HorarioTrabajo> getHorariosTrabajoJSON() {
         return horarioTrabajoRepository.findAll();
     }
@@ -78,7 +76,7 @@ public class HorarioTrabajoService {
         return "Horario de trabajo no encontrado";
     }
 
-    // MÉTODO AUXILIAR PARA FORMATEO DE SALIDA
+    // MÉTODO toString/formateo de datos
     private String datosHorario(String output, HorarioTrabajo horario) {
         output += "ID Horario: " + horario.getId() + "\n";
         output += "Día semana: " + (horario.getDiaSemana() ? "Sí" : "No") + "\n";
