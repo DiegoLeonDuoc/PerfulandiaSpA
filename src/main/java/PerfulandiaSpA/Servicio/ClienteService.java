@@ -6,84 +6,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
+
 @Service
 public class ClienteService {
+
     @Autowired
     ClienteRepository clienteRepository;
-
-    public String deleteCliente(int rut) {
-        for (Cliente cliente : clienteRepository.findAll()) {
-            if (cliente.getRutUsuario() == rut) {
-                clienteRepository.delete(cliente);
-                return "Cliente eliminado con éxito";
-            }
+    // C
+    public String crearCliente(Cliente cliente) {
+        if (clienteRepository.existsById(cliente.getRutUsuario())) {
+            return "Ya existe un usuario con ese rut";
+        } else {
+            cliente.setTipoUsuario("CLIENTE");
+            cliente.setEstadoCuenta("ACTIVO");
+            String password = new BCryptPasswordEncoder(10).encode(cliente.getPassUsuario());
+            cliente.setPassUsuario(password);
+            clienteRepository.save(cliente);
+            return "Cliente agregado con éxito";
         }
-        return "Cliente no eliminado";
     }
-
-    public String addCliente(Cliente cliente) {
-            if (clienteRepository.findById(cliente.getRutUsuario()) != null) {
-                return "Cliente ya existe";
-            } else {
-                clienteRepository.save(cliente);
-                return "Cliente actualizado con éxito";
-            }
-    }
-
-
-    // Cambiar cliente por usuario en casi todos los campos
-    public String updateCliente(Cliente cliente, int id) {
-        if (clienteRepository.existsById(id)) {
-            Cliente newCliente = new Cliente();
-            if (cliente.getEstadoCuenta() != null) {
-                newCliente.setEstadoCuenta(cliente.getEstadoCuenta());
-            }
-            if (cliente.getNomUsuario() != null) {
-                newCliente.setNomUsuario(cliente.getNomUsuario());
-            }
-            if (cliente.getNom2Usuario() != null) {
-                newCliente.setNom2Usuario(cliente.getNom2Usuario());
-            }
-            if (cliente.getApellidoPaterno() != null) {
-                newCliente.setApellidoPaterno(cliente.getApellidoPaterno());
-            }
-            if (cliente.getApellidoMaterno() != null) {
-                newCliente.setApellidoMaterno(cliente.getApellidoMaterno());
-            }
-            if (cliente.getSexoUsuario() == 'M' || cliente.getSexoUsuario() == 'F') {
-                newCliente.setSexoUsuario(cliente.getSexoUsuario());
-            }
-            if (cliente.getFechaNacimiento() != null) {
-                newCliente.setFechaNacimiento(cliente.getFechaNacimiento());
-            }
-            if (cliente.getTelefonoUsuario() != null) {
-                newCliente.setTelefonoUsuario(cliente.getTelefonoUsuario());
-            }
-            if (cliente.getTel2Usuario() != null) {
-                newCliente.setTel2Usuario(cliente.getTel2Usuario());
-            }
-            if (cliente.getEmailUsuario() != null) {
-                newCliente.setEmailUsuario(cliente.getEmailUsuario());
-            }
-            if (cliente.getPassUsuario() != null) {
-                String newPass = new BCryptPasswordEncoder(31).encode(cliente.getPassUsuario());
-                newCliente.setPassUsuario(newPass);
-            }
-            clienteRepository.save(newCliente);
-            return "Cliente actualizado con éxito";
-        }
-        return "Cliente no encontrado";
-    }
-
+    // R
     public String getClientes() {
         String output = "";
         for (Cliente cliente : clienteRepository.findAll()) {
-//            output = datosCliente(output, cliente);
-            output += cliente.toString() + "\n";
+            output = datosCliente(output, cliente);
         }
-
         if (output.isEmpty()) {
-            //return clienteRepository.findAll().toString();
             return "No hay clientes registrados";
         } else {
             return output;
@@ -94,12 +43,125 @@ public class ClienteService {
         String output = "";
         if (clienteRepository.existsById(id)) {
             Cliente cliente = clienteRepository.findById(id).get();
-            //output = datosUsuario(output, usuario);
-            output += cliente.getEstadoCuenta();
+            output = datosCliente(output, cliente);
             return output;
         }else{
-            return "Usuario no encontrado";
+            return "Cliente no encontrado";
         }
     }
 
+    public List<Cliente> getClientesJSON() {
+        return clienteRepository.findAll();
+    }
+
+    // U
+
+    public String updateCliente(Cliente cliente, int rut) {
+        if (clienteRepository.existsById(rut)) {
+            Cliente clienteUpdate = clienteRepository.findById(rut).get();
+            clienteUpdate.setRutUsuario(cliente.getRutUsuario());
+            clienteUpdate.setDvUsuario(cliente.getDvUsuario());
+            clienteUpdate.setNomUsuario(cliente.getNomUsuario());
+            clienteUpdate.setNom2Usuario(cliente.getNom2Usuario());
+            clienteUpdate.setApellidoPaterno(cliente.getApellidoPaterno());
+            clienteUpdate.setApellidoMaterno(cliente.getApellidoMaterno());
+            clienteUpdate.setSexoUsuario(cliente.getSexoUsuario());
+            clienteUpdate.setDirUsuario(cliente.getDirUsuario());
+            clienteUpdate.setFechaNacimiento(cliente.getFechaNacimiento());
+            clienteUpdate.setTelefonoUsuario(cliente.getTelefonoUsuario());
+            clienteUpdate.setTel2Usuario(cliente.getTel2Usuario());
+            clienteUpdate.setEmailUsuario(cliente.getEmailUsuario());
+            clienteUpdate.setEstadoCuenta(cliente.getEstadoCuenta());
+            String newPass = new BCryptPasswordEncoder(10).encode(cliente.getPassUsuario());
+            clienteUpdate.setPassUsuario(newPass);
+            clienteRepository.save(clienteUpdate);
+            return "Cliente actualizado con éxito";
+        } else {
+            return "Cliente no encontrado";
+        }
+    }
+
+    // U/P
+    public String parcharCliente(Cliente cliente, int rut) {
+        if (clienteRepository.existsById(rut)) {
+            Cliente clienteParchado = clienteRepository.findById(rut).get();
+            if (cliente.getEstadoCuenta() != null) {
+                clienteParchado.setEstadoCuenta(cliente.getEstadoCuenta());
+            }
+            if (cliente.getNomUsuario() != null) {
+                clienteParchado.setNomUsuario(cliente.getNomUsuario());
+            }
+            if (cliente.getNom2Usuario() != null) {
+                clienteParchado.setNom2Usuario(cliente.getNom2Usuario());
+            }
+            if (cliente.getApellidoPaterno() != null) {
+                clienteParchado.setApellidoPaterno(cliente.getApellidoPaterno());
+            }
+            if (cliente.getApellidoMaterno() != null) {
+                clienteParchado.setApellidoMaterno(cliente.getApellidoMaterno());
+            }
+            if (cliente.getSexoUsuario() == 'M' || cliente.getSexoUsuario() == 'F') {
+                clienteParchado.setSexoUsuario(cliente.getSexoUsuario());
+            }
+            if (cliente.getFechaNacimiento() != null) {
+                clienteParchado.setFechaNacimiento(cliente.getFechaNacimiento());
+            }
+            if (cliente.getTelefonoUsuario() != null) {
+                clienteParchado.setTelefonoUsuario(cliente.getTelefonoUsuario());
+            }
+            if (cliente.getTel2Usuario() != null) {
+                clienteParchado.setTel2Usuario(cliente.getTel2Usuario());
+            }
+            if (cliente.getEmailUsuario() != null) {
+                clienteParchado.setEmailUsuario(cliente.getEmailUsuario());
+            }
+            if (cliente.getPassUsuario() != null) {
+                String newPass = new BCryptPasswordEncoder(10).encode(cliente.getPassUsuario());
+                clienteParchado.setPassUsuario(newPass);
+            }
+            clienteRepository.save(clienteParchado);
+            return "Cliente actualizado con éxito";
+        }
+        return "Cliente no encontrado";
+    }
+
+    // D
+
+    public String deleteCliente(int rut) {
+        for (Cliente cliente : clienteRepository.findAll()) {
+            if (cliente.getRutUsuario() == rut) {
+                clienteRepository.delete(cliente);
+                return "Cliente eliminado con éxito";
+            }
+        }
+        return "Cliente no existente";
+    }
+
+    // Funciones no CRUD
+
+    private String datosCliente(String output, Cliente cliente) {
+        output += "ID: " + cliente.getRutUsuario() + "\n";
+        output += "RUT: " + cliente.getRutUsuario() + "-" + cliente.getDvUsuario() + "\n";
+        output += "Nombre completo: " + cliente.getNomUsuario() + " ";
+        if (cliente.getNom2Usuario() != null) {
+            output += cliente.getNom2Usuario() + " ";
+        }
+        output += cliente.getApellidoPaterno();
+        if (cliente.getNom2Usuario() != null) {
+            output += " " + cliente.getApellidoMaterno() + "\n";
+        } else {
+            output += "\n";
+        }
+        output += "Sexo: " + cliente.getSexoUsuario() + "\n";
+        output += "Fecha de nacimiento: " + cliente.getFechaNacimiento().toString() + "\n";
+        output += "Dirección: " + cliente.getDirUsuario() + "\n";
+        output += "Número de teléfono: +56" + cliente.getTelefonoUsuario() + "\n";
+        if (cliente.getTel2Usuario() != null) {
+            output += "Teléfono extra: +56" + cliente.getTel2Usuario() + "\n";
+        }
+        output += "Email: " + cliente.getEmailUsuario() + "\n";
+        output += "Estado de cuenta: " + cliente.getEstadoCuenta() + "\n";
+        output += "\n";
+        return output;
+    }
 }

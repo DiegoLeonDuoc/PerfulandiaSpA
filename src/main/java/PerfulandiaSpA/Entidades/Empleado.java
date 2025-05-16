@@ -14,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @PrimaryKeyJoinColumn(name = "RUT_USUARIO")
 public class Empleado extends Usuario{
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
     private Sucursal sucursalAsociada;
