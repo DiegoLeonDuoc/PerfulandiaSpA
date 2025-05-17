@@ -15,8 +15,17 @@ public class ProveedorService {
 
     // MÉTODO CREATE
     public String saveProveedor(Proveedor proveedor) {
-        proveedorRepository.save(proveedor);
-        return "Proveedor agregado con éxito";
+        if (proveedor.getId() == null) {
+            proveedorRepository.save(proveedor);
+            return "Proveedor agregado con éxito";
+        } else {
+            if (proveedorRepository.existsById(proveedor.getId())){
+                return "Proveedor ya existe";
+            } else {
+                proveedorRepository.save(proveedor);
+                return "Proveedor agregado con éxito";
+            }
+        }
     }
 
     // MÉTODO DELETE

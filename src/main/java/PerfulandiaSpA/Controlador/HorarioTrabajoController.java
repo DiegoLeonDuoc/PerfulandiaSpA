@@ -45,7 +45,7 @@ public class HorarioTrabajoController {
         return horarioTrabajoService.getHorarioTrabajoById(id);
     }
 
-    @PutMapping("/sucursal/{id_sucursal}")
+    @PutMapping("/{id}")
     public String updateHorarioTrabajo(){
         return "Debe indicar la sucursal del empleado en el endpoint, para ello diríjase a:\n/HorarioTrabajo/sucursal/{id_sucursal}\nEj: /HorarioTrabajo/sucursal/1";
     }

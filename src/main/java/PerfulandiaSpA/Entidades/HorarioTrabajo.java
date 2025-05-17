@@ -1,13 +1,11 @@
 package PerfulandiaSpA.Entidades;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
 
