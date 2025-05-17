@@ -16,7 +16,7 @@ public class UsuarioController {
     UsuarioService usuarioService;
 
     @PostMapping
-    public String addUsuario(@RequestBody Usuario usuario){
+    public String addUsuario(){
         //return usuarioService.crearUsuario(usuario);
         return "No puede crear un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles: /clientes\n/empleados\n/administrador";
     }
@@ -37,13 +37,13 @@ public class UsuarioController {
     }
 
     @PutMapping("/{rut}")
-    public String updateUsuario(@RequestBody Usuario usuario, @PathVariable int rut) {
+    public String updateUsuario() {
         // return usuarioService.updateUsuario(usuario, rut);
         return "No puede actualizar un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
     }
 
     @PatchMapping("/{rut}")
-    public String parcharUsuario(@RequestBody Usuario usuario, @PathVariable int rut) {
+    public String parcharUsuario() {
         // return usuarioService.parcharUsuario(usuario, rut);
         return "No puede actualizar un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
     }
