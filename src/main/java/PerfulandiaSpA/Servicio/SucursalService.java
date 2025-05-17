@@ -14,8 +14,18 @@ public class SucursalService {
     SucursalRepository sucursalRepository;
     
     public String saveSucursal(Sucursal sucursal) {
-        sucursalRepository.save(sucursal);
-        return "Sucursal agregada con éxito";
+        if (sucursal.getId() == null) {
+            sucursalRepository.save(sucursal);
+            return "Sucursal agregada con éxito";
+        } else {
+            if (sucursalRepository.existsById(sucursal.getId())){
+                return "El Sucursal ya existe";
+            } else {
+                sucursalRepository.save(sucursal);
+                return "Sucursal agregada con éxito";
+            }
+        }
+
     }
 
     public String getSucursales() {
@@ -43,7 +53,7 @@ public class SucursalService {
             output = datosSucursal(output, sucursal);
             return output;
         }else{
-            return "Sucursal no encontrado";
+            return "Sucursal no encontrada";
         }
     }
 
@@ -52,7 +62,7 @@ public class SucursalService {
             sucursalRepository.save(sucursal);
             return "Sucursal actualizado con éxito";
         }
-        return "Sucursal no encontrado";
+        return "Sucursal no encontrada";
     }
 
     public String deleteSucursal(int id) {
