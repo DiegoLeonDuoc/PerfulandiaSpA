@@ -6,6 +6,7 @@ import PerfulandiaSpA.Repositorio.SucursalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,9 +22,14 @@ public class HorarioTrabajoService {
 
     // MÉTODO CREATE
     // Guardar new horario de trabajo
-    public String saveHorarioTrabajo(HorarioTrabajo horario) {
-        horarioTrabajoRepository.save(horario); // Guardao
-        return "Horario de trabajo agregado con éxito";
+    public String saveHorarioTrabajo(HorarioTrabajo horario, int id_sucursal) {
+        if (sucursalRepository.existsById(id_sucursal)){
+            horario.setSucursal(sucursalRepository.findById(id_sucursal).get());
+            horarioTrabajoRepository.save(horario); // Guardao
+            return "Horario de trabajo agregado con éxito";
+        } else {
+            return "La sucursal no existe";
+        }
     }
 
     // MÉTODO DELETE
@@ -38,9 +44,9 @@ public class HorarioTrabajoService {
 
     // MÉTODO UPDATE
     // Actualizar horario de trabajo por ID
-    public String updateHorarioTrabajo(HorarioTrabajo horario, int id) { 
-        if (horarioTrabajoRepository.existsById(id)) {
-            horario.setId(id); //posiciona en bd antes de la actualizacion
+    public String updateHorarioTrabajo(HorarioTrabajo horario, int id_sucursal) {
+        if (horarioTrabajoRepository.existsById(horario.getId())) {
+            horario.setSucursal(sucursalRepository.getReferenceById(id_sucursal)); //posiciona en bd antes de la actualizacion
             horarioTrabajoRepository.save(horario);
             return "Horario de trabajo actualizado con éxito";
         }
@@ -78,13 +84,18 @@ public class HorarioTrabajoService {
 
     // MÉTODO toString/formateo de datos
     private String datosHorario(String output, HorarioTrabajo horario) {
+        int minutoApertura = horario.getHorarioApertura().getMinute();
+        String minutoAperturaFormateado = String.format("%02d", minutoApertura);
+        int minutoCierre = horario.getHorarioCierre().getMinute();
+        String minutoCierreFormateado = String.format("%02d", minutoCierre);
+
         output += "ID Horario: " + horario.getId() + "\n";
-        output += "Día semana: " + (horario.getDiaSemana() ? "Sí" : "No") + "\n";
+        output += "Día semana: " + HorarioTrabajo.diasSemana.get(horario.getDiaSemana()) + "\n";
         output += "Hora apertura: " + horario.getHorarioApertura() + "\n";
         output += "Hora cierre: " + horario.getHorarioCierre() + "\n";
-        output += "ID Sucursal: " + horario.getIdSucursal().getId() + "\n";
-        output += "Nombre Sucursal: " + horario.getIdSucursal().getNombreSucursal() + "\n";
-        output += "Dirección Sucursal: " + horario.getIdSucursal().getDireccionSucursal() + "\n";
+        output += "ID Sucursal: " + horario.getSucursal().getId() + "\n";
+        output += "Nombre Sucursal: " + horario.getSucursal().getNombreSucursal() + "\n";
+        output += "Dirección Sucursal: " + horario.getSucursal().getDireccionSucursal() + "\n";
         output += "\n";
         return output;
     }

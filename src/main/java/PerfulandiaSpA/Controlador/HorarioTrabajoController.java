@@ -16,16 +16,15 @@ public class HorarioTrabajoController {
 
     //CRUD
 
-    //Crear horario
-    @PostMapping
-    public String addHorarioTrabajo(@RequestBody HorarioTrabajo horarioTrabajo){
-        return horarioTrabajoService.saveHorarioTrabajo(horarioTrabajo);
+    @PostMapping()
+    public String addHorarioTrabajo(@RequestBody HorarioTrabajo horarioTrabajo) {
+        return "Debe indicar la sucursal del empleado en el endpoint, para ello diríjase a:\n/HorarioTrabajo/sucursal/{id_sucursal}\nEj: /HorarioTrabajo/sucursal/1";
     }
 
-    //deletear horario
-    @DeleteMapping("/{id}")
-    public String deleteHorarioTrabajo(@PathVariable int id){
-        return horarioTrabajoService.deleteHorarioTrabajo(id);
+    //Crear horario
+    @PostMapping("/sucursal/{id_sucursal}")
+    public String addHorarioTrabajo(@RequestBody HorarioTrabajo horarioTrabajo, @PathVariable int id_sucursal) {
+        return horarioTrabajoService.saveHorarioTrabajo(horarioTrabajo, id_sucursal);
     }
 
     //Obtener en formato ToString
@@ -46,10 +45,25 @@ public class HorarioTrabajoController {
         return horarioTrabajoService.getHorarioTrabajoById(id);
     }
 
-    //Update
-    @PutMapping("/{id}")
-    public String updateHorarioTrabajo(@RequestBody HorarioTrabajo horarioTrabajo, @PathVariable int id){
-        return horarioTrabajoService.updateHorarioTrabajo(horarioTrabajo, id);
+    @PutMapping("/sucursal/{id_sucursal}")
+    public String updateHorarioTrabajo(){
+        return "Debe indicar la sucursal del empleado en el endpoint, para ello diríjase a:\n/HorarioTrabajo/sucursal/{id_sucursal}\nEj: /HorarioTrabajo/sucursal/1";
     }
+
+    //Update
+    @PutMapping("/sucursal/{id_sucursal}")
+    public String updateHorarioTrabajoSucursal(@RequestBody HorarioTrabajo horarioTrabajo, @PathVariable int id_sucursal){
+        return horarioTrabajoService.updateHorarioTrabajo(horarioTrabajo, id_sucursal);
+    }
+
+    //deletear horario
+    @DeleteMapping("/{id}")
+    public String deleteHorarioTrabajo(@PathVariable int id){
+        return horarioTrabajoService.deleteHorarioTrabajo(id);
+    }
+
+
+
+
 
 }
