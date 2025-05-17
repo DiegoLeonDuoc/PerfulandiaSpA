@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class HorarioTrabajo {
     @Id
     @Column(name = "ID_HORARIO", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "DIA_SEMANA", nullable = false)
     private Boolean diaSemana = false;
