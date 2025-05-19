@@ -39,10 +39,10 @@ public class ClienteService {
         }
     }
 
-    public String getClienteByRut(int id) {
+    public String getClienteByRut(Integer rut) {
         String output = "";
-        if (clienteRepository.existsById(id)) {
-            Cliente cliente = clienteRepository.findById(id).get();
+        if (clienteRepository.existsById(rut)) {
+            Cliente cliente = clienteRepository.findById(rut).get();
             output = datosCliente(output, cliente);
             return output;
         }else{
@@ -56,7 +56,7 @@ public class ClienteService {
 
     // U
 
-    public String updateCliente(Cliente cliente, int rut) {
+    public String updateCliente(Cliente cliente, Integer rut) {
         if (clienteRepository.existsById(rut)) {
             Cliente clienteUpdate = clienteRepository.findById(rut).get();
             clienteUpdate.setRutUsuario(cliente.getRutUsuario());
@@ -82,7 +82,7 @@ public class ClienteService {
     }
 
     // U/P
-    public String parcharCliente(Cliente cliente, int rut) {
+    public String parcharCliente(Cliente cliente, Integer rut) {
         if (clienteRepository.existsById(rut)) {
             Cliente clienteParchado = clienteRepository.findById(rut).get();
             if (cliente.getEstadoCuenta() != null) {

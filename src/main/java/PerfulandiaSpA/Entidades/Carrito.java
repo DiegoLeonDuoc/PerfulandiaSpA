@@ -14,11 +14,11 @@ public class Carrito {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_CARRITO", nullable = false)
-    private Long id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_CLIENTE", nullable = false)
-    private Cliente idCliente;
+    @JoinColumn(name = "RUT_USUARIO", nullable = false)
+    private Cliente cliente;
 
 }

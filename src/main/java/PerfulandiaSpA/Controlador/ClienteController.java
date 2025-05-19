@@ -25,7 +25,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{rut}")
-    public String getClienteByRut(@PathVariable int rut){
+        public String getClienteByRut(@PathVariable Integer rut){
         return clienteService.getClienteByRut(rut);
     }
 
@@ -33,10 +33,10 @@ public class ClienteController {
     public List<Cliente> getClientesJSON() { return clienteService.getClientesJSON(); }
 
     @PutMapping("/{rut}")
-    public String updateCliente(@RequestBody Cliente cliente, @PathVariable int rut) { return clienteService.updateCliente(cliente, rut); }
+    public String updateCliente(@RequestBody Cliente cliente, @PathVariable Integer rut) { return clienteService.updateCliente(cliente, rut); }
 
     @PatchMapping("/{rut}")
-    public String parcharCliente(@RequestBody Cliente cliente, @PathVariable int rut) { return clienteService.parcharCliente(cliente, rut); }
+    public String parcharCliente(@RequestBody Cliente cliente, @PathVariable Integer rut) { return clienteService.parcharCliente(cliente, rut); }
 
     @DeleteMapping("/{rut}")
     public String deleteCliente(@PathVariable int rut){
