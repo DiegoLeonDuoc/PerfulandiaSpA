@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Controlador;
 
+import PerfulandiaSpA.Entidades.Cliente;
 import PerfulandiaSpA.Entidades.Usuario;
 import PerfulandiaSpA.Servicio.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,20 @@ public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
 
+    @PostMapping
+    public String addUsuario(){
+        //return usuarioService.crearUsuario(usuario);
+        return "No puede crear un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles: /clientes\n/empleados\n/administrador";
+    }
+
     @GetMapping
     public String getUsuarios(){
         return usuarioService.getUsuarios();
+    }
+
+    @GetMapping("/{rut}")
+    public String getUsuarioByRut(@PathVariable int rut){
+        return usuarioService.getUsuarioByRut(rut);
     }
 
     @GetMapping("/json")
@@ -24,31 +36,21 @@ public class UsuarioController {
         return usuarioService.getUsuariosJSON();
     }
 
-    @GetMapping("/{id}")
-    public String getUsuarioByRut(@PathVariable int id){
-        return usuarioService.getUsuarioByRut(id);
+    @PutMapping("/{rut}")
+    public String updateUsuario() {
+        // return usuarioService.updateUsuario(usuario, rut);
+        return "No puede actualizar un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
     }
 
-    @PostMapping
-    public String addUsuario(@RequestBody Usuario usuario){
-        return usuarioService.saveUsuario(usuario);
+    @PatchMapping("/{rut}")
+    public String parcharUsuario() {
+        // return usuarioService.parcharUsuario(usuario, rut);
+        return "No puede actualizar un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUsuario(@PathVariable int id){
-        return usuarioService.deleteUsuario(id);
+    @DeleteMapping("/{rut}")
+    public String deleteUsuario(@PathVariable int rut){
+        return usuarioService.deleteUsuario(rut);
     }
-
-//    @DeleteMapping("/{id}")
-//    public String deleteUsuario(@PathVariable int id) {
-//        if (usuarioService.getUsuarioByRut(id) == null) {
-//            return "No se encontro el usuario con el id: " + id;
-//        }else{
-//            return usuarioService.deleteUsuario(id);
-//        }
-//    }
-
-    @PutMapping("/{id}")
-    public String updateUsuario(@RequestBody Usuario usuario, @PathVariable int id) {return usuarioService.updateUsuario(usuario, id);}
 
 }

@@ -10,17 +10,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Setter
 @Entity
 @Table(name = "EMPLEADO")
-public class Empleado {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_EMPLEADO", nullable = false)
-    private Long id;
+@DiscriminatorValue("EMPLEADO")
+@PrimaryKeyJoinColumn(name = "RUT_USUARIO")
+public class Empleado extends Usuario{
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "RUT", referencedColumnName = "RUT")
-    private Usuario usuarioAsociado;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, cascade = CascadeType.ALL)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
     private Sucursal sucursalAsociada;

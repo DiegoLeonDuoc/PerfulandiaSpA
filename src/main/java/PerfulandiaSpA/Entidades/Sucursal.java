@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Sucursal {
     @Id
     @Column(name = "ID_SUCURSAL", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "NOMBRE_SUCURSAL", nullable = false, length = 50)
     private String nombreSucursal;

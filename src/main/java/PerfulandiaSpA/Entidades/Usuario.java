@@ -11,13 +11,11 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "USUARIO")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "TIPO_USUARIO", discriminatorType = DiscriminatorType.STRING)
 public class Usuario {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID_USUARIO", nullable = false)
-    private Integer id;
-
-    @Column(name = "RUT", nullable = false)
+    @Column(name = "RUT_USUARIO", nullable = false)
     private Integer rutUsuario;
 
     @Column(name = "DV_USUARIO", nullable = false, length = 1)
@@ -57,8 +55,7 @@ public class Usuario {
     private String passUsuario;
 
     @ColumnDefault("'CLIENTE'")
-    @Column(name = "TIPO_USUARIO", nullable = false, length = 20)
+    @Column(name = "TIPO_USUARIO", nullable = false, length = 20, updatable = false, insertable = false)
     private String tipoUsuario;
-
 
 }
