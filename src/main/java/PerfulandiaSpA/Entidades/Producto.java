@@ -14,10 +14,10 @@ import lombok.Setter;
 public class Producto {
     @Id
     @Column(name = "ID_PRODUCTO", nullable = false)
-    private Long id;
+    private Integer id;
 
     @Column(name = "COD_BARR_PROD", nullable = false)
-    private Long codBarrProd;
+    private Integer codBarrProd;
 
     @Column(name = "NOM_PROD", nullable = false, length = 50)
     private String nomProd;
@@ -26,6 +26,6 @@ public class Producto {
     private String descripProd;
 
     @Column(name = "PRECIO_PROD", nullable = false)
-    private Long precioProd;
+    private Integer precioProd;
 
 }

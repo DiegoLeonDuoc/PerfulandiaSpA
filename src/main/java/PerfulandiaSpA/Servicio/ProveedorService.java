@@ -28,25 +28,6 @@ public class ProveedorService {
         }
     }
 
-    // MÉTODO DELETE
-    public String deleteProveedor(int id) {
-        if (proveedorRepository.existsById(id)) {
-            proveedorRepository.deleteById(id);
-            return "Proveedor eliminado con éxito";
-        }
-        return "Proveedor no encontrado";
-    }
-
-    // MÉTODO UPDATE
-    public String updateProveedor(Proveedor proveedor, int id) {
-        if (proveedorRepository.existsById(id)) {
-            proveedor.setId(id);
-            proveedorRepository.save(proveedor);
-            return "Proveedor actualizado con éxito";
-        }
-        return "Proveedor no encontrado";
-    }
-
     // MÉTODO READ (LISTAR TODOS)
     // Retorna una lista de proveedores en formato toString
     public String getProveedores() {
@@ -61,7 +42,6 @@ public class ProveedorService {
             return output; // retorna lista completa
         }
     }
-
     // MÉTODO READ (LISTAR TODOS EN FORMATO JSON)
     public List<Proveedor> getProveedoresJSON() {
         return proveedorRepository.findAll();
@@ -72,6 +52,25 @@ public class ProveedorService {
         if (proveedorRepository.existsById(id)) {
             Proveedor proveedor = proveedorRepository.findById(id).get();
             return datosProveedor("", proveedor);
+        }
+        return "Proveedor no encontrado";
+    }
+
+    // MÉTODO UPDATE
+    public String updateProveedor(Proveedor proveedor, int id) {
+        if (proveedorRepository.existsById(id)) {
+            proveedor.setId(id);
+            proveedorRepository.save(proveedor);
+            return "Proveedor actualizado con éxito";
+        }
+        return "Proveedor no encontrado";
+    }
+
+    // MÉTODO DELETE
+    public String deleteProveedor(int id) {
+        if (proveedorRepository.existsById(id)) {
+            proveedorRepository.deleteById(id);
+            return "Proveedor eliminado con éxito";
         }
         return "Proveedor no encontrado";
     }
