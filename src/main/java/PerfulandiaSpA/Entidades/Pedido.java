@@ -15,12 +15,12 @@ import java.time.LocalDate;
 public class Pedido {
     @Id
     @Column(name = "ID_PEDIDO", nullable = false)
-    private Long id;
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal idSucursal;
+    private Sucursal sucursal;
 
     @Column(name = "FEC_PEDIDO", nullable = false)
     private LocalDate fecPedido;
@@ -43,9 +43,9 @@ public class Pedido {
     @Column(name = "ANOTACIONES", length = 75)
     private String anotaciones;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_CLIENTE", nullable = false)
-    private Cliente idCliente;
+    @JoinColumn(name = "RUT_USUARIO", nullable = false)
+    private Cliente cliente;
 
 }
