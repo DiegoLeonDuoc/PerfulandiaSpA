@@ -17,8 +17,8 @@ public class Proveedor {
     @Column(name = "NOMBRE_PROVEEDOR", nullable = false, length = 100)
     private String nombreProveedor;
 
-    @Column(name = "TELEFONO_PROVEEDOR", nullable = false)
-    private Integer telefonoProveedor;
+    @Column(name = "TELEFONO_PROVEEDOR", nullable = false, length = 9)
+    private String telefonoProveedor;
 
     @Column(name = "EMAIL_PROVEEDOR", nullable = false, length = 50)
     private String emailProveedor;

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class Pedido {
     @Id
     @Column(name = "ID_PEDIDO", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
@@ -26,7 +27,7 @@ public class Pedido {
     private LocalDate fecPedido;
 
     @Column(name = "PRECIO_PEDIDO", nullable = false)
-    private Long precioPedido;
+    private Integer precioPedido;
 
     @Column(name = "METODO_PAGO", nullable = false, length = 50)
     private String metodoPago;
@@ -38,7 +39,7 @@ public class Pedido {
     private String dirFacturacion;
 
     @Column(name = "COSTO_ENVIO")
-    private Long costoEnvio;
+    private Integer costoEnvio;
 
     @Column(name = "ANOTACIONES", length = 75)
     private String anotaciones;
