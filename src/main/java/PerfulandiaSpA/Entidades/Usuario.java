@@ -42,11 +42,11 @@ public class Usuario {
     @Column(name = "FECHA_NACIMIENTO", nullable = false)
     private LocalDate fechaNacimiento;
 
-    @Column(name = "TELEFONO_USUARIO", nullable = false)
-    private Integer telefonoUsuario;
+    @Column(name = "TELEFONO_USUARIO", nullable = false, length = 9)
+    private String telefonoUsuario;
 
-    @Column(name = "TEL2_USUARIO")
-    private Integer tel2Usuario;
+    @Column(name = "TEL2_USUARIO", length = 9)
+    private String tel2Usuario;
 
     @Column(name = "EMAIL_USUARIO", nullable = false, length = 100)
     private String emailUsuario;
