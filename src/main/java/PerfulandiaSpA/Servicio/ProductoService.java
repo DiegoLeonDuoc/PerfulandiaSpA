@@ -57,10 +57,11 @@ public class ProductoService {
     }
 
     // MÉTODO READ (BUSCAR POR codigo de barra)
-    public String getProductoByCodigoBarra(int codigoBarra) {
-        if (productoRepository.existsById(codigoBarra)) {
-            Producto producto = productoRepository.findById(codigoBarra).get();
-            return datosProducto("", producto);
+    public String getProductoByCodigoBarra(long codigoBarra) {
+        for (Producto producto : productoRepository.findAll()) {
+            if (producto.getCodBarrProd() == codigoBarra) {
+                return datosProducto("", producto);
+            }
         }
         return "Producto no encontrado";
     }

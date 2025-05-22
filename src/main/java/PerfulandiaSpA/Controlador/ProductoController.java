@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Producto")
+@RequestMapping("/productos")
 public class ProductoController {
 
     @Autowired
@@ -25,20 +25,20 @@ public class ProductoController {
 
     //read
     @GetMapping("/json")
-    public List<Producto> getHorariosTrabajoJSON(){
+    public List<Producto> getProductosJSON(){
         return ProductoService.getProductosJSON();
     }
 
     //read
-    @GetMapping("/{id}")
-    public String getProductoById(@PathVariable int id){
-        return ProductoService.getProductoById(id);
-    }
+//    @GetMapping("/{id}")
+//    public String getProductoById(@PathVariable int id){
+//        return ProductoService.getProductoById(id);
+//    }
 
     //read
     @GetMapping("/{codBarrProd}")
-    public String getProductoByCodBarr(@PathVariable int codBarrProd){
-        return ProductoService.getProductoById(codBarrProd);
+    public String getProductoByCodBarr(@PathVariable Long codBarrProd){
+        return ProductoService.getProductoByCodigoBarra(codBarrProd);
     }
 
     //Update
@@ -52,7 +52,7 @@ public class ProductoController {
     public String deleteProducto(@PathVariable int id){
         return ProductoService.deleteProducto(id);
     }
-    
+
     //Obtener en formato ToString
     @GetMapping
     public String listarProductoes(){

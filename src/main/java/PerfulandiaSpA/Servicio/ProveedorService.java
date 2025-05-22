@@ -28,30 +28,11 @@ public class ProveedorService {
         }
     }
 
-    // MÉTODO READ (LISTAR TODOS)
-    // Retorna una lista de proveedores en formato toString
-    public String getProveedores() {
-        String output = "";
-        for (Proveedor proveedor : proveedorRepository.findAll()) {
-            output = datosProveedor(output, proveedor); // Acumulando datos de cada proveedor
-        }
-
-        if (output.isEmpty()) {
-            return "No hay proveedores registrados";
-        } else {
-            return output; // retorna lista completa
-        }
-    }
-    // MÉTODO READ (LISTAR TODOS EN FORMATO JSON)
-    public List<Proveedor> getProveedoresJSON() {
-        return proveedorRepository.findAll();
-    }
-
-    // MÉTODO READ (BUSCAR POR ID)
-    public String getProveedorById(int id) {
+    // MÉTODO DELETE
+    public String deleteProveedor(int id) {
         if (proveedorRepository.existsById(id)) {
-            Proveedor proveedor = proveedorRepository.findById(id).get();
-            return datosProveedor("", proveedor);
+            proveedorRepository.deleteById(id);
+            return "Proveedor eliminado con éxito";
         }
         return "Proveedor no encontrado";
     }
@@ -66,11 +47,31 @@ public class ProveedorService {
         return "Proveedor no encontrado";
     }
 
-    // MÉTODO DELETE
-    public String deleteProveedor(int id) {
+    // MÉTODO READ (LISTAR TODOS)
+    // Retorna una lista de proveedores en formato toString
+    public String getProveedores() {
+        String output = "";
+        for (Proveedor proveedor : proveedorRepository.findAll()) {
+            output = datosProveedor(output, proveedor); // Acumulando datos de cada proveedor
+        }
+
+        if (output.isEmpty()) {
+            return "No hay proveedores registrados";
+        } else {
+            return output; // retorna lista completa
+        }
+    }
+
+    // MÉTODO READ (LISTAR TODOS EN FORMATO JSON)
+    public List<Proveedor> getProveedoresJSON() {
+        return proveedorRepository.findAll();
+    }
+
+    // MÉTODO READ (BUSCAR POR ID)
+    public String getProveedorById(int id) {
         if (proveedorRepository.existsById(id)) {
-            proveedorRepository.deleteById(id);
-            return "Proveedor eliminado con éxito";
+            Proveedor proveedor = proveedorRepository.findById(id).get();
+            return datosProveedor("", proveedor);
         }
         return "Proveedor no encontrado";
     }

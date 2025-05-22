@@ -17,15 +17,15 @@ public class Envio {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "ID_ENVIO", nullable = false)
-  private Long id;
+  private Integer id;
 
   @Column(name = "CODIGO_ENVIO", nullable = false)
   private Long codigoEnvio;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @OnDelete(action = OnDeleteAction.CASCADE)
-  @JoinColumn(name = "ID_PEDIDO")
-  private Pedido idPedido;
+  @JoinColumn(name = "ID_PEDIDO", nullable = false)
+  private Pedido pedidoAsociado;
 
   @Column(name = "FECHA_ENVIO", nullable = false)
   private LocalDate fechaEnvio;
@@ -43,21 +43,7 @@ public class Envio {
   private Long numSeguimiento;
 
   @ColumnDefault("'STANDARD'")
-  @Column(name = "METODO_ENVIO", length = 20)
+  @Column(name = "METODO_ENVIO", length = 20, nullable = false)
   private String metodoEnvio;
-
-  @Column(name = "COSTO_ENVIO", nullable = false)
-  private Long costoEnvio;
-
-  @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-  private Sucursal idSucursal;
-
-  @Column(name = "DIRECCION_ENVIO", nullable = false, length = 200)
-  private String direccionEnvio;
-
-  @Column(name = "ANOTACIONES", nullable = false, length = 75)
-  private String anotaciones;
 
 }

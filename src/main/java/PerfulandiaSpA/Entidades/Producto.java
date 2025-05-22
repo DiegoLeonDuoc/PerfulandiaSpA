@@ -1,9 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,10 +11,11 @@ import lombok.Setter;
 public class Producto {
     @Id
     @Column(name = "ID_PRODUCTO", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "COD_BARR_PROD", nullable = false)
-    private Integer codBarrProd;
+    private Long codBarrProd;
 
     @Column(name = "NOM_PROD", nullable = false, length = 50)
     private String nomProd;
@@ -26,6 +24,6 @@ public class Producto {
     private String descripProd;
 
     @Column(name = "PRECIO_PROD", nullable = false)
-    private Integer precioProd;
+    private Long precioProd;
 
 }

@@ -15,18 +15,19 @@ import java.time.LocalDate;
 public class Pedido {
     @Id
     @Column(name = "ID_PEDIDO", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal idSucursal;
+    private Sucursal sucursal;
 
     @Column(name = "FEC_PEDIDO", nullable = false)
     private LocalDate fecPedido;
 
     @Column(name = "PRECIO_PEDIDO", nullable = false)
-    private Long precioPedido;
+    private Integer precioPedido;
 
     @Column(name = "METODO_PAGO", nullable = false, length = 50)
     private String metodoPago;
@@ -38,14 +39,14 @@ public class Pedido {
     private String dirFacturacion;
 
     @Column(name = "COSTO_ENVIO")
-    private Long costoEnvio;
+    private Integer costoEnvio;
 
     @Column(name = "ANOTACIONES", length = 75)
     private String anotaciones;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_CLIENTE", nullable = false)
-    private Cliente idCliente;
+    @JoinColumn(name = "RUT_USUARIO", nullable = false)
+    private Cliente cliente;
 
 }

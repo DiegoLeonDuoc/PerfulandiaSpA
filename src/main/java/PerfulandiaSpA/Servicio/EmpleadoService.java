@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Servicio;
 
+import PerfulandiaSpA.DTO.EmpleadoDTO;
 import PerfulandiaSpA.Entidades.Empleado;
 import PerfulandiaSpA.Entidades.Sucursal;
 import PerfulandiaSpA.Repositorio.EmpleadoRepository;
@@ -20,24 +21,33 @@ public class EmpleadoService {
     SucursalRepository sucursalRepository;
 
     // C
-    public String crearEmpleado(Empleado empleado, int id_sucursal) {
+    public String crearEmpleado(EmpleadoDTO empleado) {
         if (empleadoRepository.existsById(empleado.getRutUsuario())) {
             return "Ya existe un usuario con ese rut";
-        } else {
-            if (sucursalRepository.existsById(id_sucursal)) {
-                empleado.setTipoUsuario("EMPLEADO");
-                String password = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
-                empleado.setPassUsuario(password);
-                Sucursal sucursal = sucursalRepository.findById(id_sucursal).get();
-                empleado.setSucursalAsociada(sucursal);
-                empleadoRepository.save(empleado);
-                return "Empleado agregado con éxito";
-            } else {
-                return "La sucursal no existe";
-            }
-
         }
+        if (!sucursalRepository.existsById(empleado.getIdSucursal())) {
+            return "La sucursal no existe";
+        }
+        Empleado newEmpleado = new Empleado();
+        newEmpleado.setRutUsuario(empleado.getRutUsuario());
+        newEmpleado.setDvUsuario(empleado.getDvUsuario());
+        newEmpleado.setNomUsuario(empleado.getNomUsuario());
+        newEmpleado.setNom2Usuario(empleado.getNom2Usuario());
+        newEmpleado.setApellidoPaterno(empleado.getApellidoPaterno());
+        newEmpleado.setApellidoMaterno(empleado.getApellidoMaterno());
+        newEmpleado.setSexoUsuario(empleado.getSexoUsuario());
+        newEmpleado.setDirUsuario(empleado.getDirUsuario());
+        newEmpleado.setFechaNacimiento(empleado.getFechaNacimiento());
+        newEmpleado.setTelefonoUsuario(empleado.getTelefonoUsuario());
+        newEmpleado.setTel2Usuario(empleado.getTel2Usuario());
+        newEmpleado.setEmailUsuario(empleado.getEmailUsuario());
+        newEmpleado.setTipoUsuario("EMPLEADO");
+        newEmpleado.setPassUsuario(new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario()));
+        newEmpleado.setSucursalAsociada(sucursalRepository.findById(empleado.getIdSucursal()).get());
+        empleadoRepository.save(newEmpleado);
+        return "Empleado agregado con éxito";
     }
+
     // R
     public String getEmpleados() {
         String output = "";
@@ -92,11 +102,9 @@ public class EmpleadoService {
 
     // U
 
-    public String updateEmpleado(Empleado empleado, int rut) {
+    public String updateEmpleado(EmpleadoDTO empleado, int rut) {
         if (empleadoRepository.existsById(rut)) {
             Empleado empleadoUpdate = empleadoRepository.findById(rut).get();
-            empleadoUpdate.setRutUsuario(empleado.getRutUsuario());
-            empleadoUpdate.setDvUsuario(empleado.getDvUsuario());
             empleadoUpdate.setNomUsuario(empleado.getNomUsuario());
             empleadoUpdate.setNom2Usuario(empleado.getNom2Usuario());
             empleadoUpdate.setApellidoPaterno(empleado.getApellidoPaterno());
@@ -107,6 +115,7 @@ public class EmpleadoService {
             empleadoUpdate.setTelefonoUsuario(empleado.getTelefonoUsuario());
             empleadoUpdate.setTel2Usuario(empleado.getTel2Usuario());
             empleadoUpdate.setEmailUsuario(empleado.getEmailUsuario());
+            empleadoUpdate.setSucursalAsociada(sucursalRepository.findById(empleado.getIdSucursal()).get());
             String newPass = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
             empleadoUpdate.setPassUsuario(newPass);
             empleadoRepository.save(empleadoUpdate);
@@ -116,24 +125,8 @@ public class EmpleadoService {
         }
     }
 
-    public String cambiarSucursalEmpleado(Empleado empleado, int id_sucursal) {
-        if (empleadoRepository.existsById(empleado.getRutUsuario())) {
-            if (sucursalRepository.existsById(id_sucursal)) {
-                empleado = empleadoRepository.findById(empleado.getRutUsuario()).get();
-                Sucursal sucursal = sucursalRepository.findById(id_sucursal).get();
-                empleado.setSucursalAsociada(sucursal);
-                empleadoRepository.save(empleado);
-                return "Sucursal del empleado actualizada con éxito";
-            } else {
-                return "Sucursal no existente";
-            }
-        } else {
-            return "Empleado no existente";
-        }
-    }
-
     // U/P
-    public String parcharEmpleado(Empleado empleado, int rut) {
+    public String parcharEmpleado(EmpleadoDTO empleado, int rut) {
         if (empleadoRepository.existsById(rut)) {
             Empleado empleadoParchado = empleadoRepository.findById(rut).get();
             if (empleado.getNomUsuario() != null) {
@@ -151,6 +144,9 @@ public class EmpleadoService {
             if (empleado.getSexoUsuario() == 'M' || empleado.getSexoUsuario() == 'F') {
                 empleadoParchado.setSexoUsuario(empleado.getSexoUsuario());
             }
+            if (empleado.getDirUsuario() != null) {
+                empleadoParchado.setDirUsuario(empleado.getDirUsuario());
+            }
             if (empleado.getFechaNacimiento() != null) {
                 empleadoParchado.setFechaNacimiento(empleado.getFechaNacimiento());
             }
@@ -166,6 +162,10 @@ public class EmpleadoService {
             if (empleado.getPassUsuario() != null) {
                 String newPass = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
                 empleadoParchado.setPassUsuario(newPass);
+            }
+            if (empleado.getIdSucursal() != null) {
+                Sucursal newSucursal = sucursalRepository.findById(empleado.getIdSucursal()).get();
+                empleadoParchado.setSucursalAsociada(newSucursal);
             }
             empleadoRepository.save(empleadoParchado);
             return "Empleado actualizado con éxito";

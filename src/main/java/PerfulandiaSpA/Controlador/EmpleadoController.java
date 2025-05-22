@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Controlador;
 
+import PerfulandiaSpA.DTO.EmpleadoDTO;
 import PerfulandiaSpA.Entidades.Empleado;
 import PerfulandiaSpA.Servicio.EmpleadoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,8 @@ public class EmpleadoController {
     EmpleadoService empleadoService;
 
     @PostMapping
-    public String addEmpleado(){
-        return "Debe indicar la sucursal del empleado en el endpoint, para ello diríjase a:\n/empleados/sucursal/{id_sucursal}\nEj: /empleados/sucursal/1";
-    }
-
-    @PostMapping("/sucursal/{id_sucursal}")
-    public String crearEmpleadoEnSucursal(@RequestBody Empleado empleado, @PathVariable int id_sucursal){
-        return empleadoService.crearEmpleado(empleado, id_sucursal);
+    public String crearEmpleado(@RequestBody EmpleadoDTO empleado){
+        return empleadoService.crearEmpleado(empleado);
     }
 
     @GetMapping
@@ -48,13 +44,10 @@ public class EmpleadoController {
     }
 
     @PutMapping("/{rut}")
-    public String updateEmpleado(@RequestBody Empleado empleado, @PathVariable int rut) { return empleadoService.updateEmpleado(empleado, rut); }
-
-    @PatchMapping("/sucursal/{id_sucursal}")
-    public String cambiarSucursalEmpleado(@RequestBody Empleado empleado, @PathVariable int id_sucursal) { return empleadoService.cambiarSucursalEmpleado(empleado, id_sucursal); }
+    public String updateEmpleado(@RequestBody EmpleadoDTO empleado, @PathVariable int rut) { return empleadoService.updateEmpleado(empleado, rut); }
 
     @PatchMapping("/{rut}")
-    public String parcharEmpleado(@RequestBody Empleado empleado, @PathVariable int rut) { return empleadoService.parcharEmpleado(empleado, rut); }
+    public String parcharEmpleado(@RequestBody EmpleadoDTO empleado, @PathVariable int rut) { return empleadoService.parcharEmpleado(empleado, rut); }
 
     @DeleteMapping("/{rut}")
     public String deleteEmpleado(@PathVariable int rut){
