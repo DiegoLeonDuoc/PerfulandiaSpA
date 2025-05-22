@@ -30,16 +30,16 @@ public class Reabastecimiento {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal idSucursal;
+    private Sucursal sucursal;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO", nullable = false)
-    private Producto idProducto;
+    private Producto producto;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PROVEEDOR", nullable = false)
-    private Proveedor idProveedor;
+    private Proveedor proveedor;
 
 }

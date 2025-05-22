@@ -81,9 +81,9 @@ public class ReabastecimientoService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String fecha = r.getFechaReabas() != null ? r.getFechaReabas().format(formatter) : "No definida";
 
-        Integer idProducto = r.getIdProducto() != null ? r.getIdProducto().getId() : null;
-        Integer idSucursal = r.getIdSucursal() != null ? r.getIdSucursal().getId() : null;
-        Integer idProveedor = r.getIdProveedor() != null ? r.getIdProveedor().getId() : null;
+        Integer idProducto = r.getProducto() != null ? r.getProducto().getId() : null;
+        Integer idSucursal = r.getSucursal() != null ? r.getSucursal().getId() : null;
+        Integer idProveedor = r.getProveedor() != null ? r.getProveedor().getId() : null;
 
         output += "ID Reabastecimiento: " + r.getId() + "\n";
         output += "Cantidad: " + r.getCantProductos() + "\n";

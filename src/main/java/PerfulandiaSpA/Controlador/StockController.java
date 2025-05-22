@@ -46,7 +46,7 @@ public class StockController {
         return stockService.updateStock(Stock, id);
     }
 
-    //deletear horario
+    //deletear stock
     @DeleteMapping("/{id}")
     public String deleteStock(@PathVariable int id) {
         return stockService.deleteStock(id);

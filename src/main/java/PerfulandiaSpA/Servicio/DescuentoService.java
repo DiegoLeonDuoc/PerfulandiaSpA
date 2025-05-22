@@ -78,10 +78,10 @@ public class DescuentoService {
 
     // Formatear texto
     private String datosDescuento(String output, Descuento d) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm, dd-MM-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String fecIni = d.getFecIniDescuento() != null ? d.getFecIniDescuento().format(formatter) : "No definida";
         String fecFin = d.getFecFinDescuento() != null ? d.getFecFinDescuento().format(formatter) : "No definida";
-        Integer idProducto = d.getIdProducto() != null ? d.getIdProducto().getId() : null;
+        Integer idProducto = d.getProducto() != null ? d.getProducto().getId() : null;
 
         output += "ID Descuento: " + d.getId() + "\n";
         output += "Tipo: " + d.getTipoDescuento() + "\n";

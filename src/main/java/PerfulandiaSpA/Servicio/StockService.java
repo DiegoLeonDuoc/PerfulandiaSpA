@@ -62,8 +62,8 @@ public class StockService {
     // MÉTODO toString
     private String datosStock(String output, Stock stock) {
         // Si getIdProducto() y getIdSucursal() devuelven entidades:
-        Integer idProducto = stock.getIdProducto() != null ? stock.getIdProducto().getId() : null;
-        Integer idSucursal = stock.getIdSucursal() != null ? stock.getIdSucursal().getId() : null;
+        Integer idProducto = stock.getProducto() != null ? stock.getProducto().getId() : null;
+        Integer idSucursal = stock.getSucursal() != null ? stock.getSucursal().getId() : null;
 
         output += "ID Stock: " + stock.getId() + "\n";
         output += "Cantidad en Stock: " + stock.getCantStock() + "\n";

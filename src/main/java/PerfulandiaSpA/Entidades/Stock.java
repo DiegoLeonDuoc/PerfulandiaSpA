@@ -23,11 +23,11 @@ public class Stock {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO", nullable = false)
-    private Producto idProducto;
+    private Producto producto;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal idSucursal;
+    private Sucursal sucursal;
 
 }

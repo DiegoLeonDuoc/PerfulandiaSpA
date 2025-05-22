@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Sucursal")
+@RequestMapping("/sucursal")
 public class SucursalController {
 
     @Autowired
