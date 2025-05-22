@@ -5,6 +5,7 @@ import PerfulandiaSpA.Repositorio.DescuentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -77,12 +78,18 @@ public class DescuentoService {
 
     // Formatear texto
     private String datosDescuento(String output, Descuento d) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm, dd-MM-yyyy");
+        String fecIni = d.getFecIniDescuento() != null ? d.getFecIniDescuento().format(formatter) : "No definida";
+        String fecFin = d.getFecFinDescuento() != null ? d.getFecFinDescuento().format(formatter) : "No definida";
+        Integer idProducto = d.getIdProducto() != null ? d.getIdProducto().getId() : null;
+
         output += "ID Descuento: " + d.getId() + "\n";
         output += "Tipo: " + d.getTipoDescuento() + "\n";
         output += "Valor: " + d.getValorDescuento() + "\n";
-        output += "Fecha de inicio: " + d.getFecIniDescuento() + "\n";
-        output += "Fecha de fin: " + (d.getFecFinDescuento() != null ? d.getFecFinDescuento() : "No definida") + "\n";
-        output += "ID Producto: " + (d.getIdProducto() != null ? d.getIdProducto() : "No asignado") + "\n\n";
+        output += "Fecha de inicio: " + fecIni + "\n";
+        output += "Fecha de fin: " + fecFin + "\n";
+        output += "ID Producto: " + (idProducto != null ? idProducto : "No asignado") + "\n\n";
         return output;
     }
+
 }
