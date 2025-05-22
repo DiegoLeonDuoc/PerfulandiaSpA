@@ -87,12 +87,13 @@ public class ProductoService {
 
     // MÉTODO toString
     private String datosProducto(String output, Producto producto) {
-        output += "ID Producto: " + producto.getId() + "\n";
-        output += "Nombre: " + producto.getNomProd() + "\n";
-        output += "Codigo de barra: " + producto.getCodBarrProd() + "\n";
-        output += "Precio: " + producto.getPrecioProd() + "\n";
-        output += "Descripcion: " + producto.getDescripProd() + "\n";
+        output += "ID Producto: " + (producto.getId() != null ? producto.getId() : "No asignado") + "\n";
+        output += "Nombre: " + (producto.getNomProd() != null ? producto.getNomProd() : "Sin nombre") + "\n";
+        output += "Código de barra: " + (producto.getCodBarrProd() != null ? producto.getCodBarrProd() : "No asignado") + "\n";
+        output += "Precio: " + (producto.getPrecioProd() != null ? producto.getPrecioProd() : "No asignado") + "\n";
+        output += "Descripción: " + (producto.getDescripProd() != null ? producto.getDescripProd() : "Sin descripción") + "\n";
         output += "\n";
         return output;
     }
+
 }

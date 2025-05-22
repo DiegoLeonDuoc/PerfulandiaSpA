@@ -3,6 +3,7 @@ package PerfulandiaSpA.Entidades;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -13,19 +14,20 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Stock {
     @Id
     @Column(name = "ID_STOCK", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "CANT_STOCK", nullable = false)
-    private Long cantStock;
+    private Integer cantStock;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO", nullable = false)
-    private Producto idProducto;
+    private Producto producto;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal idSucursal;
+    private Sucursal sucursal;
 
 }

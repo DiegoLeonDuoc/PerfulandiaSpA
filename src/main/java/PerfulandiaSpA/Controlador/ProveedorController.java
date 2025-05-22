@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Proveedor")
+@RequestMapping("/proveedor")
 public class ProveedorController {
 
     @Autowired
@@ -30,7 +30,7 @@ public class ProveedorController {
 
     //obtener en json
     @GetMapping("/json")
-    public List<Proveedor> getHorariosTrabajoJSON(){
+    public List<Proveedor> getProveedorJSON(){
         return proveedorService.getProveedoresJSON();
     }
 
@@ -42,7 +42,7 @@ public class ProveedorController {
 
     //Update
     @PutMapping("/{id}")
-    public String updateProveedorSucursal(@RequestBody Proveedor Proveedor, @PathVariable int id){
+    public String updateProveedor(@RequestBody Proveedor Proveedor, @PathVariable int id){
         return proveedorService.updateProveedor(Proveedor, id);
     }
 

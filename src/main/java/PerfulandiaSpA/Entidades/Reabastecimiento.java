@@ -15,10 +15,11 @@ import java.time.LocalDate;
 public class Reabastecimiento {
     @Id
     @Column(name = "ID_REABAS", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "CANT_PRODUCTOS", nullable = false)
-    private Long cantProductos;
+    private Integer cantProductos;
 
     @Column(name = "FECHA_REABAS", nullable = false)
     private LocalDate fechaReabas;
@@ -26,19 +27,19 @@ public class Reabastecimiento {
     @Column(name = "ESTADO_REABAS", nullable = false, length = 10)
     private String estadoReabas;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal idSucursal;
+    private Sucursal sucursal;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO", nullable = false)
-    private Producto idProducto;
+    private Producto producto;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PROVEEDOR", nullable = false)
-    private Proveedor idProveedor;
+    private Proveedor proveedor;
 
 }

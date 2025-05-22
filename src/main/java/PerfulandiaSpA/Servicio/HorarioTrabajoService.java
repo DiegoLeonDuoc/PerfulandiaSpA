@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -84,19 +85,31 @@ public class HorarioTrabajoService {
 
     // MÉTODO toString/formateo de datos
     private String datosHorario(String output, HorarioTrabajo horario) {
-        int minutoApertura = horario.getHorarioApertura().getMinute();
-        String minutoAperturaFormateado = String.format("%02d", minutoApertura);
-        int minutoCierre = horario.getHorarioCierre().getMinute();
-        String minutoCierreFormateado = String.format("%02d", minutoCierre);
+        // Formateador para hora legible (HH:mm)
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        String horaApertura = horario.getHorarioApertura() != null
+                ? horario.getHorarioApertura().format(timeFormatter)
+                : "No definida";
+        String horaCierre = horario.getHorarioCierre() != null
+                ? horario.getHorarioCierre().format(timeFormatter)
+                : "No definida";
+        String diaSemana = HorarioTrabajo.diasSemana != null && HorarioTrabajo.diasSemana.get(horario.getDiaSemana()) != null
+                ? HorarioTrabajo.diasSemana.get(horario.getDiaSemana())
+                : "No definido";
+        Integer idSucursal = horario.getSucursal() != null ? horario.getSucursal().getId() : null;
+        String nombreSucursal = horario.getSucursal() != null ? horario.getSucursal().getNombreSucursal() : "No asignada";
+        String direccionSucursal = horario.getSucursal() != null ? horario.getSucursal().getDireccionSucursal() : "No asignada";
 
         output += "ID Horario: " + horario.getId() + "\n";
-        output += "Día semana: " + HorarioTrabajo.diasSemana.get(horario.getDiaSemana()) + "\n";
-        output += "Hora apertura: " + horario.getHorarioApertura() + "\n";
-        output += "Hora cierre: " + horario.getHorarioCierre() + "\n";
-        output += "ID Sucursal: " + horario.getSucursal().getId() + "\n";
-        output += "Nombre Sucursal: " + horario.getSucursal().getNombreSucursal() + "\n";
-        output += "Dirección Sucursal: " + horario.getSucursal().getDireccionSucursal() + "\n";
+        output += "Día semana: " + diaSemana + "\n";
+        output += "Hora apertura: " + horaApertura + "\n";
+        output += "Hora cierre: " + horaCierre + "\n";
+        output += "ID Sucursal: " + (idSucursal != null ? idSucursal : "No asignada") + "\n";
+        output += "Nombre Sucursal: " + nombreSucursal + "\n";
+        output += "Dirección Sucursal: " + direccionSucursal + "\n";
         output += "\n";
         return output;
     }
+
 }

@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -15,23 +15,24 @@ import java.time.OffsetDateTime;
 public class Descuento {
     @Id
     @Column(name = "ID_DESCUENTO", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "TIPO_DESCUENTO", nullable = false, length = 10)
     private String tipoDescuento;
 
     @Column(name = "VALOR_DESCUENTO", nullable = false)
-    private Long valorDescuento;
+    private Integer valorDescuento;
 
     @Column(name = "FEC_INI_DESCUENTO", nullable = false)
-    private OffsetDateTime fecIniDescuento;
+    private LocalDate fecIniDescuento;
 
     @Column(name = "FEC_FIN_DESCUENTO")
-    private OffsetDateTime fecFinDescuento;
+    private LocalDate fecFinDescuento;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO")
-    private Producto idProducto;
+    private Producto producto;
 
 }
