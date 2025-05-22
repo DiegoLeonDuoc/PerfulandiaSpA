@@ -78,11 +78,12 @@ public class ProveedorService {
 
     // MÉTODO toString
     private String datosProveedor(String output, Proveedor proveedor) {
-        output += "ID Proveedor: " + proveedor.getId() + "\n";
-        output += "Nombre: " + proveedor.getNombreProveedor() + "\n";
-        output += "Teléfono: +569" + proveedor.getTelefonoProveedor() + "\n";
-        output += "Email: " + proveedor.getEmailProveedor() + "\n";
+        output += "ID Proveedor: " + (proveedor.getId() != null ? proveedor.getId() : "No asignado") + "\n";
+        output += "Nombre: " + (proveedor.getNombreProveedor() != null ? proveedor.getNombreProveedor() : "Sin nombre") + "\n";
+        output += "Teléfono: " + (proveedor.getTelefonoProveedor() != null ? "+569" + proveedor.getTelefonoProveedor() : "No asignado") + "\n";
+        output += "Email: " + (proveedor.getEmailProveedor() != null ? proveedor.getEmailProveedor() : "No asignado") + "\n";
         output += "\n";
         return output;
     }
+
 }
