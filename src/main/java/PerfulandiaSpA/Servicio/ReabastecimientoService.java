@@ -5,6 +5,7 @@ import PerfulandiaSpA.Repositorio.ReabastecimientoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -77,14 +78,22 @@ public class ReabastecimientoService {
 
     // Formatear texto
     private String datosReabastecimiento(String output, Reabastecimiento r) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String fecha = r.getFechaReabas() != null ? r.getFechaReabas().format(formatter) : "No definida";
+
+        Integer idProducto = r.getIdProducto() != null ? r.getIdProducto().getId() : null;
+        Integer idSucursal = r.getIdSucursal() != null ? r.getIdSucursal().getId() : null;
+        Integer idProveedor = r.getIdProveedor() != null ? r.getIdProveedor().getId() : null;
+
         output += "ID Reabastecimiento: " + r.getId() + "\n";
         output += "Cantidad: " + r.getCantProductos() + "\n";
-        output += "Fecha: " + r.getFechaReabas() + "\n";
+        output += "Fecha: " + fecha + "\n";
         output += "Estado: " + r.getEstadoReabas() + "\n";
-        output += "ID Producto: " + r.getIdProducto() + "\n";
-        output += "ID Sucursal: " + r.getIdSucursal() + "\n";
-        output += "ID Proveedor: " + r.getIdProveedor() + "\n\n";
+        output += "ID Producto: " + (idProducto != null ? idProducto : "No asignado") + "\n";
+        output += "ID Sucursal: " + (idSucursal != null ? idSucursal : "No asignado") + "\n";
+        output += "ID Proveedor: " + (idProveedor != null ? idProveedor : "No asignado") + "\n\n";
         return output;
     }
+
 }
 

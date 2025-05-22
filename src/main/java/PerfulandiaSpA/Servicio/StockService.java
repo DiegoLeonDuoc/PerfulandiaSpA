@@ -61,14 +61,18 @@ public class StockService {
 
     // MÉTODO toString
     private String datosStock(String output, Stock stock) {
+        // Si getIdProducto() y getIdSucursal() devuelven entidades:
+        Integer idProducto = stock.getIdProducto() != null ? stock.getIdProducto().getId() : null;
+        Integer idSucursal = stock.getIdSucursal() != null ? stock.getIdSucursal().getId() : null;
+
         output += "ID Stock: " + stock.getId() + "\n";
-        output += "id: " + stock.getId() + "\n";
-        output += "cantidad Stock: " + stock.getCantStock() + "\n";
-        output += "idProducto: " + stock.getIdProducto() + "\n";
-        output += "idSucursal: " + stock.getIdSucursal() + "\n";
+        output += "Cantidad en Stock: " + stock.getCantStock() + "\n";
+        output += "ID Producto: " + (idProducto != null ? idProducto : "No asignado") + "\n";
+        output += "ID Sucursal: " + (idSucursal != null ? idSucursal : "No asignada") + "\n";
         output += "\n";
         return output;
     }
+
 
     //UPDATE
     public String updateStock(Stock stock, int id) {
