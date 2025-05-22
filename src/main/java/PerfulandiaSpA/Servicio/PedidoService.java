@@ -9,10 +9,8 @@ import PerfulandiaSpA.Repositorio.PedidoRepository;
 import PerfulandiaSpA.Repositorio.SucursalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,38 +28,33 @@ public class PedidoService {
     // C
     public String crearPedido(PedidoDTO pedidoDTO) {
         Pedido pedido = new Pedido();
-        if (pedidoRepository.existsById(pedidoDTO.getId())) {
-            return "Ya existe un carrito con esta ID";
-        } else {
-            if (sucursalRepository.existsById(pedidoDTO.getIdSucursal())) {
-                Sucursal sucursal = sucursalRepository.findById(pedidoDTO.getIdSucursal()).get();
-                pedido.setSucursal(sucursal);
-                if (clienteRepository.existsById(pedidoDTO.getRutCliente())) {
-                    Cliente cliente = clienteRepository.findById(pedidoDTO.getRutCliente()).get();
-                    pedido.setMetodoPago(pedidoDTO.getMetodoPago());
-                    pedido.setDirEnvio(pedidoDTO.getDirEnvio());
-                    pedido.setDirFacturacion(pedidoDTO.getDirFacturacion());
-                    pedido.setCostoEnvio(pedidoDTO.getCostoEnvio());
-                    pedido.setPrecioPedido(pedidoDTO.getPrecioPedido());
-                    pedido.setAnotaciones(pedidoDTO.getAnotaciones());
-                    pedido.setCliente(cliente);
-                    pedido.setFecPedido(LocalDate.now());
-                    pedidoRepository.save(pedido);
-                } else {
-                    return "Ingrese un RUT de cliente válido";
-                }
-                return "Pedido agregado con éxito";
+        if (sucursalRepository.existsById(pedidoDTO.getIdSucursal())) {
+            Sucursal sucursal = sucursalRepository.findById(pedidoDTO.getIdSucursal()).get();
+            pedido.setSucursal(sucursal);
+            if (clienteRepository.existsById(pedidoDTO.getRutCliente())) {
+                Cliente cliente = clienteRepository.findById(pedidoDTO.getRutCliente()).get();
+                pedido.setMetodoPago(pedidoDTO.getMetodoPago());
+                pedido.setDirEnvio(pedidoDTO.getDirEnvio());
+                pedido.setDirFacturacion(pedidoDTO.getDirFacturacion());
+                pedido.setCostoEnvio(pedidoDTO.getCostoEnvio());
+                pedido.setPrecioPedido(pedidoDTO.getPrecioPedido());
+                pedido.setAnotaciones(pedidoDTO.getAnotaciones());
+                pedido.setCliente(cliente);
+                pedido.setFecPedido(LocalDate.now());
+                pedidoRepository.save(pedido);
             } else {
-                return "La sucursal no existe";
+                return "Ingrese un RUT de cliente válido";
             }
+            return "Pedido agregado con éxito";
+        } else {
+            return "La sucursal no existe";
         }
     }
     // R
     public String getPedidos() {
         String output = "";
         for (Pedido pedido : pedidoRepository.findAll()) {
-            //                output = datosPedido(output, pedido);
-            output = pedido.toString();
+            output = datosPedido(output, pedido);
         }
         if (output.isEmpty()) {
             return "No hay pedidos registrados";
@@ -82,10 +75,8 @@ public class PedidoService {
             if (pedidosIds.isEmpty()) {
                 return "Este cliente no tiene pedidos registrados";
             } else {
-                for (Integer id : pedidosIds) {
-                    Pedido pedido = pedidoRepository.findById(id).get();
-                    //                output = datosPedido(output, pedido);
-                    output = pedido.toString();
+                for (Integer id: pedidosIds) {
+                    output += datosPedido(output, pedidoRepository.findById(id).get());
                 }
                 return output;
             }
@@ -98,25 +89,24 @@ public class PedidoService {
         return pedidoRepository.findAll();
     }
 
-    public String getPedidosSucursal(Integer id_sucursal) {
+    public String getPedidosSucursal(Integer idSucursal) {
         String output = "";
         for (Pedido pedido : pedidoRepository.findAll()) {
-            if (pedido.getSucursal().getId().equals(id_sucursal)) {
-//                output = datosPedido(output, pedido);
-                output = pedido.toString();
+            if (pedido.getSucursal().getId().equals(idSucursal)) {
+                output = datosPedido(output, pedido);
             }
         }
         if (output.isEmpty()) {
-            return "No hay pedidos registrados";
+            return "No hay pedidos registrados en esta sucursal";
         } else {
             return output;
         }
     }
 
-    public List<Pedido> getPedidosSucursalJSON(Integer id_sucursal) {
+    public List<Pedido> getPedidosBySucursalJSON(Integer idSucursal) {
         List<Pedido> pedidosSucursal = new ArrayList<>();
         for (Pedido pedido : pedidoRepository.findAll()) {
-            if (pedido.getSucursal().getId().equals(id_sucursal)) {
+            if (pedido.getSucursal().getId().equals(idSucursal)) {
                 pedidosSucursal.add(pedido);
             }
         }
@@ -155,68 +145,50 @@ public class PedidoService {
         }
     }
 
-//    public String cambiarSucursalPedido(Pedido pedido, int id_sucursal) {
-//        if (pedidoRepository.existsById(pedido.getRutUsuario())) {
-//            if (sucursalRepository.existsById(id_sucursal)) {
-//                pedido = pedidoRepository.findById(pedido.getRutUsuario()).get();
-//                Sucursal sucursal = sucursalRepository.findById(id_sucursal).get();
-//                pedido.setSucursalAsociada(sucursal);
-//                pedidoRepository.save(pedido);
-//                return "Sucursal del pedido actualizada con éxito";
-//            } else {
-//                return "Sucursal no existente";
-//            }
-//        } else {
-//            return "Pedido no existente";
-//        }
-//    }
-
     // U/P
-//    public String parcharPedido(Pedido pedido, int rut) {
-//        if (pedidoRepository.existsById(rut)) {
-//            Pedido pedidoParchado = pedidoRepository.findById(rut).get();
-//            if (pedido.getNomUsuario() != null) {
-//                pedidoParchado.setNomUsuario(pedido.getNomUsuario());
-//            }
-//            if (pedido.getNom2Usuario() != null) {
-//                pedidoParchado.setNom2Usuario(pedido.getNom2Usuario());
-//            }
-//            if (pedido.getApellidoPaterno() != null) {
-//                pedidoParchado.setApellidoPaterno(pedido.getApellidoPaterno());
-//            }
-//            if (pedido.getApellidoMaterno() != null) {
-//                pedidoParchado.setApellidoMaterno(pedido.getApellidoMaterno());
-//            }
-//            if (pedido.getSexoUsuario() == 'M' || pedido.getSexoUsuario() == 'F') {
-//                pedidoParchado.setSexoUsuario(pedido.getSexoUsuario());
-//            }
-//            if (pedido.getFechaNacimiento() != null) {
-//                pedidoParchado.setFechaNacimiento(pedido.getFechaNacimiento());
-//            }
-//            if (pedido.getTelefonoUsuario() != null) {
-//                pedidoParchado.setTelefonoUsuario(pedido.getTelefonoUsuario());
-//            }
-//            if (pedido.getTel2Usuario() != null) {
-//                pedidoParchado.setTel2Usuario(pedido.getTel2Usuario());
-//            }
-//            if (pedido.getEmailUsuario() != null) {
-//                pedidoParchado.setEmailUsuario(pedido.getEmailUsuario());
-//            }
-//            if (pedido.getPassUsuario() != null) {
-//                String newPass = new BCryptPasswordEncoder(10).encode(pedido.getPassUsuario());
-//                pedidoParchado.setPassUsuario(newPass);
-//            }
-//            pedidoRepository.save(pedidoParchado);
-//            return "Pedido actualizado con éxito";
-//        }
-//        return "Pedido no encontrado";
-//    }
+    public String parcharPedido(PedidoDTO pedido, int id) {
+        if (pedidoRepository.existsById(id)) {
+            Pedido pedidoParchado = pedidoRepository.findById(id).get();
+            if (pedido.getIdSucursal() != null) {
+                Sucursal newSucursal = sucursalRepository.findById(pedido.getIdSucursal()).get();
+                pedidoParchado.setSucursal(newSucursal);
+            }
+            if (pedido.getFecPedido() != null) {
+                pedidoParchado.setFecPedido(pedido.getFecPedido());
+            }
+            if (pedido.getPrecioPedido() != null) {
+                pedidoParchado.setPrecioPedido(pedido.getPrecioPedido());
+            }
+            if (pedido.getMetodoPago() != null) {
+                pedidoParchado.setMetodoPago(pedido.getMetodoPago());
+            }
+            if (pedido.getDirEnvio() != null) {
+                pedidoParchado.setDirEnvio(pedido.getDirEnvio());
+            }
+            if (pedido.getDirFacturacion() != null) {
+                pedidoParchado.setDirFacturacion(pedido.getDirFacturacion());
+            }
+            if (pedido.getCostoEnvio() != null) {
+                pedidoParchado.setCostoEnvio(pedido.getCostoEnvio());
+            }
+            if (pedido.getAnotaciones() != null) {
+                pedidoParchado.setAnotaciones(pedido.getAnotaciones());
+            }
+            if (pedido.getRutCliente() != null) {
+                Cliente newCliente = clienteRepository.findById(pedido.getRutCliente()).get();
+                pedidoParchado.setCliente(newCliente);
+            }
+            pedidoRepository.save(pedidoParchado);
+            return "Pedido actualizado con éxito";
+        }
+        return "Pedido no encontrado";
+    }
 
     // D
 
-    public String deletePedido(int rut) {
+    public String deletePedido(int id) {
         for (Pedido pedido : pedidoRepository.findAll()) {
-            if (pedido.getCliente().getRutUsuario() == rut) {
+            if (pedido.getId() == id) {
                 pedidoRepository.delete(pedido);
                 return "Pedido eliminado con éxito";
             }
@@ -226,29 +198,37 @@ public class PedidoService {
 
     // Funciones no CRUD
 
-//    private String datosPedido(String output, Pedido pedido) {
-//        output += "RUT: " + pedido.getRutUsuario() + "-" + pedido.getDvUsuario() + "\n";
-//        output += "Nombre completo: " + pedido.getNomUsuario() + " ";
-//        if (pedido.getNom2Usuario() != null) {
-//            output += pedido.getNom2Usuario() + " ";
-//        }
-//        output += pedido.getApellidoPaterno();
-//        if (pedido.getNom2Usuario() != null) {
-//            output += " " + pedido.getApellidoMaterno() + "\n";
-//        } else {
-//            output += "\n";
-//        }
-//        output += "Sexo: " + pedido.getSexoUsuario() + "\n";
-//        output += "Fecha de nacimiento: " + pedido.getFechaNacimiento().toString() + "\n";
-//        output += "Dirección: " + pedido.getDirUsuario() + "\n";
-//        output += "Número de teléfono: +56" + pedido.getTelefonoUsuario() + "\n";
-//        if (pedido.getTel2Usuario() != null) {
-//            output += "Teléfono extra: +56" + pedido.getTel2Usuario() + "\n";
-//        }
-//        output += "Email: " + pedido.getEmailUsuario() + "\n";
-//        output += "Nombre Sucursal: " + pedido.getSucursalAsociada().getNombreSucursal() + "\n";
-//        output += "Dirección sucursal: " + pedido.getSucursalAsociada().getDireccionSucursal() + "\n";
-//        output += "\n";
-//        return output;
-//    }
+    private String datosPedido(String output, Pedido pedido) {
+        output += "ID Pedido: " + pedido.getId() + "\n";
+        output += "RUT Cliente: " + pedido.getCliente().getRutUsuario() + "\n";
+        output += "Fecha pedido:  " + pedido.getFecPedido() + "\n";
+        output += "Precio total pedido: $" + pedido.getPrecioPedido() + "\n";
+        output += "Método de pago: " + pedido.getMetodoPago() + "\n";
+        if (pedido.getDirEnvio() == null) {
+            output += "Dirección Envío: Pedido en tienda\n";
+        } else {
+            output += "Dirección Envío: " + pedido.getDirEnvio() + "\n";
+        }
+        if (pedido.getDirFacturacion() == null) {
+            if (pedido.getDirEnvio() == null) {
+                output += "Dirección Facturación: Pedido en tienda\n";
+            } else {
+                output += "Dirección Facturación: " + pedido.getDirEnvio() + "\n";
+            }
+        } else {
+            output += "Dirección Facturación: " + pedido.getDirFacturacion() + "\n";
+        }
+        if (pedido.getCostoEnvio() == null) {
+            output += "Coste de envío: Pedido en tienda\n";
+        } else {
+            output += "Coste de envío: $" + pedido.getCostoEnvio() + "\n";
+        }
+        if (pedido.getAnotaciones() == null) {
+            output += "Anotaciones: Ninguna\n";
+        } else {
+            output += "Anotaciones: " + pedido.getAnotaciones() + "\n";
+        }
+        output += "Sucursal asociada:  " + pedido.getSucursal().getNombreSucursal() + "\n";
+        return output;
+    }
 }
