@@ -13,20 +13,16 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Devolucion {
     @Id
     @Column(name = "ID_DEVOLUCION", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_PEDIDO", nullable = false)
-    private Pedido idPedido;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO_PEDIDO", nullable = false)
-    private ProductosPedido idProductoPedido;
+    private ProductosPedido productoPedido;
 
     @Column(name = "CANTIDAD_DEVUELTA", nullable = false)
-    private Long cantidadDevuelta;
+    private Integer cantidadDevuelta;
 
     @Column(name = "MOTIVO_DEVO", length = 100)
     private String motivoDevo;
@@ -35,9 +31,9 @@ public class Devolucion {
     private String estadoDevo;
 
     @Column(name = "MONTO_DEVUELTO", nullable = false)
-    private Long montoDevuelto;
+    private Integer montoDevuelto;
 
     @Column(name = "RESTOCK", nullable = false)
-    private Long restock;
+    private boolean restock;
 
 }
