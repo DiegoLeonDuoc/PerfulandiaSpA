@@ -24,6 +24,6 @@ public class Producto {
     private String descripProd;
 
     @Column(name = "PRECIO_PROD", nullable = false)
-    private Long precioProd;
+    private Integer precioProd;
 
 }
