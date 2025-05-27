@@ -13,5 +13,5 @@ public class DevolucionDTO {
     private Integer idProductoPedido;
     private String motivoDevo;
     private String estadoDevo;
-    private Boolean restock;
+    private Integer restock;
 }
