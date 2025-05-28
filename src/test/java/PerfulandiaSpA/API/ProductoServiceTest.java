@@ -5,22 +5,26 @@ import PerfulandiaSpA.Servicio.ProductoService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest // Hace que Spring levante la app con una base de datos de prueba (h2 tenemos puesta)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) // Usa la misma instancia de la clase para todos los tests
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class) // definir el orden de los tests = @Order
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Sql(scripts = {"/schema.sql", "/data.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 public class ProductoServiceTest {
 
     @Autowired
     ProductoService productoService;
 
-    private Integer idCreado = null; // Para guardar el id del producto que creamos en el test
+    private Integer idCreado = null;
 
     // C - Crear un producto nuevo
     @Test
-    @Order(1) //corre primero
+    @Order(1)
     public void testSaveProducto() {
         Producto producto = new Producto();
         producto.setNomProd("Corrector");
@@ -31,15 +35,24 @@ public class ProductoServiceTest {
         String resultado = productoService.saveProducto(producto);
         assertEquals("Producto agregado con éxito", resultado);
 
-        assertNotNull(producto.getId()); // Verifica que se le asignó un id
-        idCreado = producto.getId(); // Guarda el id para los siguientes tests
+        assertNotNull(producto.getId());
+        idCreado = producto.getId();
     }
 
-    // R -
+    // R - Buscar por ID (busca el ID de "Lápiz" dinámicamente)
     @Test
     @Order(2)
     public void testGetProductoById_Lapiz() {
-        String resultado = productoService.getProductoById(1);
+        List<Producto> productos = productoService.getProductosJSON();
+        Integer idLapiz = null;
+        for (Producto p : productos) {
+            if ("Lápiz".equalsIgnoreCase(p.getNomProd())) {
+                idLapiz = p.getId();
+                break;
+            }
+        }
+        assertNotNull(idLapiz, "No se encontró el producto Lápiz en la base de datos de prueba.");
+        String resultado = productoService.getProductoById(idLapiz);
         assertTrue(resultado.contains("Lápiz"));
         assertTrue(resultado.contains("grafito"));
         assertTrue(resultado.contains("200"));
@@ -53,10 +66,10 @@ public class ProductoServiceTest {
         assertTrue(resultado.contains("Lápiz"));
         assertTrue(resultado.contains("Cuaderno"));
         assertTrue(resultado.contains("Regla"));
-        assertTrue(resultado.contains("Corrector")); // Elque creamos arriba
+        assertTrue(resultado.contains("Corrector")); // El que creamos arriba
     }
 
-    // U -
+    // U - Actualizar producto creado
     @Test
     @Order(4)
     public void testUpdateProducto() {
@@ -75,7 +88,7 @@ public class ProductoServiceTest {
         assertTrue(productoActual.contains("1200"));
     }
 
-    // D -
+    // D - Eliminar producto creado
     @Test
     @Order(5)
     public void testDeleteProducto() {
