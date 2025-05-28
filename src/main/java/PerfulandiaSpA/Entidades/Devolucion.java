@@ -34,6 +34,6 @@ public class Devolucion {
     private Integer montoDevuelto;
 
     @Column(name = "RESTOCK", nullable = false)
-    private Integer restock;
+    private boolean restock;
 
 }
