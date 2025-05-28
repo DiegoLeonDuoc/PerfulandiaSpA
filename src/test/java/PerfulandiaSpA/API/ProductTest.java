@@ -1,14 +1,33 @@
 package PerfulandiaSpA.API;
 
-import PerfulandiaSpA.Repositorio.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+//Fijarse primero en el servicio, logica de negocio y operaciones con datos
+//Controlador despues, manejo de peticiones API
 
+import PerfulandiaSpA.Entidades.Producto;
+import PerfulandiaSpA.Servicio.ProductoService;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductTest {
 
-//    @Autowired
-//    ProductoRepository productoRepository;
-//
-//    @MockitoBean
 
+    @Autowired
+    ProductoService productoService;
+
+    //crud
+    //C
+    @Test
+    public void testSaveProducto() {
+        Producto producto = new Producto();
+
+    }
+
+
+    //R
+    //U
+    //D
 }
