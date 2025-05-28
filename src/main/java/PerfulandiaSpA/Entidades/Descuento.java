@@ -19,7 +19,7 @@ public class Descuento {
     private Integer id;
 
     @Column(name = "TIPO_DESCUENTO", nullable = false, length = 10)
-    private String tipoDescuento;
+    private Character tipoDescuento;
 
     @Column(name = "VALOR_DESCUENTO", nullable = false)
     private Integer valorDescuento;
