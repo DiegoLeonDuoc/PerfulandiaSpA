@@ -39,7 +39,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description="Retorna registro del usuario en formato texto simple"),
             @ApiResponse(responseCode = "404", description="Usuario no encontrado")
     })
-    @Parameter(description= "RUT del usuario", required = true)
+    //@Parameter(description= "RUT del usuario", required = true)
     public String getUsuarioByRut(@PathVariable int rut){
         return usuarioService.getUsuarioByRut(rut);
     }
