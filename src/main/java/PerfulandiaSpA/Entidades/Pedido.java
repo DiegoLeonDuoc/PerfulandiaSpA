@@ -7,6 +7,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -48,5 +50,11 @@ public class Pedido {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "RUT_USUARIO", nullable = false)
     private Cliente cliente;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductosPedido> productos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "pedidoAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Envio> envios = new ArrayList<>();
 
 }

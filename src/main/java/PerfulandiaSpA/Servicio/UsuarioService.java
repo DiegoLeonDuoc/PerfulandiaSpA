@@ -138,7 +138,6 @@ public class UsuarioService {
     }
 
     private String datosUsuario(String output, Usuario usuario) {
-        output += "ID: " + usuario.getRutUsuario() + "\n";
         output += "RUT: " + usuario.getRutUsuario() + "-" + usuario.getDvUsuario() + "\n";
         output += "Nombre completo: " + usuario.getNomUsuario() + " ";
         if (usuario.getNom2Usuario() != null) {

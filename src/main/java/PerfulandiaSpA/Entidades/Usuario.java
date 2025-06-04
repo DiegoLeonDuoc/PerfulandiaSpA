@@ -55,7 +55,7 @@ public class Usuario {
     private String passUsuario;
 
     @ColumnDefault("'CLIENTE'")
-    @Column(name = "TIPO_USUARIO", nullable = false, length = 20, updatable = false, insertable = false)
+    @Column(name = "TIPO_USUARIO", nullable = false, length = 13, updatable = false, insertable = false)
     private String tipoUsuario;
 
 }
