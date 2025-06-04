@@ -11,8 +11,8 @@ INSERT INTO SUCURSAL (id_sucursal, nombre_sucursal, direccion_sucursal) VALUES (
 INSERT INTO SUCURSAL (id_sucursal, nombre_sucursal, direccion_sucursal) VALUES (2, 'Sucursal Norte', 'Calle Norte 200');
 
 -- 3. PROVEEDOR
-INSERT INTO PROVEEDOR (id_proveedor, nombre_proveedor, telefono_proveedor, email_proveedor) VALUES (1, 'Proveedor Uno', '912000001', 'prov1@correo.com');
-INSERT INTO PROVEEDOR (id_proveedor, nombre_proveedor, telefono_proveedor, email_proveedor) VALUES (2, 'Proveedor Dos', '912000002', 'prov2@correo.com');
+INSERT INTO PROVEEDOR (nombre_proveedor, telefono_proveedor, email_proveedor) VALUES ('Proveedor Uno', '912000001', 'prov1@correo.com');
+INSERT INTO PROVEEDOR (nombre_proveedor, telefono_proveedor, email_proveedor) VALUES ('Proveedor Dos', '912000002', 'prov2@correo.com');
 
 -- 4. PRODUCTO (sin id_producto, H2 lo autogenera)
 INSERT INTO PRODUCTO (cod_barr_prod, nom_prod, descrip_prod, precio_prod) VALUES (10001, 'Lápiz', 'Lápiz grafito HB', 200);
@@ -71,4 +71,3 @@ VALUES (12345, 1, '2024-05-21', '2024-05-23', NULL, 'TransporteX', 10001, 'STAND
 -- 15. DEVOLUCION (sin id_devolucion, H2 lo autogenera)
 INSERT INTO DEVOLUCION (id_pedido, id_producto_pedido, cantidad_devuelta, motivo_devo, estado_devo, monto_devuelto, restock)
 VALUES (1, 1, 1, 'Producto defectuoso', 'SOLICITADA', 200, 1);
-
