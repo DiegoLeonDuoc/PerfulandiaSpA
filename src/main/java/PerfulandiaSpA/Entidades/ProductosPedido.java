@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -42,5 +45,8 @@ public class ProductosPedido {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO", nullable = false)
     private Producto producto;
+
+    @OneToMany(mappedBy = "productoPedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Devolucion> devoluciones = new ArrayList<>();
 
 }

@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -21,4 +24,6 @@ public class Carrito {
     @JoinColumn(name = "RUT_USUARIO", nullable = false)
     private Cliente cliente;
 
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductosCarrito> productos = new ArrayList<>();
 }
