@@ -71,3 +71,4 @@ VALUES (12345, 1, '2024-05-21', '2024-05-23', NULL, 'TransporteX', 10001, 'STAND
 -- 15. DEVOLUCION (sin id_devolucion, H2 lo autogenera)
 INSERT INTO DEVOLUCION (id_pedido, id_producto_pedido, cantidad_devuelta, motivo_devo, estado_devo, monto_devuelto, restock)
 VALUES (1, 1, 1, 'Producto defectuoso', 'SOLICITADA', 200, 1);
+
