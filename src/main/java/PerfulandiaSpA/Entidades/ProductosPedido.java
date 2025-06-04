@@ -32,7 +32,6 @@ public class ProductosPedido {
     private Integer precioTotalProd;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_DESCUENTO")
     private Descuento descuento;
 
@@ -41,9 +40,9 @@ public class ProductosPedido {
     @JoinColumn(name = "ID_PEDIDO", nullable = false)
     private Pedido pedido;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_PRODUCTO", nullable = false)
+    @JoinColumn(name = "ID_PRODUCTO")
     private Producto producto;
 
     @OneToMany(mappedBy = "productoPedido", cascade = CascadeType.ALL, orphanRemoval = true)

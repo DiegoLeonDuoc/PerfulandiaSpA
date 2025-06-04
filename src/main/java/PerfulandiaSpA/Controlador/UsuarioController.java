@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
-@Tag(name="Servicio Usuarios", description="Servicios de gestión para usuarios")
+@Tag(name="Servicio Usuarios", description="Servicios de gestión de usuarios")
 public class UsuarioController {
 
     @Autowired

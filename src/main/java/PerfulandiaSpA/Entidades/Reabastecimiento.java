@@ -37,9 +37,8 @@ public class Reabastecimiento {
     @JoinColumn(name = "ID_PRODUCTO", nullable = false)
     private Producto producto;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_PROVEEDOR", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_PROVEEDOR")
     private Proveedor proveedor;
 
 }
