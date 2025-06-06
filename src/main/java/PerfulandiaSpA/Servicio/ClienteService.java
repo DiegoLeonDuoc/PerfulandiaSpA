@@ -1,6 +1,7 @@
 package PerfulandiaSpA.Servicio;
 
 import PerfulandiaSpA.Entidades.Cliente;
+
 import PerfulandiaSpA.Repositorio.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.List;
 
 @Service
-public class wClienteService {
+public class ClienteService {
 
     @Autowired
     ClienteRepository clienteRepository;

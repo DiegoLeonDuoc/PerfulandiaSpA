@@ -51,16 +51,9 @@ public class Pedido {
     private Cliente cliente;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-<<<<<<< HEAD
     private List<ProductosPedido> productos = new ArrayList<>();
 
     @OneToMany(mappedBy = "pedidoAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Envio> envios = new ArrayList<>();
-=======
-    private List<ProductosPedido> productosEnPedido = new ArrayList<>();
-
-    @OneToMany(mappedBy = "pedidoAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Envio> pedidosEnviados = new ArrayList<>();
->>>>>>> devDiego
 
 }

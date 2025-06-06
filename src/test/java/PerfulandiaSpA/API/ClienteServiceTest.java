@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClienteServiceTest {
 
     @Autowired
-    UsuarioService usuarioService;
+    ClienteService clienteService;
 
     private Integer idCreado = null;
 
@@ -55,10 +55,10 @@ public class ClienteServiceTest {
     @Order(2)
     // R Mostrar clientes por rut
     public void testGetClientes() {
-        List<Cliente> clientes = UsuarioService.getClientesJSON();
-        Integer Rut = null;
+        List<Cliente> clientes = clienteService.getClientesJSON();
+        Integer rut = null;
         for (Cliente c : clientes) {
-            Rut = c.getRutUsuario();
+            rut = c.getRutUsuario();
             break;
         }
     }
