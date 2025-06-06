@@ -24,7 +24,7 @@ public class Reabastecimiento {
     @Column(name = "FECHA_REABAS", nullable = false)
     private LocalDate fechaReabas;
 
-    @Column(name = "ESTADO_REABAS", nullable = false, length = 10)
+    @Column(name = "ESTADO_REABAS", nullable = false, length = 13)
     private String estadoReabas;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)

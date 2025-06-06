@@ -169,7 +169,7 @@ public class DevolucionService {
         output += "Motivo de Devolución: " + (devolucion.getMotivoDevo() != null ? devolucion.getMotivoDevo() : "No disponible") + "\n";
         output += "Estado de Devolución: " + devolucion.getEstadoDevo() + "\n";
         output += "Monto Devuelto: " + devolucion.getMontoDevuelto() + "\n";
-        output += "Restock: " + (devolucion.isRestock() ? "Sí" : "No") + "\n";
+        output += "Restock: " + (devolucion.getRestock()) + "\n";
 
         if (devolucion.getProductoPedido() != null) {
             output += "ID Producto Pedido asociado: " + devolucion.getProductoPedido().getId() + "\n";
