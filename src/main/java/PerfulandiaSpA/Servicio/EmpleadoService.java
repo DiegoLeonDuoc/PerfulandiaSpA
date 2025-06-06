@@ -207,8 +207,13 @@ public class EmpleadoService {
             output += "Teléfono extra: +56" + empleado.getTel2Usuario() + "\n";
         }
         output += "Email: " + empleado.getEmailUsuario() + "\n";
-        output += "Nombre Sucursal: " + empleado.getSucursalAsociada().getNombreSucursal() + "\n";
-        output += "Dirección sucursal: " + empleado.getSucursalAsociada().getDireccionSucursal() + "\n";
+        if (empleado.getSucursalAsociada() != null) {
+            output += "Nombre Sucursal: " + empleado.getSucursalAsociada().getNombreSucursal() + "\n";
+            output += "Dirección sucursal: " + empleado.getSucursalAsociada().getDireccionSucursal() + "\n";
+        } else {
+            output += "Nombre Sucursal: Este empleado no posee una sucursal asociada\n";
+        }
+
         output += "\n";
         return output;
     }

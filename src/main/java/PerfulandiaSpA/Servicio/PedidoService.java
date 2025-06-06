@@ -228,7 +228,10 @@ public class PedidoService {
         } else {
             output += "Anotaciones: " + pedido.getAnotaciones() + "\n";
         }
-        output += "Sucursal asociada:  " + pedido.getSucursal().getNombreSucursal() + "\n";
+        if (pedido.getSucursal() != null) {
+            output += "Sucursal asociada:  " + pedido.getSucursal().getNombreSucursal() + "\n";
+        }
+        output += "\n";
         return output;
     }
 }
