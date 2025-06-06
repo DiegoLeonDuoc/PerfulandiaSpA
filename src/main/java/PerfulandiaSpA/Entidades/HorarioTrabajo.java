@@ -31,7 +31,7 @@ public class HorarioTrabajo {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_SUCURSAL", nullable = false)
-    private Sucursal Sucursal;
+    private Sucursal sucursal;
 
     public static final Map<Integer, String> diasSemana = Map.of(
             1, "Lunes",

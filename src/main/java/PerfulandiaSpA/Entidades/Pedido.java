@@ -20,9 +20,8 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_SUCURSAL")
     private Sucursal sucursal;
 
     @Column(name = "FEC_PEDIDO", nullable = false)
@@ -52,9 +51,9 @@ public class Pedido {
     private Cliente cliente;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductosPedido> productos = new ArrayList<>();
+    private List<ProductosPedido> productosEnPedido = new ArrayList<>();
 
     @OneToMany(mappedBy = "pedidoAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Envio> envios = new ArrayList<>();
+    private List<Envio> pedidosEnviados = new ArrayList<>();
 
 }

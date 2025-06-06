@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -25,5 +28,20 @@ public class Producto {
 
     @Column(name = "PRECIO_PROD", nullable = false)
     private Integer precioProd;
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Stock> cantStock = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reabastecimiento> reabastecimientos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Descuento> descuentos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductosCarrito> prodCarritos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto")
+    private List<ProductosPedido> prodPedidos = new ArrayList<>();
 
 }
