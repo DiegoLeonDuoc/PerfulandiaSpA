@@ -41,10 +41,25 @@ public class SucursalServiceTest {
     @Order(2)
     // R Lista todas las sucursales
     public void testGetSucursales() {
+        // Creacion de sucursales
+        Sucursal a = new Sucursal();
+        a.setId(101);
+        a.setNombreSucursal("Sucursal Teatinos");
+        a.setDireccionSucursal("Teatinos 1231");
+
+        Sucursal b = new Sucursal();
+        b.setId(102);
+        b.setNombreSucursal("Sucursal SanFran");
+        b.setDireccionSucursal("avenida jose 12");
+
+        sucursalService.saveSucursal(a);
+        sucursalService.saveSucursal(b);
         String resultado = sucursalService.getSucursales();
+
+        // Validar
         assertNotNull(resultado);
-        assertTrue(resultado.contains("Teatinos"));
-        assertTrue(resultado.contains("san francisco 2432"));
+        assertTrue(resultado.contains("Teatinos 1231"));
+        assertTrue(resultado.contains("avenida jose 12"));
     }
 
     @Test
@@ -72,14 +87,14 @@ public class SucursalServiceTest {
         s.setId(999);
         s.setNombreSucursal("Sucursal temporal");
         s.setDireccionSucursal("Falsa 123");
+        sucursalService.saveSucursal(s);
 
-        // Ahora actualizarla
-        Sucursal actualizada = new Sucursal();
-        actualizada.setId(999); // MISMO ID
-        actualizada.setNombreSucursal("Actualizada");
-        actualizada.setDireccionSucursal("Nueva direccion 123");
 
-        String resultado = sucursalService.updateSucursal(actualizada, 999);
+        s.setId(999);
+        s.setNombreSucursal("Actualizada");
+        s.setDireccionSucursal("Nueva direccion 123");
+
+        String resultado = sucursalService.updateSucursal(s, 999);
         assertEquals("Sucursal actualizado con éxito", resultado);
 
         // Verificar que se haya actualizado
