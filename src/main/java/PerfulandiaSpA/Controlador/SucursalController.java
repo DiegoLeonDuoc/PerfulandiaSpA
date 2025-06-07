@@ -69,7 +69,7 @@ public class SucursalController {
 
     //deletear horario
     @DeleteMapping("/{id}")
-    @Operation(summary= "Modificar sucursal", description = "Servicio DELETE para eliminar registro de una sucursal específica")
+    @Operation(summary= "Eliminar sucursal", description = "Servicio DELETE para eliminar registro de una sucursal específica")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa"),
             @ApiResponse(responseCode = "404", description="Sucursal no encontrada")
