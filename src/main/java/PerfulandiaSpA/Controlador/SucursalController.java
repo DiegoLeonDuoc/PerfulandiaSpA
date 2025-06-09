@@ -49,8 +49,8 @@ public class SucursalController {
     @GetMapping("/{id}")
     @Operation(summary= "Obtener sucursal por ID", description = "Servicio GET para obtener información sobre una sucursal específica en formato String")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro de la sucursal en formato texto simple"),
-            @ApiResponse(responseCode = "404", description="Sucursal no encontrada")
+            @ApiResponse(responseCode = "200", description="Registro de la sucursal en formato texto simple o información sobre inexistencia de la sucursal"),
+            //@ApiResponse(responseCode = "404", description="Sucursal no encontrada")
     })
     public String getSucursalById(@PathVariable int id){
         return sucursalService.getSucursalByID(id);
@@ -60,8 +60,8 @@ public class SucursalController {
     @PutMapping("/{id}")
     @Operation(summary= "Modificar sucursal", description = "Servicio PUT para modificar información sobre una sucursal específica")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa"),
-            @ApiResponse(responseCode = "404", description="Sucursal no encontrada")
+            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia de la sucursal"),
+            //@ApiResponse(responseCode = "404", description="Sucursal no encontrada")
     })
     public String updateSucursalSucursal(@RequestBody Sucursal Sucursal, @PathVariable int id){
         return sucursalService.updateSucursal(Sucursal, id);
@@ -71,8 +71,8 @@ public class SucursalController {
     @DeleteMapping("/{id}")
     @Operation(summary= "Eliminar sucursal", description = "Servicio DELETE para eliminar registro de una sucursal específica")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa"),
-            @ApiResponse(responseCode = "404", description="Sucursal no encontrada")
+            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa o información sobre inexistencia de la sucursal"),
+            //@ApiResponse(responseCode = "404", description="Sucursal no encontrada")
     })
     public String deleteSucursal(@PathVariable int id){
         return sucursalService.deleteSucursal(id);

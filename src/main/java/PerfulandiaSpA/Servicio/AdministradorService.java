@@ -32,7 +32,7 @@ public class AdministradorService {
             output = datosAdministrador(output, administrador);
         }
         if (output.isEmpty()) {
-            return "No hay administradors registrados";
+            return "No hay administradores registrados";
         } else {
             return output;
         }
@@ -49,7 +49,7 @@ public class AdministradorService {
         }
     }
 
-    public List<Administrador> getAdministradorsJSON() {
+    public List<Administrador> getAdministradoresJSON() {
         return administradorRepository.findAll();
     }
 

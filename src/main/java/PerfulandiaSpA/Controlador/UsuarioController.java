@@ -37,8 +37,8 @@ public class UsuarioController {
     @GetMapping("/{rut}")
     @Operation(summary= "Obtener usuario por RUT", description = "Servicio GET para obtener información sobre un usuario específico en formato String")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro del usuario en formato texto simple"),
-            @ApiResponse(responseCode = "404", description="Usuario no encontrado")
+            @ApiResponse(responseCode = "200", description="Registro del usuario en formato texto simple o información de usuario no encontrado."),
+            //@ApiResponse(responseCode = "404", description="Usuario no encontrado")
     })
     //@Parameter(description= "RUT del usuario", required = true)
     public String getUsuarioByRut(@PathVariable int rut){
@@ -49,7 +49,7 @@ public class UsuarioController {
     @Operation(summary= "Obtener usuario en formato JSON", description = "Servicio GET para obtener información sobre usuarios en formato JSON")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description="Registro de usuarios en formato JSON"),
-            @ApiResponse(responseCode = "404", description="Usuario no encontrado")
+            @ApiResponse(responseCode = "404", description="No existen usuarios registrados")
     })
     public List<Usuario> getUsuariosJSON(){
         return usuarioService.getUsuariosJSON();
@@ -74,8 +74,8 @@ public class UsuarioController {
     @DeleteMapping("/{rut}")
     @Operation(summary= "Eliminar usuario", description = "Servicio DELETE para eliminar un usuario específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación sobre la eliminación del usuario"),
-            @ApiResponse(responseCode = "404", description="Usuario no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación sobre la eliminación del usuario o información de usuario no encontrado."),
+            //@ApiResponse(responseCode = "404", description="Usuario no encontrado")
     })
     public String deleteUsuario(@PathVariable int rut){
         return usuarioService.deleteUsuario(rut);

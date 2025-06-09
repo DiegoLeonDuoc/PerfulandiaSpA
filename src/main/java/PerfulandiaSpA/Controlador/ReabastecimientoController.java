@@ -5,6 +5,7 @@ import PerfulandiaSpA.Servicio.ReabastecimientoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reabastecimientos")
+@Tag(name="Servicio Reabastecimiento", description="Servicios de gestión de reabastecimientos")
 public class ReabastecimientoController {
 
     @Autowired
@@ -45,10 +47,10 @@ public class ReabastecimientoController {
 
     //Buscar por id
     @GetMapping("/{id}")
-    @Operation(summary= "Obtener reabastecimientos por ID", description = "Servicio GET para obtener información sobre un reabastecimiento específico en formato String")
+    @Operation(summary= "Obtener reabastecimiento por ID", description = "Servicio GET para obtener información sobre un reabastecimiento específico en formato String")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro del reabastecimiento en formato texto simple"),
-            @ApiResponse(responseCode = "404", description="Reabastecimiento no encontrado")
+            @ApiResponse(responseCode = "200", description="Registro del reabastecimiento en formato texto simple o información sobre inexistencia del reabastecimiento"),
+            //@ApiResponse(responseCode = "404", description="Reabastecimiento no encontrado")
     })
     public String getReabastecimientoById(@PathVariable int id) {
         return reabastecimientoService.getReabastecimientoById(id);
@@ -58,8 +60,8 @@ public class ReabastecimientoController {
     @PutMapping("/{id}")
     @Operation(summary= "Modificar reabastecimiento", description = "Servicio PUT para modificar información sobre un reabastecimiento específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa"),
-            @ApiResponse(responseCode = "404", description="Reabastecimiento no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia del reabastecimiento"),
+            //@ApiResponse(responseCode = "404", description="Reabastecimiento no encontrado")
     })
     public String updateReabastecimiento(@RequestBody Reabastecimiento Reabastecimiento, @PathVariable int id) {
         return reabastecimientoService.updateReabastecimiento(Reabastecimiento, id);
@@ -69,8 +71,8 @@ public class ReabastecimientoController {
     @DeleteMapping("/{id}")
     @Operation(summary= "Eliminar reabastecimiento", description = "Servicio DELETE para eliminar registro de un reabastecimiento en específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa"),
-            @ApiResponse(responseCode = "404", description="Reabastecimiento no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa o información sobre inexistencia del reabastecimiento"),
+            //@ApiResponse(responseCode = "404", description="Reabastecimiento no encontrado")
     })
     public String deleteReabastecimiento(@PathVariable int id) {
         return reabastecimientoService.deleteReabastecimiento(id);

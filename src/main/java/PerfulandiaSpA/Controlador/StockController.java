@@ -5,6 +5,7 @@ import PerfulandiaSpA.Servicio.StockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/stock")
+@Tag(name="Servicio Stock", description="Servicios de gestión de stock")
 public class StockController {
 
     @Autowired
@@ -47,8 +49,8 @@ public class StockController {
     @GetMapping("/{id}")
     @Operation(summary= "Obtener stocks por ID", description = "Servicio GET para obtener información sobre un stock específico en formato String")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro del stock en formato texto simple"),
-            @ApiResponse(responseCode = "404", description="Stock no encontrado")
+            @ApiResponse(responseCode = "200", description="Registro del stock en formato texto simple o información sobre inexistencia del stock"),
+            //@ApiResponse(responseCode = "404", description="Stock no encontrado")
     })
     public String getStockById(@PathVariable int id) {
         return stockService.getStockById(id);
@@ -58,8 +60,8 @@ public class StockController {
     @PutMapping("/{id}")
     @Operation(summary= "Modificar stock", description = "Servicio PUT para modificar información sobre un stock específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa"),
-            @ApiResponse(responseCode = "404", description="Stock no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia del stock"),
+            //@ApiResponse(responseCode = "404", description="Stock no encontrado")
     })
     public String updateStock(@RequestBody Stock Stock, @PathVariable int id) {
         return stockService.updateStock(Stock, id);
@@ -69,8 +71,8 @@ public class StockController {
     @DeleteMapping("/{id}")
     @Operation(summary= "Eliminar stock", description = "Servicio DELETE para eliminar registro de un stock en específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa"),
-            @ApiResponse(responseCode = "404", description="Stock no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa o información sobre inexistencia del stock"),
+            //@ApiResponse(responseCode = "404", description="Stock no encontrado")
     })
     public String deleteStock(@PathVariable int id) {
         return stockService.deleteStock(id);

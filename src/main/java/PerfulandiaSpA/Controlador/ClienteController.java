@@ -36,8 +36,8 @@ public class ClienteController {
     @GetMapping("/{rut}")
     @Operation(summary= "Obtener cliente por RUT", description = "Servicio GET para obtener información sobre un cliente específico en formato String")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro del cliente en formato texto simple"),
-            @ApiResponse(responseCode = "404", description="Usuario no encontrado")
+            @ApiResponse(responseCode = "200", description="Registro del cliente en formato texto simple o información de cliente no encontrado"),
+            //@ApiResponse(responseCode = "404", description="Usuario no encontrado")
     })
     public String getClienteByRut(@PathVariable Integer rut){
         return clienteService.getClienteByRut(rut);
@@ -47,31 +47,31 @@ public class ClienteController {
     @Operation(summary= "Obtener clientes en formato JSON", description = "Servicio GET para obtener información sobre clientes en formato JSON")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description="Registro de usuarios en formato JSON"),
-            @ApiResponse(responseCode = "404", description="Usuario no encontrado")
+            //@ApiResponse(responseCode = "404", description="Usuario no encontrado")
     })
     public List<Cliente> getClientesJSON() { return clienteService.getClientesJSON(); }
 
     @PutMapping("/{rut}")
     @Operation(summary= "Modificar cliente", description = "Servicio PUT para modificar datos de un cliente en específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa."),
-            @ApiResponse(responseCode = "404", description="Cliente no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información de cliente no encontrado."),
+            //@ApiResponse(responseCode = "404", description="Cliente no encontrado")
     })
     public String updateCliente(@RequestBody Cliente cliente, @PathVariable Integer rut) { return clienteService.updateCliente(cliente, rut); }
 
     @PatchMapping("/{rut}")
     @Operation(summary= "Parchar cliente", description = "Servicio PATCH para modificar datos de un cliente en específico de forma parcial")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa."),
-            @ApiResponse(responseCode = "404", description="Cliente no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información de cliente no encontrado."),
+            //@ApiResponse(responseCode = "404", description="Cliente no encontrado")
     })
     public String parcharCliente(@RequestBody Cliente cliente, @PathVariable Integer rut) { return clienteService.parcharCliente(cliente, rut); }
 
     @DeleteMapping("/{rut}")
     @Operation(summary= "Eliminar cliente", description = "Servicio DELETE para un cliente específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de la eliminación del cliente"),
-            @ApiResponse(responseCode = "404", description="Cliente no encontrado")
+            @ApiResponse(responseCode = "200", description="Confirmación de la eliminación del cliente o información de cliente no existente."),
+            //@ApiResponse(responseCode = "404", description="Cliente no encontrado")
     })
     public String deleteCliente(@PathVariable int rut){
         return clienteService.deleteCliente(rut);

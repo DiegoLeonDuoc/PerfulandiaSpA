@@ -45,7 +45,8 @@ public class ClienteService {
             Cliente cliente = clienteRepository.findById(rut).get();
             output = datosCliente(output, cliente);
             return output;
-        }else{
+        }
+        else{
             return "Cliente no encontrado";
         }
     }
@@ -140,7 +141,6 @@ public class ClienteService {
     // Funciones no CRUD
 
     private String datosCliente(String output, Cliente cliente) {
-        output += "ID: " + cliente.getRutUsuario() + "\n";
         output += "RUT: " + cliente.getRutUsuario() + "-" + cliente.getDvUsuario() + "\n";
         output += "Nombre completo: " + cliente.getNomUsuario() + " ";
         if (cliente.getNom2Usuario() != null) {

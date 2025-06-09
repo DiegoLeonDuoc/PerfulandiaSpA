@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -81,6 +82,17 @@ public class HorarioTrabajoService {
             return datosHorario("", horario); // Retorna los datos formateados
         }
         return "Horario de trabajo no encontrado";
+    }
+
+    // MÉTODO READ (BUSCAR POR SUCURSAL)
+    public List<HorarioTrabajo> getHorarioTrabajoBySucursalJSON(int id) {
+        List<HorarioTrabajo> horariosSucursal = new ArrayList<>();
+        for (HorarioTrabajo horario: horarioTrabajoRepository.findAll()){
+            if (horario.getSucursal().getId().equals(id)) {
+                horariosSucursal.add(horario);
+            }
+        }
+        return horariosSucursal;
     }
 
     // MÉTODO toString/formateo de datos
