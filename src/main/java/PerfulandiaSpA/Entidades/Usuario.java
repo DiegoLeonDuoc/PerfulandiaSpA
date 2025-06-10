@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +55,7 @@ public class Usuario {
     @Column(name = "PASS_USUARIO", nullable = false, length = 200)
     private String passUsuario;
 
-    @ColumnDefault("'CLIENTE'")
+    //@ColumnDefault("CLIENTE")
     @Column(name = "TIPO_USUARIO", nullable = false, length = 13, updatable = false, insertable = false)
     private String tipoUsuario;
 
