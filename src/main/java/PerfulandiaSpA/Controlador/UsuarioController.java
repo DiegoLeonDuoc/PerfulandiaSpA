@@ -1,7 +1,7 @@
 package PerfulandiaSpA.Controlador;
 
-import PerfulandiaSpA.Assembler.UsuarioModelAssembler2;
-import PerfulandiaSpA.Servicio.UsuarioService2;
+import PerfulandiaSpA.Assembler.UsuarioModelAssembler;
+import PerfulandiaSpA.Servicio.UsuarioService;
 import PerfulandiaSpA.Entidades.Usuario;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,13 +20,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @Tag(name = "Controlador Usuarios", description = "Servicio de gestion de usuarios Fullstack I")
-public class UsuarioController2 {
+public class UsuarioController {
 
     @Autowired
-    UsuarioService2 usuarioService;
+    UsuarioService usuarioService;
 
     @Autowired
-    UsuarioModelAssembler2 assembler;
+    UsuarioModelAssembler assembler;
 
       // C
 //    @PostMapping
