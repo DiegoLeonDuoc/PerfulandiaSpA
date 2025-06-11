@@ -1,6 +1,5 @@
 package PerfulandiaSpA.Assembler;
 
-import PerfulandiaSpA.Controlador.UsuarioController;
 import PerfulandiaSpA.Controlador.UsuarioController2;
 import PerfulandiaSpA.Entidades.Usuario;
 import org.springframework.hateoas.EntityModel;
