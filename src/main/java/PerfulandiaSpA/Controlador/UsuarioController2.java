@@ -1,30 +1,21 @@
 package PerfulandiaSpA.Controlador;
 
-import PerfulandiaSpA.Assembler.UsuarioModelAssembler;
 import PerfulandiaSpA.Assembler.UsuarioModelAssembler2;
 import PerfulandiaSpA.Servicio.UsuarioService2;
 import PerfulandiaSpA.Entidades.Usuario;
-import io.swagger.v3.oas.annotations.*;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/users")
@@ -32,88 +23,80 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UsuarioController2 {
 
     @Autowired
-    UsuarioService2 userService;
+    UsuarioService2 usuarioService;
 
     @Autowired
     UsuarioModelAssembler2 assembler;
 
+      // C
+//    @PostMapping
+//    @Operation(summary= "Crear usuario", description = "Servicio NO disponibilizado. Entrega información acorde.")
+//    @ApiResponse(responseCode = "200", description="Entrega información sobre los endpoints disponibilizados para la creación de usuarios")
+//    public String crearUsuario(){
+//        //return usuarioService.crearUsuario(usuario);
+//        return "No puede crear un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
+//    }
+
+    // R
     @GetMapping
-    @Operation(summary = "Obtener Usuarios", description = "Obtiene la lista completa de usuarios registrados en sistema")
+    @Operation(summary= "Obtener usuarios", description = "Obtiene la lista de usuarios registrados")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna lista completa de usuarios"),
             @ApiResponse(responseCode = "404", description = "No se encuentran datos")
     })
-    public ResponseEntity<CollectionModel<EntityModel<Usuario>>> getAllUsuarios() {
-        List<Usuario> lista = userService.getUsuarios();
-        if (lista.isEmpty()) {
+    public ResponseEntity<CollectionModel<EntityModel<Usuario>>> getUsuarios(){
+        List<Usuario> usuarios = usuarioService.getUsuarios();
+        if (usuarios.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<>(assembler.toCollectionModel(lista), HttpStatus.OK);
+            return new ResponseEntity<>(assembler.toCollectionModel(usuarios), HttpStatus.OK);
         }
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Buscar Usuario por ID", description = "Obtiene un usuario segun el ID registrado en el sistema")
+    @GetMapping("/{rut}")
+    @Operation(summary = "Buscar usuario por RUT", description = "Obtiene un usuario segun el RUT registrado en el sistema")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna Usuario"),
             @ApiResponse(responseCode = "404", description = "No se encuentran datos")
     })
-    @Parameter(description = "El ID del usuario", example = "123")
-    public ResponseEntity<EntityModel<Usuario>> getUsuarioById(@PathVariable int id) {
-        if (userService.getuser(id).isPresent()) {
-            Usuario user = userService.getuser(id).get();
-            return new ResponseEntity<>(assembler.toModel(user), HttpStatus.OK);
+    @Parameter(description = "El RUT del usuario SIN dígito verificador", example = "12345678")
+    public ResponseEntity<EntityModel<Usuario>> getUsuarioById(@PathVariable int rut) {
+        if (usuarioService.getUsuarioByRut(rut).isPresent()) {
+            Usuario usuario = usuarioService.getUsuarioByRut(rut).get();
+            return new ResponseEntity<>(assembler.toModel(usuario), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @PostMapping
-    @Operation(summary = "Agregar Usuario", description = "Permite registrar un usuario en el sistema")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario creado",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Usuario.class))),
-            @ApiResponse(responseCode = "204", description = "No hay contenido en la solicitud")
-    })
-    public ResponseEntity<Usuario> addUsuario(@RequestBody Usuario user) {
-        userService.addUsuario(user);
-        if (userService.getuser(user.getRutUsuario()).isPresent()) {
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-    }
+//    @PutMapping("/{rut}")
+//    @Operation(summary= "Modificar usuario", description = "Servicio NO disponibilizado. Entrega información acorde.")
+//    @ApiResponse(responseCode = "200", description="Entrega información sobre los endpoints disponibilizados para la modificación de usuarios")
+//    public String updateUsuario() {
+//        // return usuarioService.updateUsuario(usuario, rut);
+//        return "No puede actualizar un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
+//    }
+//
+//    @PatchMapping("/{rut}")
+//    @Operation(summary= "Parchar usuario", description = "Servicio NO disponibilizado. Entrega información acorde.")
+//    @ApiResponse(responseCode = "200", description="Entrega información sobre los endpoints disponibilizados para la edición parcial de usuarios")
+//    public String parcharUsuario() {
+//        // return usuarioService.parcharUsuario(usuario, rut);
+//        return "No puede actualizar un usuario aquí, dirígase al endpoint correspondiente.\nEndpoints disponibles:\n/clientes\n/empleados\n/administrador";
+//    }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar Usuario por ID", description = "Elimina un usuario segun el ID registrado en el sistema")
+    @DeleteMapping("/{rut}")
+    @Operation(summary= "Eliminar usuario", description = "Elimina un usuario específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Retorna Usuario"),
-            @ApiResponse(responseCode = "404", description = "No se encuentran datos")
+            @ApiResponse(responseCode = "200", description="Retorna el usuario eliminado"),
+            @ApiResponse(responseCode = "404", description="Usuario no encontrado")
     })
-    @Parameter(description = "El ID del usuario", example = "123")
-    public ResponseEntity<Void> deleteUsuarioById(@PathVariable int id) {
-        if (userService.getuser(id).isPresent()) {
-            userService.deleteUsuario(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{rut}")
-    @Operation(summary = "Actualizar Usuario", description = "Permite actualizar los datos de un usuario segun su ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuario modificado",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Usuario.class))),
-            @ApiResponse(responseCode = "204", description = "No hay contenido en la solicitud")
-    })
-    @Parameter(description = "El ID del usuario", example = "123")
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable int rut, @RequestBody Usuario user) {
-        if (userService.getuser(rut).isPresent()) {
-            userService.updateUsuario(rut, user);
-            return new ResponseEntity<>(user, HttpStatus.OK);
+    @Parameter(description = "El RUT del usuario SIN dígito verificador", example = "12345678")
+    public ResponseEntity<EntityModel<Usuario>> eliminarUsuario(@PathVariable int rut) {
+        if (usuarioService.getUsuarioByRut(rut).isPresent()) {
+            Usuario usuario  = usuarioService.getUsuarioByRut(rut).get();
+            usuarioService.deleteUsuario(rut);
+            return new ResponseEntity<>(assembler.toModel(usuario), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
