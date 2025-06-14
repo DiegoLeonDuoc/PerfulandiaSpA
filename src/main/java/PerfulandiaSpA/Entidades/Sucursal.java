@@ -15,6 +15,7 @@ import java.util.List;
 public class Sucursal {
     @Id
     @Column(name = "ID_SUCURSAL", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "NOMBRE_SUCURSAL", nullable = false, length = 50)

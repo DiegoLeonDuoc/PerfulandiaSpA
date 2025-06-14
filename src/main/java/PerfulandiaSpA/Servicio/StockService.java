@@ -1,98 +1,78 @@
 package PerfulandiaSpA.Servicio;
 
+import PerfulandiaSpA.DTO.StockDTO;
+import PerfulandiaSpA.Entidades.Producto;
 import PerfulandiaSpA.Entidades.Stock;
 
+import PerfulandiaSpA.Entidades.Sucursal;
+import PerfulandiaSpA.Repositorio.ProductoRepository;
 import PerfulandiaSpA.Repositorio.StockRepository;
+import PerfulandiaSpA.Repositorio.SucursalRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StockService {
 
     @Autowired
     StockRepository stockRepository;
-    // MÉTODOS CRUD
 
-    //CREATE
-    public String saveStock(Stock stock) {
-        if (stock.getId() == null) {
-            stockRepository.save(stock); // Guarda el stock en la BD
-            return "Stock agregado con éxito";
+    @Autowired
+    ProductoRepository productoRepository;
+
+    @Autowired
+    SucursalRepository sucursalRepository;
+
+    public Stock saveStock(StockDTO stockDTO) {
+        Stock stock = new Stock();
+        stock.setCantStock(stockDTO.getCantStock());
+
+        Optional<Producto> producto = productoRepository.findById(stockDTO.getIdProducto());
+        Optional<Sucursal> sucursal = sucursalRepository.findById(stockDTO.getIdSucursal());
+
+        if (producto.isPresent() && sucursal.isPresent()) {
+            stock.setProducto(producto.get());
+            stock.setSucursal(sucursal.get());
+            return stockRepository.save(stock);
         } else {
-            if (stockRepository.existsById(stock.getId())){
-                return "Stock ya existe";
-            } else { // Si no existe el stock, se crea
-                stockRepository.save(stock);
-                return "Stock agregado con éxito";
-            }
+            throw new EntityNotFoundException("Producto o Sucursal no encontrado");
         }
     }
 
-    //READ
-    // Retorna una lista de stockes en formato toString
-    public String getStocks() {
-        String output = "";
-        for (Stock stock : stockRepository.findAll()) {
-            output = datosStock(output, stock); // Acumulando datos de cada stock
-        }
-
-        if (output.isEmpty()) {
-            return "No hay stocks registrados";
-        } else {
-            return output; // retorna lista completa
-        }
-    }
-
-    // MÉTODO READ (LISTAR TODOS EN FORMATO JSON)
-    public List<Stock> getStocksJSON() {
+    public List<Stock> getStocks() {
         return stockRepository.findAll();
     }
 
-    // MÉTODO READ (BUSCAR POR ID)
-    public String getStockById(int id) {
-        if (stockRepository.existsById(id)) {
-            Stock stock = stockRepository.findById(id).get();
-            return datosStock("", stock);
-        }
-        return "Stock no encontrado";
+    public Optional<Stock> getStockByID(int id) {
+        return stockRepository.findById(id);
     }
 
-    // MÉTODO toString
-    private String datosStock(String output, Stock stock) {
-        // Si getIdProducto() y getIdSucursal() devuelven entidades:
-        Integer idProducto = stock.getProducto() != null ? stock.getProducto().getId() : null;
-        Integer idSucursal = stock.getSucursal() != null ? stock.getSucursal().getId() : null;
+    public Stock updateStock(Integer id, StockDTO stockDTO) {
+        Stock stockExistente = stockRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Stock no encontrado"));
 
-        output += "ID Stock: " + stock.getId() + "\n";
-        output += "Cantidad en Stock: " + stock.getCantStock() + "\n";
-        output += "ID Producto: " + (idProducto != null ? idProducto : "No asignado") + "\n";
-        output += "ID Sucursal: " + (idSucursal != null ? idSucursal : "No asignada") + "\n";
-        output += "\n";
-        return output;
+        stockExistente.setCantStock(stockDTO.getCantStock());
+
+        Optional<Producto> producto = productoRepository.findById(stockDTO.getIdProducto());
+        Optional<Sucursal> sucursal = sucursalRepository.findById(stockDTO.getIdSucursal());
+
+        if (producto.isPresent() && sucursal.isPresent()) {
+            stockExistente.setId(id);
+            stockExistente.setProducto(producto.get());
+            stockExistente.setSucursal(sucursal.get());
+        } else {
+            throw new EntityNotFoundException("Producto o Sucursal no encontrado");
+        }
+
+        return stockRepository.save(stockExistente);
     }
 
-
-    //UPDATE
-    public String updateStock(Stock stock, int id) {
-        if (stockRepository.existsById(id)) {
-            stock.setId(id);
-            stockRepository.save(stock);
-            return "Stock actualizado con éxito";
-        }
-        return "Stock no encontrado";
-    }
-
-
-
-    //DELETE
-    public String deleteStock(int id) {
-        if (stockRepository.existsById(id)) {
-            stockRepository.deleteById(id);
-            return "Stock eliminado con éxito";
-        }
-        return "Stock no encontrado";
+    public void deleteStock(int id) {
+        stockRepository.deleteById(id);
     }
 
 }

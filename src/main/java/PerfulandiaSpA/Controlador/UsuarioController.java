@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
-@Tag(name = "Controlador Usuarios", description = "Servicio de gestion de usuarios Fullstack I")
+@RequestMapping("/usuarios")
+@Tag(name = "Controlador Usuarios", description = "Servicio de gestion de usuarios")
 public class UsuarioController {
 
     @Autowired
