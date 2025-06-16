@@ -103,41 +103,6 @@ public class ProductosCarritoService {
         }
     }
 
-    public ProductosCarrito patchProductosCarrito(ProductosCarritoDTO productosCarritoDTO, int id) {
-        Optional<ProductosCarrito> productoCarritoOpt = productosCarritoRepository.findById(id);
-
-        if (productoCarritoOpt.isPresent()) {
-            ProductosCarrito productosCarritoParchado = productoCarritoOpt.get();
-
-            if (productosCarritoDTO.getCantProd() != null) {
-                productosCarritoParchado.setCantProd(productosCarritoDTO.getCantProd());
-            }
-
-            if (productosCarritoDTO.getIdCarrito() != null) {
-                Optional<Carrito> carritoOpt = carritoRepository.findById(productosCarritoDTO.getIdCarrito());
-                if (carritoOpt.isPresent()) {
-                    productosCarritoParchado.setCarrito(carritoOpt.get());
-                } else {
-                    throw new EntityNotFoundException("Carrito no encontrado");
-                }
-            }
-
-            if (productosCarritoDTO.getIdProducto() != null) {
-                Optional<Producto> productoOpt = productoRepository.findById(productosCarritoDTO.getIdProducto());
-                if (productoOpt.isPresent()) {
-                    productosCarritoParchado.setProducto(productoOpt.get());
-                } else {
-                    throw new EntityNotFoundException("Producto no encontrado");
-                }
-            }
-
-            return productosCarritoRepository.save(productosCarritoParchado);
-
-        } else {
-            throw new EntityNotFoundException("Producto en carrito no encontrado");
-        }
-    }
-
     // D
 
     public void deleteProductosCarrito(int id) {

@@ -6,11 +6,14 @@ import PerfulandiaSpA.Entidades.Pedido;
 import PerfulandiaSpA.Repositorio.ClienteRepository;
 import PerfulandiaSpA.Repositorio.EnvioRepository;
 import PerfulandiaSpA.Repositorio.PedidoRepository;
+import PerfulandiaSpA.Repositorio.SucursalRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EnvioService {
@@ -18,202 +21,139 @@ public class EnvioService {
     EnvioRepository envioRepository;
 
     @Autowired
-    ClienteRepository clienteRepository;
-
-    @Autowired
     PedidoRepository pedidoRepository;
 
+    @Autowired
+    SucursalRepository sucursalRepository;
+
+    @Autowired
+    ClienteRepository clienteRepository;
+
     // C
-    public String crearEnvio(EnvioDTO envio) {
+    public Envio crearEnvio(EnvioDTO envio) {
         Envio newEnvio = new Envio();
-        if (!pedidoRepository.existsById(envio.getIdPedido())) {
-            return "No existe un pedido asociado a ese ID";
-        }
-        if (pedidoRepository.findById(envio.getIdPedido()).get().getDirEnvio() == null) {
-            return "El pedido asociado fue entregado en tienda";
-        }
+
         newEnvio.setCodigoEnvio(envio.getCodigoEnvio());
-        Pedido pedido = pedidoRepository.findById(envio.getIdPedido()).get();
-        newEnvio.setPedidoAsociado(pedido);
         newEnvio.setFechaEnvio(envio.getFechaEnvio());
         newEnvio.setFechaLlegadaEstim(envio.getFechaLlegadaEstim());
         newEnvio.setFechaLlegadaReal(envio.getFechaLlegadaReal());
         newEnvio.setTransportista(envio.getTransportista());
         newEnvio.setNumSeguimiento(envio.getNumSeguimiento());
         newEnvio.setMetodoEnvio(envio.getMetodoEnvio());
-        envioRepository.save(newEnvio);
-        return "Envio agregado con éxito";
+
+        Optional<Pedido> pedido = pedidoRepository.findById(envio.getIdPedido());
+
+        if  (pedido.isPresent()) {
+            newEnvio.setPedidoAsociado(pedido.get());
+            return envioRepository.save(newEnvio);
+        } else {
+            throw new EntityNotFoundException("Pedido no encontrado");
+        }
     }
+
     // R
-    public String getEnvios() {
-        String output = "";
-        for (Envio envio : envioRepository.findAll()) {
-            output = datosEnvio(output, envio);
-        }
-        if (output.isEmpty()) {
-            return "No hay envios registrados";
-        } else {
-            return output;
-        }
-    }
-
-    public String getEnviosByRut(Integer rut) {
-        String output = "";
-        List<Integer> enviosIds = new ArrayList<>();
-        if (clienteRepository.existsById(rut)) {
-            for (Envio envio : envioRepository.findAll()) {
-                if (envio.getPedidoAsociado().getCliente().getRutUsuario().equals(rut)) {
-                    enviosIds.add(envio.getId());
-                }
-            }
-            if (enviosIds.isEmpty()) {
-                return "Este cliente no tiene envios registrados";
-            } else {
-                for (Integer id: enviosIds) {
-                    output += datosEnvio(output, envioRepository.findById(id).get());
-                }
-                return output;
-            }
-        } else {
-            return "Este cliente no existe";
-        }
-    }
-
-    public List<Envio> getEnviosJSON() {
+    public List<Envio> getEnvios() {
         return envioRepository.findAll();
     }
 
-    public String getEnviosSucursal(Integer idSucursal) {
-        String output = "";
-        for (Envio envio : envioRepository.findAll()) {
-            if (envio.getPedidoAsociado().getSucursal().getId().equals(idSucursal)) {
-                output = datosEnvio(output, envio);
+    public List<Envio> getEnviosByRut(Integer rut) {
+        List<Envio> enviosCliente = new ArrayList<>();
+        if (clienteRepository.existsById(rut)) {
+            for (Envio envio : envioRepository.findAll()) {
+                if (envio.getPedidoAsociado().getCliente().getRutUsuario().equals(rut)) {
+                    enviosCliente.add(envio);
+                }
             }
-        }
-        if (output.isEmpty()) {
-            return "No hay envios registrados en esta sucursal";
+            return enviosCliente;
         } else {
-            return output;
+            throw new EntityNotFoundException("Cliente no encontrado");
         }
     }
 
-    public List<Envio> getEnviosBySucursalJSON(Integer idSucursal) {
+    public List<Envio> getEnviosBySucursal(Integer id) {
         List<Envio> enviosSucursal = new ArrayList<>();
-        for (Envio envio : envioRepository.findAll()) {
-            if (envio.getPedidoAsociado().getSucursal().getId().equals(idSucursal)) {
-                enviosSucursal.add(envio);
+        if (sucursalRepository.existsById(id)) {
+            for (Envio envio : envioRepository.findAll()) {
+                if (envio.getPedidoAsociado().getSucursal().getId().equals(id)) {
+                    enviosSucursal.add(envio);
+                }
             }
+            return enviosSucursal;
+        } else {
+            throw new EntityNotFoundException("Sucursal no encontrada");
         }
-        return enviosSucursal;
+    }
+
+    public Optional<Envio> getEnvioByID(Integer id) {
+        return envioRepository.findById(id);
     }
 
     // U
 
-    public String updateEnvio(EnvioDTO envio) {
-        if (!envioRepository.existsById(envio.getId())) {
-            return "El envío a actualizar no existe";
+    public Envio updateEnvio(Integer id, EnvioDTO envio) {
+        Envio envioExistente = envioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Envío no encontrado"));
+
+        envioExistente.setCodigoEnvio(envio.getCodigoEnvio());
+        envioExistente.setFechaEnvio(envio.getFechaEnvio());
+        envioExistente.setFechaLlegadaEstim(envio.getFechaLlegadaEstim());
+        envioExistente.setFechaLlegadaReal(envio.getFechaLlegadaReal());
+        envioExistente.setTransportista(envio.getTransportista());
+        envioExistente.setNumSeguimiento(envio.getNumSeguimiento());
+        envioExistente.setMetodoEnvio(envio.getMetodoEnvio());
+
+        Optional<Pedido> pedido = pedidoRepository.findById(envio.getIdPedido());
+
+        if (pedido.isPresent()) {
+            envioExistente.setPedidoAsociado(pedido.get());
+            return envioRepository.save(envioExistente);
+        } else {
+            throw new EntityNotFoundException("Pedido no encontrado");
         }
-        if (!pedidoRepository.existsById(envio.getIdPedido())) {
-            return "No existe un pedido asociado a ese ID";
-        }
-        if (pedidoRepository.findById(envio.getIdPedido()).get().getDirEnvio() == null) {
-            return "El pedido asociado a ese ID fue entregado en tienda";
-        }
-        Envio envioParchado = envioRepository.findById(envio.getId()).get();
-        envioParchado.setCodigoEnvio(envio.getCodigoEnvio());
-        Pedido pedido = pedidoRepository.findById(envio.getIdPedido()).get();
-        envioParchado.setPedidoAsociado(pedido);
-        envioParchado.setFechaEnvio(envio.getFechaEnvio());
-        envioParchado.setFechaLlegadaEstim(envio.getFechaLlegadaEstim());
-        envioParchado.setFechaLlegadaReal(envio.getFechaLlegadaReal());
-        envioParchado.setTransportista(envio.getTransportista());
-        envioParchado.setNumSeguimiento(envio.getNumSeguimiento());
-        envioParchado.setMetodoEnvio(envio.getMetodoEnvio());
-        envioRepository.save(envioParchado);
-        return "Envio agregado con éxito";
     }
 
 
     // U/P
-    public String parcharEnvio(EnvioDTO envio, int id) {
-        if (envioRepository.existsById(id)) {
-            Envio envioParchado = envioRepository.findById(id).get();
-            if (envio.getCodigoEnvio() != null) {
-                envioParchado.setCodigoEnvio(envio.getCodigoEnvio());
-            }
-            if (envio.getIdPedido() != null) {
-                if (!pedidoRepository.existsById(envio.getIdPedido())) {
-                    return "No existe un pedido asociado a ese ID";
-                }
-                Pedido pedido = pedidoRepository.findById(envio.getIdPedido()).get();
-                if (pedido.getDirEnvio() == null) {
-                    return "El pedido asociado a ese ID fue entregado en tienda";
-                }
-                envioParchado.setPedidoAsociado(pedido);
-            }
+    public Envio patchEnvio(Integer id, EnvioDTO envio) {
+        Envio envioExistente = envioRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Envío no encontrado"));
 
-            if (envio.getFechaEnvio() != null) {
-                envioParchado.setFechaEnvio(envio.getFechaEnvio());
-            }
-
-            if (envio.getFechaLlegadaEstim() != null) {
-                envioParchado.setFechaLlegadaEstim(envio.getFechaLlegadaEstim());
-            }
-
-            if (envio.getFechaLlegadaReal() != null) {
-                envioParchado.setFechaLlegadaReal(envio.getFechaLlegadaReal());
-            }
-
-            if (envio.getTransportista() != null) {
-                envioParchado.setTransportista(envio.getTransportista());
-            }
-
-            if (envio.getNumSeguimiento() != null) {
-                envioParchado.setNumSeguimiento(envio.getNumSeguimiento());
-            }
-
-            if (envio.getMetodoEnvio() != null) {
-                envioParchado.setMetodoEnvio(envio.getMetodoEnvio());
-            }
-            envioRepository.save(envioParchado);
-            return "Envio actualizado con éxito";
+        if (envio.getCodigoEnvio() != null) {
+            envioExistente.setCodigoEnvio(envio.getCodigoEnvio());
         }
-        return "Envio no encontrado";
+        if (envio.getFechaEnvio() != null) {
+            envioExistente.setFechaEnvio(envio.getFechaEnvio());
+        }
+        if (envio.getFechaLlegadaEstim() != null) {
+            envioExistente.setFechaLlegadaEstim(envio.getFechaLlegadaEstim());
+        }
+        if (envio.getFechaLlegadaReal() != null) {
+            envioExistente.setFechaLlegadaReal(envio.getFechaLlegadaReal());
+        }
+        if (envio.getTransportista() != null) {
+            envioExistente.setTransportista(envio.getTransportista());
+        }
+        if (envio.getNumSeguimiento() != null) {
+            envioExistente.setNumSeguimiento(envio.getNumSeguimiento());
+        }
+        if (envio.getMetodoEnvio() != null) {
+            envioExistente.setMetodoEnvio(envio.getMetodoEnvio());
+        }
 
+        if (envio.getIdPedido() != null) {
+            Optional<Pedido> pedido = pedidoRepository.findById(envio.getIdPedido());
+            if (pedido.isPresent()) {
+                envioExistente.setPedidoAsociado(pedido.get());
+            } else {
+                throw new EntityNotFoundException("Pedido no encontrado");
+            }
+        }
+
+        return envioRepository.save(envioExistente);
     }
 
     // D
-
-    public String deleteEnvio(int id) {
-        for (Envio envio : envioRepository.findAll()) {
-            if (envio.getId() == id) {
-                envioRepository.delete(envio);
-                return "Envio eliminado con éxito";
-            }
-        }
-        return "Envio no existente";
-    }
-
-    // Funciones no CRUD
-
-    private String datosEnvio(String output, Envio envio) {
-        output += "ID Envio: " + envio.getId() + "\n";
-        output += "Código Envío: " + envio.getCodigoEnvio() + "\n";
-        output += "Fecha envío: " + envio.getFechaEnvio() + "\n";
-        output += "Fecha llegada estimada: " + envio.getFechaLlegadaEstim() + "\n";
-
-        if (envio.getFechaLlegadaReal() == null) {
-            output += "Fecha llegada real: No disponible\n";
-        } else {
-            output += "Fecha llegada real: " + envio.getFechaLlegadaReal() + "\n";
-        }
-
-        output += "Transportista: " + envio.getTransportista() + "\n";
-        output += "Número de seguimiento: " + envio.getNumSeguimiento() + "\n";
-        output += "Método de envío: " + envio.getMetodoEnvio() + "\n";
-        output += "ID Pedido asociado: " + envio.getPedidoAsociado().getId() + "\n";
-
-        return output;
-
+    public void deleteEnvio(int id) {
+        envioRepository.deleteById(id);
     }
 }

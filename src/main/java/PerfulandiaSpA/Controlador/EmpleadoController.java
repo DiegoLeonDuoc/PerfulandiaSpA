@@ -1,89 +1,162 @@
 package PerfulandiaSpA.Controlador;
 
+import PerfulandiaSpA.Assembler.EmpleadoModelAssembler;
 import PerfulandiaSpA.DTO.EmpleadoDTO;
 import PerfulandiaSpA.Entidades.Empleado;
 import PerfulandiaSpA.Servicio.EmpleadoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/empleados")
-@Tag(name="Servicio Empleados", description="Servicios de gestión de empleados")
+@RequestMapping("/empleado")
+@Tag(name="Controlador Empleado", description="Servicios de gestión de empleado")
 public class EmpleadoController {
 
     @Autowired
     EmpleadoService empleadoService;
 
+    @Autowired
+    EmpleadoModelAssembler assembler;
+
+    // C
     @PostMapping
-    @Operation(summary= "Crear empleado", description = "Servicio POST para registrar un empleado")
-    @ApiResponse(responseCode = "200", description="Confirmación sobre la creación del empleado")
-    public String crearEmpleado(@RequestBody EmpleadoDTO empleado){
-        return empleadoService.crearEmpleado(empleado);
+    @Operation(summary = "Agregar Empleado", description = "Permite registrar un empleado en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Empleado creado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Empleado.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenruto en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
+    })
+    public ResponseEntity<EntityModel<Empleado>> crearEmpleado(@RequestBody EmpleadoDTO empleadoDTO) {
+        Empleado empleado = empleadoService.crearEmpleado(empleadoDTO);
+        if (empleadoService.getEmpleadoByRut(empleado.getRutUsuario()).isPresent()) {
+            return new ResponseEntity<>(assembler.toModel(empleado), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
+    // R
     @GetMapping
-    @Operation(summary= "Obtener empleados", description = "Servicio GET para obtener información sobre los empleados en formato String")
-    @ApiResponse(responseCode = "200", description="Registro de empleados en formato texto simple")
-    public String getEmpleados(){
-        return empleadoService.getEmpleados();
+    @Operation(summary= "Obtener empleados", description = "Obtiene la lista de empleados registrados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna lista completa de empleados"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
+    })
+    public ResponseEntity<CollectionModel<EntityModel<Empleado>>> getEmpleados(){
+        List<Empleado> empleados = empleadoService.getEmpleados();
+        if (empleados.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(assembler.toCollectionModel(empleados), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/{rut}")
-    @Operation(summary= "Obtener empleados por RUT", description = "Servicio GET para obtener información sobre los empleados en formato String")
-    @ApiResponse(responseCode = "200", description="Registro de empleados en formato texto simple")
-    public String getEmpleadoByRut(@PathVariable int rut){
-        return empleadoService.getEmpleadoByRut(rut);
-    }
-
-    @GetMapping("/json")
-    @Operation(summary= "Obtener empleados JSON", description = "Servicio GET para obtener información sobre los empleados en formato JSON")
-    @ApiResponse(responseCode = "200", description="Registro de empleados en formato JSON")
-    public List<Empleado> getEmpleadosJSON() { return empleadoService.getEmpleadosJSON(); }
-
-    @GetMapping("/sucursal/{id_sucursal}")
-    @Operation(summary= "Obtener empleados por sucursal", description = "Servicio GET para obtener información sobre los empleados asociados a una sucursal específica en formato String")
-    @ApiResponse(responseCode = "200", description="Registro de empleados en formato texto simple")
-    public String getEmpleadosEnSucursal(@PathVariable int id_sucursal){
-        return empleadoService.getEmpleadosSucursal(id_sucursal);
-    }
-
-    @GetMapping("/sucursal/{id_sucursal}/json")
-    @Operation(summary= "Obtener empleados por sucursal JSON", description = "Servicio GET para obtener información sobre los empleados asociados a una sucursal específica en formato JSON")
-    @ApiResponse(responseCode = "200", description="Registro de empleados en formato JSON")
-    public List<Empleado> getEmpleadosEnSucursalJSON(@PathVariable int id_sucursal){
-        return empleadoService.getEmpleadosSucursalJSON(id_sucursal);
-    }
-
-    @PutMapping("/{rut}")
-    @Operation(summary= "Modificar empleado", description = "Servicio PUT para modificar información sobre un empleado específico")
+    @Operation(summary = "Buscar empleado por ID", description = "Obtiene un empleado según la ID registrada en el sistema")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia de atributos"),
-            //@ApiResponse(responseCode = "404", description="Empleado no encontrado")
+            @ApiResponse(responseCode = "200", description = "Retorna Empleado"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
     })
-    public String updateEmpleado(@RequestBody EmpleadoDTO empleado, @PathVariable int rut) { return empleadoService.updateEmpleado(empleado, rut); }
+    @Parameter(description = "El RUT del empleado", example = "12345678")
+    public ResponseEntity<EntityModel<Empleado>> getEmpleadoById(@PathVariable int rut) {
+        Optional<Empleado> empleadoOptional = empleadoService.getEmpleadoByRut(rut);
+        if (empleadoOptional.isPresent()) {
+            return new ResponseEntity<>(assembler.toModel(empleadoOptional.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/sucursal/{id}")
+    @Operation(summary = "Buscar empleados por ID de sucursal", description = "Obtiene los empleados según la ID de la sucursal registrada en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna lista de Empleados"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
+    })
+    @Parameter(description = "El RUT del empleado", example = "12345678")
+    public ResponseEntity<CollectionModel<EntityModel<Empleado>>> getEmpleadoBySucursal(@PathVariable int id) {
+        List<Empleado> empleados = empleadoService.getEmpleadosBySucursal(id);
+        if (empleados.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(assembler.toCollectionModel(empleados), HttpStatus.OK);
+        }
+    }
+
+    // U
+    @PutMapping("/{rut}")
+    @Operation(summary = "Actualizar empleado", description = "Permite actualizar los datos de un empleado según su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Empleado modificado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Empleado.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenruto en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
+    })
+    @Parameter(description = "El RUT del empleado", example = "12345678")
+    public ResponseEntity<Empleado> updateEmpleado(@PathVariable int rut, @RequestBody EmpleadoDTO empleadoDTO) {
+        Optional<Empleado> empleadoOptional = empleadoService.getEmpleadoByRut(rut);
+        if (empleadoOptional.isPresent()) {
+            Empleado empleado = empleadoService.updateEmpleado(empleadoDTO, rut);
+            return new ResponseEntity<>(empleado, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @PatchMapping("/{rut}")
-    @Operation(summary= "Modificar empleado", description = "Servicio PUT para modificar información sobre un empleado específico")
+    @Operation(summary = "Parchar Empleado", description = "Permite actualizar parcialmente los datos de un empleado según su ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia de atributos"),
-            //@ApiResponse(responseCode = "404", description="Empleado no encontrado")
+            @ApiResponse(responseCode = "200", description = "Empleado modificado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Empleado.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenruto en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
     })
-    public String parcharEmpleado(@RequestBody EmpleadoDTO empleado, @PathVariable int rut) { return empleadoService.parcharEmpleado(empleado, rut); }
-
-    @DeleteMapping("/{rut}")
-    @Operation(summary= "Eliminar empleado", description = "Servicio DELETE para eliminar registro de un empleado específico")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa o información sobre inexistencia del empleado"),
-            //@ApiResponse(responseCode = "404", description="Empleado no encontrado")
-    })
-    public String deleteEmpleado(@PathVariable int rut){
-        return empleadoService.deleteEmpleado(rut);
+    @Parameter(description = "El RUT del empleado", example = "12345678")
+    public ResponseEntity<Empleado> parcharEmpleado(@PathVariable int rut, @RequestBody EmpleadoDTO empleadoDTO) {
+        Optional<Empleado> empleadoOptional = empleadoService.getEmpleadoByRut(rut);
+        if (empleadoOptional.isPresent()) {
+            Empleado empleado = empleadoService.patchEmpleado(empleadoDTO, rut);
+            return new ResponseEntity<>(empleado, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
+    // D
+    @DeleteMapping("/{rut}")
+    @Operation(summary= "Eliminar empleado", description = "Elimina un empleado específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description="Retorna el empleado eliminado"),
+            @ApiResponse(responseCode = "404", description="Empleado no encontrado")
+    })
+    @Parameter(description = "El RUT del empleado", example = "12345678")
+    public ResponseEntity<EntityModel<Empleado>> eliminarEmpleado(@PathVariable int rut) {
+        Optional<Empleado> empleadoOptional = empleadoService.getEmpleadoByRut(rut);
+        if (empleadoOptional.isPresent()) {
+            Empleado empleado = empleadoOptional.get();
+            empleadoService.deleteEmpleado(rut);
+            return new ResponseEntity<>(assembler.toModel(empleado), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
+

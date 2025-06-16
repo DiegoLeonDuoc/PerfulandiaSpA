@@ -18,6 +18,7 @@ public class ProductosPedidoModelAssembler implements RepresentationModelAssembl
                 linkTo(methodOn(ProductosPedidoController.class).getProductoPedidoByID(productoPedido.getId())).withSelfRel(),
                 linkTo(methodOn(ProductosPedidoController.class).getProductosPedidos()).withRel("Productos en pedidos"),
                 linkTo(methodOn(ProductosPedidoController.class).updateProductosPedido(productoPedido.getId(), null)).withRel("PUT"),
+                linkTo(methodOn(ProductosPedidoController.class).patchProductosPedido(productoPedido.getId(), null)).withRel("PATCH"),
                 linkTo(methodOn(ProductosPedidoController.class).eliminarProductosPedido(productoPedido.getId())).withRel("DELETE")
         );
     }

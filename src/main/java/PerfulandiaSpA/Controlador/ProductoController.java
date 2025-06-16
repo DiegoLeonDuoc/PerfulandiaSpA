@@ -94,10 +94,10 @@ public class ProductoController {
             @ApiResponse(responseCode = "400", description = "JSON con mal formato", content = @Content)
     })
     @Parameter(description = "El ID del producto", example = "1")
-    public ResponseEntity<Producto> updateProducto(@PathVariable int id, @RequestBody Producto producto) {
+    public ResponseEntity<EntityModel<Producto>> updateProducto(@PathVariable int id, @RequestBody Producto producto) {
         if (productoService.getProductoByID(id).isPresent()) {
             productoService.updateProducto(producto, id);
-            return new ResponseEntity<>(producto, HttpStatus.OK);
+            return new ResponseEntity<>(assembler.toModel(producto), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

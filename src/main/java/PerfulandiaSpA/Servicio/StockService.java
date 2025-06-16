@@ -63,11 +63,10 @@ public class StockService {
             stockExistente.setId(id);
             stockExistente.setProducto(producto.get());
             stockExistente.setSucursal(sucursal.get());
+            return stockRepository.save(stockExistente);
         } else {
             throw new EntityNotFoundException("Producto o Sucursal no encontrado");
         }
-
-        return stockRepository.save(stockExistente);
     }
 
     public void deleteStock(int id) {

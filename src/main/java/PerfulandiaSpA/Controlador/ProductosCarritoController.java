@@ -120,26 +120,6 @@ public class ProductosCarritoController {
         }
     }
 
-    @PatchMapping("/{id}")
-    @Operation(summary = "Parchar producto en carrito", description = "Permite actualizar parcialmente los datos de un producto en carrito según su ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Producto en carrito modificado",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProductosCarrito.class))),
-            @ApiResponse(responseCode = "204", description = "No hay contenido en la solicitud"),
-            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
-    })
-    @Parameter(description = "El ID del producto en carrito", example = "1")
-    public ResponseEntity<ProductosCarrito> patchProductosCarrito(@PathVariable int id, @RequestBody ProductosCarritoDTO productosCarritoDTO) {
-        Optional<ProductosCarrito> productosCarritoOptional = productosCarritoService.getProductoCarritoByID(id);
-        if (productosCarritoOptional.isPresent()) {
-            ProductosCarrito productosCarrito = productosCarritoService.patchProductosCarrito(productosCarritoDTO, id);
-            return new ResponseEntity<>(productosCarrito, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
     // D
     @DeleteMapping("/{id}")
     @Operation(summary= "Eliminar producto en carrito", description = "Elimina un producto en carrito específico")

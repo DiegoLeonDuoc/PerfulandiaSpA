@@ -18,6 +18,7 @@ public class PedidoModelAssembler implements RepresentationModelAssembler<Pedido
                 linkTo(methodOn(PedidoController.class).getPedidoByID(pedido.getId())).withSelfRel(),
                 linkTo(methodOn(PedidoController.class).getPedidos()).withRel("pedidos"),
                 linkTo(methodOn(PedidoController.class).updatePedido(pedido.getId(), null)).withRel("PUT"),
+                linkTo(methodOn(PedidoController.class).patchPedido(pedido.getId(), null)).withRel("PATCH"),
                 linkTo(methodOn(PedidoController.class).eliminarPedido(pedido.getId())).withRel("DELETE")
         );
     }

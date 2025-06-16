@@ -1,10 +1,8 @@
 package PerfulandiaSpA.Entidades;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -20,7 +18,7 @@ public class Usuario {
     private Integer rutUsuario;
 
     @Column(name = "DV_USUARIO", nullable = false, length = 1)
-    private char dvUsuario;
+    private Character dvUsuario;
 
     @Column(name = "NOM_USUARIO", nullable = false, length = 30)
     private String nomUsuario;
@@ -35,7 +33,7 @@ public class Usuario {
     private String apellidoMaterno;
 
     @Column(name = "SEXO_USUARIO", nullable = false, length = 1)
-    private char sexoUsuario;
+    private Character sexoUsuario;
 
     @Column(name = "DIR_USUARIO", nullable = false, length = 100)
     private String dirUsuario;
@@ -55,7 +53,6 @@ public class Usuario {
     @Column(name = "PASS_USUARIO", nullable = false, length = 200)
     private String passUsuario;
 
-    //@ColumnDefault("CLIENTE")
     @Column(name = "TIPO_USUARIO", nullable = false, length = 13, updatable = false, insertable = false)
     private String tipoUsuario;
 

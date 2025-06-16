@@ -1,80 +1,145 @@
 package PerfulandiaSpA.Controlador;
 
+import PerfulandiaSpA.Assembler.ClienteModelAssembler;
 import PerfulandiaSpA.Entidades.Cliente;
 import PerfulandiaSpA.Servicio.ClienteService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/clientes")
-@Tag(name="Servicio Clientes", description="Servicios de gestión para clientes")
+@RequestMapping("/cliente")
+@Tag(name="Controlador Cliente", description="Servicios de gestión de cliente")
 public class ClienteController {
 
     @Autowired
     ClienteService clienteService;
 
+    @Autowired
+    ClienteModelAssembler assembler;
+
+    // C
     @PostMapping
-    @Operation(summary= "Crear cliente", description = "Servicio POST para crear usuarios tipo cliente")
-    @ApiResponse(responseCode = "200", description="Confirmación sobre la creación del usuario")
-    public String addCliente(@RequestBody Cliente cliente){
-        return clienteService.crearCliente(cliente);
+    @Operation(summary = "Agregar Cliente", description = "Permite registrar un cliente en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Cliente creado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Cliente.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenruto en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
+    })
+    public ResponseEntity<EntityModel<Cliente>> crearCliente(@RequestBody Cliente cliente) {
+        clienteService.crearCliente(cliente);
+        if (clienteService.getClienteByRut(cliente.getRutUsuario()).isPresent()) {
+            return new ResponseEntity<>(assembler.toModel(cliente), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
+    // R
     @GetMapping
-    @Operation(summary= "Obtener clientes", description = "Servicio GET para obtener información sobre clientes en formato String")
-    @ApiResponse(responseCode = "200", description="Registro de clientes en formato texto simple")
-    public String getClientes(){
-        return clienteService.getClientes();
+    @Operation(summary= "Obtener clientes", description = "Obtiene la lista de clientes registrados")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna lista completa de clientes"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
+    })
+    public ResponseEntity<CollectionModel<EntityModel<Cliente>>> getClientes(){
+        List<Cliente> clientes = clienteService.getClientes();
+        if (clientes.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(assembler.toCollectionModel(clientes), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/{rut}")
-    @Operation(summary= "Obtener cliente por RUT", description = "Servicio GET para obtener información sobre un cliente específico en formato String")
+    @Operation(summary = "Buscar cliente por RUT", description = "Obtiene un cliente según la RUT registrada en el sistema")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro del cliente en formato texto simple o información de cliente no encontrado"),
-            //@ApiResponse(responseCode = "404", description="Usuario no encontrado")
+            @ApiResponse(responseCode = "200", description = "Retorna Cliente"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
     })
-    public String getClienteByRut(@PathVariable Integer rut){
-        return clienteService.getClienteByRut(rut);
+    @Parameter(description = "El RUT del cliente", example = "12345678")
+    public ResponseEntity<EntityModel<Cliente>> getClienteByRut(@PathVariable int rut) {
+        Optional<Cliente> clienteOptional = clienteService.getClienteByRut(rut);
+        if (clienteOptional.isPresent()) {
+            return new ResponseEntity<>(assembler.toModel(clienteOptional.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/json")
-    @Operation(summary= "Obtener clientes en formato JSON", description = "Servicio GET para obtener información sobre clientes en formato JSON")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro de usuarios en formato JSON"),
-            //@ApiResponse(responseCode = "404", description="Usuario no encontrado")
-    })
-    public List<Cliente> getClientesJSON() { return clienteService.getClientesJSON(); }
-
+    // U
     @PutMapping("/{rut}")
-    @Operation(summary= "Modificar cliente", description = "Servicio PUT para modificar datos de un cliente en específico")
+    @Operation(summary = "Actualizar cliente", description = "Permite actualizar los datos de un cliente según su RUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información de cliente no encontrado."),
-            //@ApiResponse(responseCode = "404", description="Cliente no encontrado")
+            @ApiResponse(responseCode = "200", description = "Cliente modificado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Cliente.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenruto en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
     })
-    public String updateCliente(@RequestBody Cliente cliente, @PathVariable Integer rut) { return clienteService.updateCliente(cliente, rut); }
+    @Parameter(description = "El RUT del cliente", example = "12345678")
+    public ResponseEntity<EntityModel<Cliente>> updateCliente(@PathVariable int rut, @RequestBody Cliente cliente) {
+        Optional<Cliente> clienteOptional = clienteService.getClienteByRut(rut);
+        if (clienteOptional.isPresent()) {
+            clienteService.updateCliente(cliente, rut);
+            return new ResponseEntity<>(assembler.toModel(clienteOptional.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @PatchMapping("/{rut}")
-    @Operation(summary= "Parchar cliente", description = "Servicio PATCH para modificar datos de un cliente en específico de forma parcial")
+    @Operation(summary = "Parchar Cliente", description = "Permite actualizar parcialmente los datos de un cliente según su RUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información de cliente no encontrado."),
-            //@ApiResponse(responseCode = "404", description="Cliente no encontrado")
+            @ApiResponse(responseCode = "200", description = "Cliente modificado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Cliente.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenruto en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
     })
-    public String parcharCliente(@RequestBody Cliente cliente, @PathVariable Integer rut) { return clienteService.parcharCliente(cliente, rut); }
-
-    @DeleteMapping("/{rut}")
-    @Operation(summary= "Eliminar cliente", description = "Servicio DELETE para un cliente específico")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de la eliminación del cliente o información de cliente no existente."),
-            //@ApiResponse(responseCode = "404", description="Cliente no encontrado")
-    })
-    public String deleteCliente(@PathVariable int rut){
-        return clienteService.deleteCliente(rut);
+    @Parameter(description = "El RUT del cliente", example = "12345678")
+    public ResponseEntity<EntityModel<Cliente>> patchCliente(@PathVariable int rut, @RequestBody Cliente cliente) {
+        Optional<Cliente> clienteOptional = clienteService.getClienteByRut(rut);
+        if (clienteOptional.isPresent()) {
+            clienteService.patchCliente(cliente, rut);
+            return new ResponseEntity<>(assembler.toModel(cliente), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
+    // D
+    @DeleteMapping("/{rut}")
+    @Operation(summary= "Eliminar cliente", description = "Elimina un cliente específico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description="Retorna el cliente eliminado"),
+            @ApiResponse(responseCode = "404", description="Cliente no encontrado")
+    })
+    @Parameter(description = "El RUT del cliente", example = "12345678")
+    public ResponseEntity<EntityModel<Cliente>> eliminarCliente(@PathVariable int rut) {
+        Optional<Cliente> clienteOptional = clienteService.getClienteByRut(rut);
+        if (clienteOptional.isPresent()) {
+            Cliente cliente = clienteOptional.get();
+            clienteService.deleteCliente(rut);
+            return new ResponseEntity<>(assembler.toModel(cliente), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
+
