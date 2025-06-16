@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +33,6 @@ public class ProductosPedido {
     private Integer precioTotalProd;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_DESCUENTO")
     private Descuento descuento;
 
@@ -41,11 +41,12 @@ public class ProductosPedido {
     @JoinColumn(name = "ID_PEDIDO", nullable = false)
     private Pedido pedido;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_PRODUCTO", nullable = false)
+    @JoinColumn(name = "ID_PRODUCTO")
     private Producto producto;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productoPedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Devolucion> devoluciones = new ArrayList<>();
 

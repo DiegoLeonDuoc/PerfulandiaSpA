@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,9 +21,8 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "ID_SUCURSAL", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ID_SUCURSAL")
     private Sucursal sucursal;
 
     @Column(name = "FEC_PEDIDO", nullable = false)
@@ -51,10 +51,12 @@ public class Pedido {
     @JoinColumn(name = "RUT_USUARIO", nullable = false)
     private Cliente cliente;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductosPedido> productos = new ArrayList<>();
+    private List<ProductosPedido> productosEnPedido = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "pedidoAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Envio> envios = new ArrayList<>();
+    private List<Envio> pedidosEnviados = new ArrayList<>();
 
 }

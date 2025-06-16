@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,8 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,5 +37,9 @@ public class Descuento {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "ID_PRODUCTO")
     private Producto producto;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "descuento", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductosPedido> pedidosDescontados = new ArrayList<>();
 
 }

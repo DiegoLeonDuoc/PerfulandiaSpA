@@ -1,12 +1,20 @@
 package PerfulandiaSpA.Servicio;
 
+import PerfulandiaSpA.DTO.ReabastecimientoDTO;
+import PerfulandiaSpA.Entidades.Producto;
+import PerfulandiaSpA.Entidades.Proveedor;
 import PerfulandiaSpA.Entidades.Reabastecimiento;
+import PerfulandiaSpA.Entidades.Sucursal;
+import PerfulandiaSpA.Repositorio.ProductoRepository;
+import PerfulandiaSpA.Repositorio.ProveedorRepository;
 import PerfulandiaSpA.Repositorio.ReabastecimientoRepository;
+import PerfulandiaSpA.Repositorio.SucursalRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReabastecimientoService {
@@ -14,86 +22,68 @@ public class ReabastecimientoService {
     @Autowired
     ReabastecimientoRepository reabastecimientoRepository;
 
-    // CREATE
-    public String saveReabastecimiento(Reabastecimiento reabastecimiento) {
-        if (reabastecimiento.getId() == null) {
-            reabastecimientoRepository.save(reabastecimiento);
-            return "Reabastecimiento agregado con éxito";
+    @Autowired
+    ProductoRepository productoRepository;
+
+    @Autowired
+    SucursalRepository sucursalRepository;
+
+    @Autowired
+    ProveedorRepository proveedorRepository;
+
+    public Reabastecimiento saveReabastecimiento(ReabastecimientoDTO reabastecimientoDTO) {
+        Reabastecimiento reabastecimiento = new Reabastecimiento();
+        reabastecimiento.setCantProductos(reabastecimientoDTO.getCantProductos());
+        reabastecimiento.setFechaReabas(reabastecimientoDTO.getFechaReabas());
+        reabastecimiento.setEstadoReabas(reabastecimientoDTO.getEstadoReabas());
+
+        Optional<Producto> producto = productoRepository.findById(reabastecimientoDTO.getIdProducto());
+        Optional<Sucursal> sucursal = sucursalRepository.findById(reabastecimientoDTO.getIdSucursal());
+        Optional<Proveedor> proveedor = proveedorRepository.findById(reabastecimientoDTO.getIdProveedor());
+
+        if (producto.isPresent() && sucursal.isPresent() && proveedor.isPresent()) {
+            reabastecimiento.setProducto(producto.get());
+            reabastecimiento.setSucursal(sucursal.get());
+            reabastecimiento.setProveedor(proveedor.get());
+            return reabastecimientoRepository.save(reabastecimiento);
         } else {
-            if (reabastecimientoRepository.existsById(reabastecimiento.getId())) {
-                return "Reabastecimiento ya existe";
-            } else {
-                reabastecimientoRepository.save(reabastecimiento);
-                return "Reabastecimiento agregado con éxito";
-            }
+            throw new EntityNotFoundException("Producto, Sucursal o Proveedor no encontrado");
         }
     }
 
-    // READ (Formato toString)
-    public String getReabastecimientos() {
-        String output = "";
-        for (Reabastecimiento r : reabastecimientoRepository.findAll()) {
-            output = datosReabastecimiento(output, r);
-        }
-
-        if (output.isEmpty()) {
-            return "No hay reabastecimientos registrados";
-        } else {
-            return output;
-        }
-    }
-
-    // READ (JSON)
-    public List<Reabastecimiento> getReabastecimientosJSON() {
+    public List<Reabastecimiento> getReabastecimientos() {
         return reabastecimientoRepository.findAll();
     }
 
-    // READ (por ID)
-    public String getReabastecimientoById(Integer id) {
-        if (reabastecimientoRepository.existsById(id)) {
-            Reabastecimiento r = reabastecimientoRepository.findById(id).get();
-            return datosReabastecimiento("", r);
-        }
-        return "Reabastecimiento no encontrado";
+    public Optional<Reabastecimiento> getReabastecimientoByID(int id) {
+        return reabastecimientoRepository.findById(id);
     }
 
-    // UPDATE
-    public String updateReabastecimiento(Reabastecimiento r, Integer id) {
-        if (reabastecimientoRepository.existsById(id)) {
-            r.setId(id);
-            reabastecimientoRepository.save(r);
-            return "Reabastecimiento actualizado con éxito";
+    public Reabastecimiento updateReabastecimiento(Integer id, ReabastecimientoDTO reabastecimientoDTO) {
+        Reabastecimiento reabastecimientoExistente = reabastecimientoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Reabastecimiento no encontrado"));
+
+        reabastecimientoExistente.setCantProductos(reabastecimientoDTO.getCantProductos());
+        reabastecimientoExistente.setFechaReabas(reabastecimientoDTO.getFechaReabas());
+        reabastecimientoExistente.setEstadoReabas(reabastecimientoDTO.getEstadoReabas());
+
+        Optional<Producto> producto = productoRepository.findById(reabastecimientoDTO.getIdProducto());
+        Optional<Sucursal> sucursal = sucursalRepository.findById(reabastecimientoDTO.getIdSucursal());
+        Optional<Proveedor> proveedor = proveedorRepository.findById(reabastecimientoDTO.getIdProveedor());
+
+        if (producto.isPresent() && sucursal.isPresent() && proveedor.isPresent()) {
+            reabastecimientoExistente.setId(id);
+            reabastecimientoExistente.setProducto(producto.get());
+            reabastecimientoExistente.setSucursal(sucursal.get());
+            reabastecimientoExistente.setProveedor(proveedor.get());
+            return reabastecimientoRepository.save(reabastecimientoExistente);
+        } else {
+            throw new EntityNotFoundException("Producto, Sucursal o Proveedor no encontrado");
         }
-        return "Reabastecimiento no encontrado";
     }
 
-    // DELETE
-    public String deleteReabastecimiento(Integer id) {
-        if (reabastecimientoRepository.existsById(id)) {
-            reabastecimientoRepository.deleteById(id);
-            return "Reabastecimiento eliminado con éxito";
-        }
-        return "Reabastecimiento no encontrado";
-    }
-
-    // Formatear texto
-    private String datosReabastecimiento(String output, Reabastecimiento r) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String fecha = r.getFechaReabas() != null ? r.getFechaReabas().format(formatter) : "No definida";
-
-        Integer idProducto = r.getProducto() != null ? r.getProducto().getId() : null;
-        Integer idSucursal = r.getSucursal() != null ? r.getSucursal().getId() : null;
-        Integer idProveedor = r.getProveedor() != null ? r.getProveedor().getId() : null;
-
-        output += "ID Reabastecimiento: " + r.getId() + "\n";
-        output += "Cantidad: " + r.getCantProductos() + "\n";
-        output += "Fecha: " + fecha + "\n";
-        output += "Estado: " + r.getEstadoReabas() + "\n";
-        output += "ID Producto: " + (idProducto != null ? idProducto : "No asignado") + "\n";
-        output += "ID Sucursal: " + (idSucursal != null ? idSucursal : "No asignado") + "\n";
-        output += "ID Proveedor: " + (idProveedor != null ? idProveedor : "No asignado") + "\n\n";
-        return output;
+    public void deleteReabastecimiento(int id) {
+        reabastecimientoRepository.deleteById(id);
     }
 
 }
-

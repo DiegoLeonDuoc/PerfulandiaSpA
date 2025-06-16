@@ -3,16 +3,19 @@ package PerfulandiaSpA.Servicio;
 import PerfulandiaSpA.DTO.PedidoDTO;
 import PerfulandiaSpA.Entidades.Cliente;
 import PerfulandiaSpA.Entidades.Pedido;
+import PerfulandiaSpA.Entidades.Reabastecimiento;
 import PerfulandiaSpA.Entidades.Sucursal;
 import PerfulandiaSpA.Repositorio.ClienteRepository;
 import PerfulandiaSpA.Repositorio.PedidoRepository;
 import PerfulandiaSpA.Repositorio.SucursalRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PedidoService {
@@ -26,82 +29,51 @@ public class PedidoService {
     ClienteRepository clienteRepository;
 
     // C
-    public String crearPedido(PedidoDTO pedidoDTO) {
+    public Pedido crearPedido(PedidoDTO pedidoDTO) {
         Pedido pedido = new Pedido();
-        if (sucursalRepository.existsById(pedidoDTO.getIdSucursal())) {
-            Sucursal sucursal = sucursalRepository.findById(pedidoDTO.getIdSucursal()).get();
-            pedido.setSucursal(sucursal);
-            if (clienteRepository.existsById(pedidoDTO.getRutCliente())) {
-                Cliente cliente = clienteRepository.findById(pedidoDTO.getRutCliente()).get();
-                pedido.setMetodoPago(pedidoDTO.getMetodoPago());
-                pedido.setDirEnvio(pedidoDTO.getDirEnvio());
-                pedido.setDirFacturacion(pedidoDTO.getDirFacturacion());
-                pedido.setCostoEnvio(pedidoDTO.getCostoEnvio());
-                pedido.setPrecioPedido(pedidoDTO.getPrecioPedido());
-                pedido.setAnotaciones(pedidoDTO.getAnotaciones());
-                pedido.setCliente(cliente);
-                pedido.setFecPedido(LocalDate.now());
-                pedidoRepository.save(pedido);
-            } else {
-                return "Ingrese un RUT de cliente válido";
-            }
-            return "Pedido agregado con éxito";
+        pedido.setMetodoPago(pedidoDTO.getMetodoPago());
+        pedido.setDirEnvio(pedidoDTO.getDirEnvio());
+        pedido.setDirFacturacion(pedidoDTO.getDirFacturacion());
+        pedido.setCostoEnvio(pedidoDTO.getCostoEnvio());
+        pedido.setPrecioPedido(pedidoDTO.getPrecioPedido());
+        pedido.setAnotaciones(pedidoDTO.getAnotaciones());
+        pedido.setFecPedido(LocalDate.now());
+
+        Optional<Cliente> cliente = clienteRepository.findById(pedidoDTO.getRutCliente());
+        Optional<Sucursal> sucursal = sucursalRepository.findById(pedidoDTO.getIdSucursal());
+
+        if (cliente.isPresent() && sucursal.isPresent()) {
+            pedido.setCliente(cliente.get());
+            pedido.setSucursal(sucursal.get());
+            return pedidoRepository.save(pedido);
         } else {
-            return "La sucursal no existe";
+            throw new EntityNotFoundException("Cliente o Sucursal no encontrado");
         }
     }
+
     // R
-    public String getPedidos() {
-        String output = "";
-        for (Pedido pedido : pedidoRepository.findAll()) {
-            output = datosPedido(output, pedido);
-        }
-        if (output.isEmpty()) {
-            return "No hay pedidos registrados";
-        } else {
-            return output;
-        }
-    }
 
-    public String getPedidosByRut(Integer rut) {
-        String output = "";
-        List<Integer> pedidosIds = new ArrayList<>();
-        if (clienteRepository.existsById(rut)) {
-            for (Pedido pedido : pedidoRepository.findAll()) {
-                if (pedido.getCliente().getRutUsuario().equals(rut)) {
-                    pedidosIds.add(pedido.getId());
-                }
-            }
-            if (pedidosIds.isEmpty()) {
-                return "Este cliente no tiene pedidos registrados";
-            } else {
-                for (Integer id: pedidosIds) {
-                    output += datosPedido(output, pedidoRepository.findById(id).get());
-                }
-                return output;
-            }
-        } else {
-            return "Este cliente no existe";
-        }
-    }
-
-    public List<Pedido> getPedidosJSON() {
+    public List<Pedido> getPedidos() {
         return pedidoRepository.findAll();
     }
 
-    public String getPedidosSucursal(Integer idSucursal) {
-        String output = "";
-        for (Pedido pedido : pedidoRepository.findAll()) {
-            if (pedido.getSucursal().getId().equals(idSucursal)) {
-                output = datosPedido(output, pedido);
-            }
-        }
-        if (output.isEmpty()) {
-            return "No hay pedidos registrados en esta sucursal";
-        } else {
-            return output;
-        }
+    public Optional<Pedido> getPedidoByID(int id) {
+        return pedidoRepository.findById(id);
     }
+
+//    public List<Pedido> getPedidosByRut(Integer rut) {
+//        List<Pedido> productosCliente = new ArrayList<>();
+//        if (clienteRepository.existsById(rut)) {
+//            for (Pedido pedido : pedidoRepository.findAll()) {
+//                if (pedido.getCliente().getRutUsuario().equals(rut)) {
+//                    productosCliente.add(pedido);
+//                }
+//            }
+//            return productosCliente;
+//        } else {
+//            throw new EntityNotFoundException("Cliente no encontrado");
+//        }
+//    }
 
     public List<Pedido> getPedidosBySucursalJSON(Integer idSucursal) {
         List<Pedido> pedidosSucursal = new ArrayList<>();
@@ -115,120 +87,88 @@ public class PedidoService {
 
     // U
 
-    public String updatePedido(PedidoDTO pedidoDTO) {
-        if (pedidoRepository.existsById(pedidoDTO.getId())) {
-            Pedido pedidoUpdate = pedidoRepository.findById(pedidoDTO.getId()).get();
-            pedidoUpdate.setId(pedidoDTO.getId());
-            if (sucursalRepository.existsById(pedidoDTO.getIdSucursal())) {
-                Sucursal sucursalUpdate = sucursalRepository.findById(pedidoDTO.getIdSucursal()).get();
-                pedidoUpdate.setSucursal(sucursalUpdate);
+    public Pedido updatePedido(PedidoDTO pedidoDTO, int id) {
+        Pedido pedidoParchado;
+        Optional<Pedido> pedido = pedidoRepository.findById(id);
+        if (pedido.isPresent()) {
+            pedidoParchado = pedido.get();
+            pedidoParchado.setMetodoPago(pedidoDTO.getMetodoPago());
+            pedidoParchado.setDirEnvio(pedidoDTO.getDirEnvio());
+            pedidoParchado.setDirFacturacion(pedidoDTO.getDirFacturacion());
+            pedidoParchado.setCostoEnvio(pedidoDTO.getCostoEnvio());
+            pedidoParchado.setPrecioPedido(pedidoDTO.getPrecioPedido());
+            pedidoParchado.setAnotaciones(pedidoDTO.getAnotaciones());
+            pedidoParchado.setFecPedido(LocalDate.now());
+
+            Optional<Cliente> cliente = clienteRepository.findById(pedidoDTO.getRutCliente());
+            Optional<Sucursal> sucursal = sucursalRepository.findById(pedidoDTO.getIdSucursal());
+
+            if (cliente.isPresent() && sucursal.isPresent()) {
+                pedidoParchado.setCliente(cliente.get());
+                pedidoParchado.setSucursal(sucursal.get());
+                return pedidoRepository.save(pedidoParchado);
             } else {
-                return "Ingrese una ID de sucursal válida";
+                throw new EntityNotFoundException("Cliente o Sucursal no encontrado");
             }
-            pedidoUpdate.setFecPedido(pedidoDTO.getFecPedido());
-            pedidoUpdate.setPrecioPedido(pedidoDTO.getPrecioPedido());
-            pedidoUpdate.setMetodoPago(pedidoDTO.getMetodoPago());
-            pedidoUpdate.setDirEnvio(pedidoDTO.getDirEnvio());
-            pedidoUpdate.setDirFacturacion(pedidoDTO.getDirFacturacion());
-            pedidoUpdate.setCostoEnvio(pedidoDTO.getCostoEnvio());
-            pedidoUpdate.setAnotaciones(pedidoDTO.getAnotaciones());
-            if (clienteRepository.existsById(pedidoDTO.getRutCliente())) {
-                Cliente clienteUpdate = clienteRepository.findById(pedidoDTO.getRutCliente()).get();
-                pedidoUpdate.setCliente(clienteUpdate);
-            } else {
-                return "Ingrese un RUT de cliente válido";
-            }
-            pedidoRepository.save(pedidoUpdate);
-            return "Pedido actualizado con éxito";
-        } else {
-            return "Pedido no encontrado";
+        } else  {
+            throw new EntityNotFoundException("Pedido no encontrado");
         }
     }
 
     // U/P
-    public String parcharPedido(PedidoDTO pedido, int id) {
-        if (pedidoRepository.existsById(id)) {
-            Pedido pedidoParchado = pedidoRepository.findById(id).get();
-            if (pedido.getIdSucursal() != null) {
-                Sucursal newSucursal = sucursalRepository.findById(pedido.getIdSucursal()).get();
-                pedidoParchado.setSucursal(newSucursal);
+    public Pedido patchPedido(PedidoDTO pedidoDTO, int id) {
+        Optional<Pedido> pedidoOptional = pedidoRepository.findById(id);
+        if (pedidoOptional.isPresent()) {
+            Pedido pedidoParchado = pedidoOptional.get();
+
+            if (pedidoDTO.getMetodoPago() != null) {
+                pedidoParchado.setMetodoPago(pedidoDTO.getMetodoPago());
             }
-            if (pedido.getFecPedido() != null) {
-                pedidoParchado.setFecPedido(pedido.getFecPedido());
+            if (pedidoDTO.getDirEnvio() != null) {
+                pedidoParchado.setDirEnvio(pedidoDTO.getDirEnvio());
             }
-            if (pedido.getPrecioPedido() != null) {
-                pedidoParchado.setPrecioPedido(pedido.getPrecioPedido());
+            if (pedidoDTO.getDirFacturacion() != null) {
+                pedidoParchado.setDirFacturacion(pedidoDTO.getDirFacturacion());
             }
-            if (pedido.getMetodoPago() != null) {
-                pedidoParchado.setMetodoPago(pedido.getMetodoPago());
+            if (pedidoDTO.getCostoEnvio() != null) {
+                pedidoParchado.setCostoEnvio(pedidoDTO.getCostoEnvio());
             }
-            if (pedido.getDirEnvio() != null) {
-                pedidoParchado.setDirEnvio(pedido.getDirEnvio());
+            if (pedidoDTO.getPrecioPedido() != null) {
+                pedidoParchado.setPrecioPedido(pedidoDTO.getPrecioPedido());
             }
-            if (pedido.getDirFacturacion() != null) {
-                pedidoParchado.setDirFacturacion(pedido.getDirFacturacion());
+            if (pedidoDTO.getAnotaciones() != null) {
+                pedidoParchado.setAnotaciones(pedidoDTO.getAnotaciones());
             }
-            if (pedido.getCostoEnvio() != null) {
-                pedidoParchado.setCostoEnvio(pedido.getCostoEnvio());
+            if (pedidoDTO.getFecPedido() != null) {
+                pedidoParchado.setFecPedido(pedidoDTO.getFecPedido());
             }
-            if (pedido.getAnotaciones() != null) {
-                pedidoParchado.setAnotaciones(pedido.getAnotaciones());
+
+            if (pedidoDTO.getRutCliente() != null) {
+                Optional<Cliente> cliente = clienteRepository.findById(pedidoDTO.getRutCliente());
+                if (cliente.isPresent()) {
+                    pedidoParchado.setCliente(cliente.get());
+                } else {
+                    throw new EntityNotFoundException("Cliente no encontrado");
+                }
             }
-            if (pedido.getRutCliente() != null) {
-                Cliente newCliente = clienteRepository.findById(pedido.getRutCliente()).get();
-                pedidoParchado.setCliente(newCliente);
+            if (pedidoDTO.getIdSucursal() != null) {
+                Optional<Sucursal> sucursal = sucursalRepository.findById(pedidoDTO.getIdSucursal());
+                if (sucursal.isPresent()) {
+                    pedidoParchado.setSucursal(sucursal.get());
+                } else {
+                    throw new EntityNotFoundException("Sucursal no encontrada");
+                }
             }
-            pedidoRepository.save(pedidoParchado);
-            return "Pedido actualizado con éxito";
+
+            return pedidoRepository.save(pedidoParchado);
+        } else {
+            throw new EntityNotFoundException("Pedido no encontrado");
         }
-        return "Pedido no encontrado";
     }
 
     // D
 
-    public String deletePedido(int id) {
-        for (Pedido pedido : pedidoRepository.findAll()) {
-            if (pedido.getId() == id) {
-                pedidoRepository.delete(pedido);
-                return "Pedido eliminado con éxito";
-            }
-        }
-        return "Pedido no existente";
-    }
-
-    // Funciones no CRUD
-
-    private String datosPedido(String output, Pedido pedido) {
-        output += "ID Pedido: " + pedido.getId() + "\n";
-        output += "RUT Cliente: " + pedido.getCliente().getRutUsuario() + "\n";
-        output += "Fecha pedido:  " + pedido.getFecPedido() + "\n";
-        output += "Precio total pedido: $" + pedido.getPrecioPedido() + "\n";
-        output += "Método de pago: " + pedido.getMetodoPago() + "\n";
-        if (pedido.getDirEnvio() == null) {
-            output += "Dirección Envío: Pedido en tienda\n";
-        } else {
-            output += "Dirección Envío: " + pedido.getDirEnvio() + "\n";
-        }
-        if (pedido.getDirFacturacion() == null) {
-            if (pedido.getDirEnvio() == null) {
-                output += "Dirección Facturación: Pedido en tienda\n";
-            } else {
-                output += "Dirección Facturación: " + pedido.getDirEnvio() + "\n";
-            }
-        } else {
-            output += "Dirección Facturación: " + pedido.getDirFacturacion() + "\n";
-        }
-        if (pedido.getCostoEnvio() == null) {
-            output += "Coste de envío: Pedido en tienda\n";
-        } else {
-            output += "Coste de envío: $" + pedido.getCostoEnvio() + "\n";
-        }
-        if (pedido.getAnotaciones() == null) {
-            output += "Anotaciones: Ninguna\n";
-        } else {
-            output += "Anotaciones: " + pedido.getAnotaciones() + "\n";
-        }
-        output += "Sucursal asociada:  " + pedido.getSucursal().getNombreSucursal() + "\n";
-        return output;
+    public void deletePedido(int id) {
+        pedidoRepository.deleteById(id);
     }
 }

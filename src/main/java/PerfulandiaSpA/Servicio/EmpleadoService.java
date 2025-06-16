@@ -2,15 +2,19 @@ package PerfulandiaSpA.Servicio;
 
 import PerfulandiaSpA.DTO.EmpleadoDTO;
 import PerfulandiaSpA.Entidades.Empleado;
+import PerfulandiaSpA.Entidades.Empleado;
+import PerfulandiaSpA.Entidades.Envio;
 import PerfulandiaSpA.Entidades.Sucursal;
 import PerfulandiaSpA.Repositorio.EmpleadoRepository;
 import PerfulandiaSpA.Repositorio.SucursalRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmpleadoService {
@@ -21,13 +25,7 @@ public class EmpleadoService {
     SucursalRepository sucursalRepository;
 
     // C
-    public String crearEmpleado(EmpleadoDTO empleado) {
-        if (empleadoRepository.existsById(empleado.getRutUsuario())) {
-            return "Ya existe un usuario con ese rut";
-        }
-        if (!sucursalRepository.existsById(empleado.getIdSucursal())) {
-            return "La sucursal no existe";
-        }
+    public Empleado crearEmpleado(EmpleadoDTO empleado) {
         Empleado newEmpleado = new Empleado();
         newEmpleado.setRutUsuario(empleado.getRutUsuario());
         newEmpleado.setDvUsuario(empleado.getDvUsuario());
@@ -43,173 +41,126 @@ public class EmpleadoService {
         newEmpleado.setEmailUsuario(empleado.getEmailUsuario());
         newEmpleado.setTipoUsuario("EMPLEADO");
         newEmpleado.setPassUsuario(new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario()));
-        newEmpleado.setSucursalAsociada(sucursalRepository.findById(empleado.getIdSucursal()).get());
-        empleadoRepository.save(newEmpleado);
-        return "Empleado agregado con éxito";
+
+        Optional<Sucursal> sucursal = sucursalRepository.findById(empleado.getIdSucursal());
+
+        if (sucursal.isPresent()) {
+            newEmpleado.setSucursalAsociada(sucursal.get());
+            return empleadoRepository.save(newEmpleado);
+        } else {
+            throw new EntityNotFoundException("Sucursal no encontrada");
+        }
     }
 
     // R
-    public String getEmpleados() {
-        String output = "";
-        for (Empleado empleado : empleadoRepository.findAll()) {
-            output = datosEmpleado(output, empleado);
-        }
-        if (output.isEmpty()) {
-            return "No hay empleados registrados";
-        } else {
-            return output;
-        }
-    }
-
-    public String getEmpleadoByRut(int id) {
-        String output = "";
-        if (empleadoRepository.existsById(id)) {
-            Empleado empleado = empleadoRepository.findById(id).get();
-            output = datosEmpleado(output, empleado);
-            return output;
-        }else{
-            return "Empleado no encontrado";
-        }
-    }
-
-    public List<Empleado> getEmpleadosJSON() {
+    public List<Empleado> getEmpleados() {
         return empleadoRepository.findAll();
     }
 
-    public String getEmpleadosSucursal(int id_sucursal) {
-        String output = "";
-        for (Empleado empleado : empleadoRepository.findAll()) {
-            if (empleado.getSucursalAsociada().getId() == id_sucursal) {
-                output = datosEmpleado(output, empleado);
+    public List<Empleado> getEmpleadosBySucursal(Integer id) {
+        List<Empleado> empleadosSucursal = new ArrayList<>();
+        if (sucursalRepository.existsById(id)) {
+            for (Empleado empleado : empleadoRepository.findAll()) {
+                if (empleado.getSucursalAsociada().getId().equals(id)) {
+                    empleadosSucursal.add(empleado);
+                }
             }
-        }
-        if (output.isEmpty()) {
-            return "No hay empleados registrados";
+            return empleadosSucursal;
         } else {
-            return output;
+            throw new EntityNotFoundException("Sucursal no encontrada");
         }
     }
 
-    public List<Empleado> getEmpleadosSucursalJSON(int id_sucursal) {
-        List<Empleado> empleadosSucursal = new ArrayList<>();
-        for (Empleado empleado : empleadoRepository.findAll()) {
-            if (empleado.getSucursalAsociada().getId() == id_sucursal) {
-                empleadosSucursal.add(empleado);
-            }
-        }
-        return empleadosSucursal;
+    public Optional<Empleado> getEmpleadoByRut(Integer rut) {
+        return empleadoRepository.findById(rut);
     }
 
     // U
 
-    public String updateEmpleado(EmpleadoDTO empleado, int rut) {
-        if (empleadoRepository.existsById(rut)) {
-            Empleado empleadoUpdate = empleadoRepository.findById(rut).get();
-            empleadoUpdate.setNomUsuario(empleado.getNomUsuario());
-            empleadoUpdate.setNom2Usuario(empleado.getNom2Usuario());
-            empleadoUpdate.setApellidoPaterno(empleado.getApellidoPaterno());
-            empleadoUpdate.setApellidoMaterno(empleado.getApellidoMaterno());
-            empleadoUpdate.setSexoUsuario(empleado.getSexoUsuario());
-            empleadoUpdate.setDirUsuario(empleado.getDirUsuario());
-            empleadoUpdate.setFechaNacimiento(empleado.getFechaNacimiento());
-            empleadoUpdate.setTelefonoUsuario(empleado.getTelefonoUsuario());
-            empleadoUpdate.setTel2Usuario(empleado.getTel2Usuario());
-            empleadoUpdate.setEmailUsuario(empleado.getEmailUsuario());
-            empleadoUpdate.setSucursalAsociada(sucursalRepository.findById(empleado.getIdSucursal()).get());
-            String newPass = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
-            empleadoUpdate.setPassUsuario(newPass);
-            empleadoRepository.save(empleadoUpdate);
-            return "Empleado actualizado con éxito";
+    public Empleado updateEmpleado(EmpleadoDTO empleado, int rut) {
+        Empleado empleadoExistente = empleadoRepository.findById(rut)
+                .orElseThrow(() -> new EntityNotFoundException("Empleado no encontrado"));
+
+        empleadoExistente.setRutUsuario(rut);
+        empleadoExistente.setNomUsuario(empleado.getNomUsuario());
+        empleadoExistente.setNom2Usuario(empleado.getNom2Usuario());
+        empleadoExistente.setApellidoPaterno(empleado.getApellidoPaterno());
+        empleadoExistente.setApellidoMaterno(empleado.getApellidoMaterno());
+        empleadoExistente.setSexoUsuario(empleado.getSexoUsuario());
+        empleadoExistente.setDirUsuario(empleado.getDirUsuario());
+        empleadoExistente.setFechaNacimiento(empleado.getFechaNacimiento());
+        empleadoExistente.setTelefonoUsuario(empleado.getTelefonoUsuario());
+        empleadoExistente.setTel2Usuario(empleado.getTel2Usuario());
+        empleadoExistente.setEmailUsuario(empleado.getEmailUsuario());
+        String newPass = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
+        empleadoExistente.setPassUsuario(newPass);
+        empleadoExistente.setTipoUsuario("EMPLEADO");
+
+        Optional<Sucursal> sucursal = sucursalRepository.findById(empleado.getIdSucursal());
+
+        if (sucursal.isPresent()) {
+            empleadoExistente.setSucursalAsociada(sucursal.get());
+            return empleadoRepository.save(empleadoExistente);
         } else {
-            return "Empleado no encontrado";
+            throw new EntityNotFoundException("Sucursal no encontrada");
         }
     }
 
     // U/P
-    public String parcharEmpleado(EmpleadoDTO empleado, int rut) {
-        if (empleadoRepository.existsById(rut)) {
-            Empleado empleadoParchado = empleadoRepository.findById(rut).get();
-            if (empleado.getNomUsuario() != null) {
-                empleadoParchado.setNomUsuario(empleado.getNomUsuario());
-            }
-            if (empleado.getNom2Usuario() != null) {
-                empleadoParchado.setNom2Usuario(empleado.getNom2Usuario());
-            }
-            if (empleado.getApellidoPaterno() != null) {
-                empleadoParchado.setApellidoPaterno(empleado.getApellidoPaterno());
-            }
-            if (empleado.getApellidoMaterno() != null) {
-                empleadoParchado.setApellidoMaterno(empleado.getApellidoMaterno());
-            }
-            if (empleado.getSexoUsuario() == 'M' || empleado.getSexoUsuario() == 'F') {
-                empleadoParchado.setSexoUsuario(empleado.getSexoUsuario());
-            }
-            if (empleado.getDirUsuario() != null) {
-                empleadoParchado.setDirUsuario(empleado.getDirUsuario());
-            }
-            if (empleado.getFechaNacimiento() != null) {
-                empleadoParchado.setFechaNacimiento(empleado.getFechaNacimiento());
-            }
-            if (empleado.getTelefonoUsuario() != null) {
-                empleadoParchado.setTelefonoUsuario(empleado.getTelefonoUsuario());
-            }
-            if (empleado.getTel2Usuario() != null) {
-                empleadoParchado.setTel2Usuario(empleado.getTel2Usuario());
-            }
-            if (empleado.getEmailUsuario() != null) {
-                empleadoParchado.setEmailUsuario(empleado.getEmailUsuario());
-            }
-            if (empleado.getPassUsuario() != null) {
-                String newPass = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
-                empleadoParchado.setPassUsuario(newPass);
-            }
-            if (empleado.getIdSucursal() != null) {
-                Sucursal newSucursal = sucursalRepository.findById(empleado.getIdSucursal()).get();
-                empleadoParchado.setSucursalAsociada(newSucursal);
-            }
-            empleadoRepository.save(empleadoParchado);
-            return "Empleado actualizado con éxito";
+    public Empleado patchEmpleado(EmpleadoDTO empleado, int rut) {
+        Empleado empleadoExistente = empleadoRepository.findById(rut)
+                .orElseThrow(() -> new EntityNotFoundException("Empleado no encontrado"));
+
+        if (empleado.getNomUsuario() != null) {
+            empleadoExistente.setNomUsuario(empleado.getNomUsuario());
         }
-        return "Empleado no encontrado";
+        if (empleado.getNom2Usuario() != null) {
+            empleadoExistente.setNom2Usuario(empleado.getNom2Usuario());
+        }
+        if (empleado.getApellidoPaterno() != null) {
+            empleadoExistente.setApellidoPaterno(empleado.getApellidoPaterno());
+        }
+        if (empleado.getApellidoMaterno() != null) {
+            empleadoExistente.setApellidoMaterno(empleado.getApellidoMaterno());
+        }
+        if (empleado.getSexoUsuario() != null) {
+            empleadoExistente.setSexoUsuario(empleado.getSexoUsuario());
+        }
+        if (empleado.getDirUsuario() != null) {
+            empleadoExistente.setDirUsuario(empleado.getDirUsuario());
+        }
+        if (empleado.getFechaNacimiento() != null) {
+            empleadoExistente.setFechaNacimiento(empleado.getFechaNacimiento());
+        }
+        if (empleado.getTelefonoUsuario() != null) {
+            empleadoExistente.setTelefonoUsuario(empleado.getTelefonoUsuario());
+        }
+        if (empleado.getTel2Usuario() != null) {
+            empleadoExistente.setTel2Usuario(empleado.getTel2Usuario());
+        }
+        if (empleado.getEmailUsuario() != null) {
+            empleadoExistente.setEmailUsuario(empleado.getEmailUsuario());
+        }
+        if (empleado.getPassUsuario() != null) {
+            String newPass = new BCryptPasswordEncoder(10).encode(empleado.getPassUsuario());
+            empleadoExistente.setPassUsuario(newPass);
+        }
+
+        if (empleado.getIdSucursal() != null) {
+            Optional<Sucursal> sucursal = sucursalRepository.findById(empleado.getIdSucursal());
+            if (sucursal.isPresent()) {
+                empleadoExistente.setSucursalAsociada(sucursal.get());
+            } else {
+                throw new EntityNotFoundException("Sucursal no encontrada");
+            }
+        }
+
+        return empleadoRepository.save(empleadoExistente);
     }
 
     // D
 
-    public String deleteEmpleado(int rut) {
-        for (Empleado empleado : empleadoRepository.findAll()) {
-            if (empleado.getRutUsuario() == rut) {
-                empleadoRepository.delete(empleado);
-                return "Empleado eliminado con éxito";
-            }
-        }
-        return "Empleado no existente";
-    }
-
-    // Funciones no CRUD
-
-    private String datosEmpleado(String output, Empleado empleado) {
-        output += "RUT: " + empleado.getRutUsuario() + "-" + empleado.getDvUsuario() + "\n";
-        output += "Nombre completo: " + empleado.getNomUsuario() + " ";
-        if (empleado.getNom2Usuario() != null) {
-            output += empleado.getNom2Usuario() + " ";
-        }
-        output += empleado.getApellidoPaterno();
-        if (empleado.getNom2Usuario() != null) {
-            output += " " + empleado.getApellidoMaterno() + "\n";
-        } else {
-            output += "\n";
-        }
-        output += "Sexo: " + empleado.getSexoUsuario() + "\n";
-        output += "Fecha de nacimiento: " + empleado.getFechaNacimiento().toString() + "\n";
-        output += "Dirección: " + empleado.getDirUsuario() + "\n";
-        output += "Número de teléfono: +56" + empleado.getTelefonoUsuario() + "\n";
-        if (empleado.getTel2Usuario() != null) {
-            output += "Teléfono extra: +56" + empleado.getTel2Usuario() + "\n";
-        }
-        output += "Email: " + empleado.getEmailUsuario() + "\n";
-        output += "Nombre Sucursal: " + empleado.getSucursalAsociada().getNombreSucursal() + "\n";
-        output += "Dirección sucursal: " + empleado.getSucursalAsociada().getDireccionSucursal() + "\n";
-        output += "\n";
-        return output;
+    public void deleteEmpleado(int rut) {
+        empleadoRepository.deleteById(rut);
     }
 }
