@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/carritos")
-@Tag(name="Controlador carritos", description="Servicios de gestión de carritos")
+@Tag(name="Controlador Carritos", description="Servicios de gestión de carritos")
 public class CarritoController {
 
     @Autowired

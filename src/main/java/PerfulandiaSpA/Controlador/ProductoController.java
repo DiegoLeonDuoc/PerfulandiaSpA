@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/productos")
-@Tag(name="Controlador productos", description="Servicios de gestión de productos")
+@Tag(name="Controlador Productos", description="Servicios de gestión de productos")
 public class ProductoController {
 
     @Autowired

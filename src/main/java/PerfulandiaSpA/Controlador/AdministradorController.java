@@ -52,17 +52,17 @@ public class AdministradorController {
 
     // R
     @GetMapping
-    @Operation(summary= "Obtener administradors", description = "Obtiene la lista de administradors registrados")
+    @Operation(summary= "Obtener administradores", description = "Obtiene la lista de administradores registrados")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Retorna lista completa de administradors"),
+            @ApiResponse(responseCode = "200", description = "Retorna lista completa de administradores"),
             @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
     })
     public ResponseEntity<CollectionModel<EntityModel<Administrador>>> getAdministradors(){
-        List<Administrador> administradors = administradorService.getAdministradors();
-        if (administradors.isEmpty()) {
+        List<Administrador> administradores = administradorService.getAdministradors();
+        if (administradores.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return new ResponseEntity<>(assembler.toCollectionModel(administradors), HttpStatus.OK);
+            return new ResponseEntity<>(assembler.toCollectionModel(administradores), HttpStatus.OK);
         }
     }
 
