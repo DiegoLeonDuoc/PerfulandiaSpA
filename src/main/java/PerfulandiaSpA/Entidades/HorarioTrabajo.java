@@ -20,7 +20,7 @@ public class HorarioTrabajo {
     private Integer id;
 
     @Column(name = "DIA_SEMANA", nullable = false, length = 1)
-    private int diaSemana;
+    private Integer diaSemana;
 
     @Column(name = "HORARIO_APERTURA", nullable = false)
     private LocalTime horarioApertura;

@@ -30,7 +30,6 @@ public class StockService {
     public Stock saveStock(StockDTO stockDTO) {
         Stock stock = new Stock();
         stock.setCantStock(stockDTO.getCantStock());
-
         Optional<Producto> producto = productoRepository.findById(stockDTO.getIdProducto());
         Optional<Sucursal> sucursal = sucursalRepository.findById(stockDTO.getIdSucursal());
 

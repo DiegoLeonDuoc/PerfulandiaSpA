@@ -1,91 +1,162 @@
 package PerfulandiaSpA.Controlador;
 
+import PerfulandiaSpA.Assembler.ProductosPedidoModelAssembler;
 import PerfulandiaSpA.DTO.ProductosPedidoDTO;
 import PerfulandiaSpA.Entidades.ProductosPedido;
 import PerfulandiaSpA.Servicio.ProductosPedidoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/productosPedido")
-@Tag(name="Servicio ProductosPedido", description="Servicios de gestión de productos en pedidos")
+@RequestMapping("/productosPedidos")
+@Tag(name="Controlador ProductosPedido", description="Servicios de gestión de productos en pedidos")
 public class ProductosPedidoController {
 
     @Autowired
-    private ProductosPedidoService productosPedidoService;
+    ProductosPedidoService productosPedidoService;
 
-    //CRUD
+    @Autowired
+    ProductosPedidoModelAssembler assembler;
 
-    //CREATE productosPedido
+    // C
     @PostMapping
-    @Operation(summary= "Crear productoPedido", description = "Servicio POST para registrar un producto en un pedido")
-    @ApiResponse(responseCode = "200", description="Confirmación sobre la creación del productoPedido")
-    public String addProductosPedido(@RequestBody ProductosPedidoDTO productosPedidoDTO) {
-        return productosPedidoService.crearProductosPedido(productosPedidoDTO);
+    @Operation(summary = "Agregar ProductosPedido", description = "Permite registrar un productosPedido en el sistema")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "ProductosPedido creado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ProductosPedido.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenido en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
+    })
+    public ResponseEntity<EntityModel<ProductosPedido>> crearProductosPedido(@RequestBody ProductosPedidoDTO productosPedidoDTO) {
+        ProductosPedido productosPedido = productosPedidoService.crearProductosPedido(productosPedidoDTO);
+        if (productosPedidoService.getProductoPedidoByID(productosPedido.getId()).isPresent()) {
+            return new ResponseEntity<>(assembler.toModel(productosPedido), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
     }
 
-    //Obtener en formato ToString
+    // R
     @GetMapping
-    @Operation(summary= "Obtener productosPedidos", description = "Servicio GET para obtener información sobre los productos en los pedidos en formato String")
-    @ApiResponse(responseCode = "200", description="Registro de productos pedidos en formato texto simple")
-    public String listarProductosPedidos() {
-        return productosPedidoService.getProductosPedidos();
-    }
-
-    //obtener en json
-    @GetMapping("/json")
-    @Operation(summary= "Obtener productosPedidos JSON", description = "Servicio GET para obtener información sobre los producto pedidos en formato JSON")
-    @ApiResponse(responseCode = "200", description="Registro de productos pedidos en formato JSON")
-    public List<ProductosPedido> getProductosPedidoJSON() {
-        return productosPedidoService.getProductosPedidosJSON();
-    }
-
-    //Buscar por rut
-    @GetMapping("/{rut}")
-    @Operation(summary= "Obtener productosPedidos por RUT", description = "Servicio GET para obtener información sobre los productos pedidos asociados a un RUT en formato String")
+    @Operation(summary= "Obtener productos en pedidos", description = "Obtiene la lista de productos en pedidos registrados")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Registro de los productos pedidos por un cliente en formato texto simple o información sobre inexistencia del producto en pedido"),
-            //@ApiResponse(responseCode = "404", description="El cliente no posee productos pedidos asociados")
+            @ApiResponse(responseCode = "200", description = "Retorna lista completa de productos en pedidos"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
     })
-    public String getProductosPedidoById(@PathVariable int rut) {
-        return productosPedidoService.getProductosPedidosByRut(rut);
+    public ResponseEntity<CollectionModel<EntityModel<ProductosPedido>>> getProductosPedidos(){
+        List<ProductosPedido> productosPedidos = productosPedidoService.getProductosPedidos();
+        if (productosPedidos.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(assembler.toCollectionModel(productosPedidos), HttpStatus.OK);
+        }
     }
 
-    //Update
-    @PutMapping
-    @Operation(summary= "Modificar productoPedido", description = "Servicio PUT para modificar información sobre un producto pedido específico")
+//    @GetMapping("/{rut}")
+//    @Operation(summary = "Buscar productos en pedidos por cliente", description = "Obtiene un producto en pedido según la ID registrada en el sistema")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Retorna producto en pedido"),
+//            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
+//    })
+//    @Parameter(description = "RUT del cliente SIN dígito verificador", example = "2")
+//    public ResponseEntity<CollectionModel<EntityModel<ProductosPedido>>> getProductosPedidoByRut(@PathVariable int rut) {
+//        List<ProductosPedido> productosPedidos = productosPedidoService.getProductosPedidosByRut(rut);
+//        if (productosPedidos.isEmpty()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        } else {
+//            return new ResponseEntity<>(assembler.toCollectionModel(productosPedidos), HttpStatus.OK);
+//        }
+//    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar producto en pedido por ID", description = "Obtiene un producto en pedido según la ID registrada en el sistema")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia de atributos"),
-            //@ApiResponse(responseCode = "404", description="Producto pedido no encontrado")
+            @ApiResponse(responseCode = "200", description = "Retorna producto en pedido"),
+            @ApiResponse(responseCode = "404", description = "No se encuentran datos", content = @Content)
     })
-    public String updateProductosPedido(@RequestBody ProductosPedidoDTO productosPedidoDTO) {
-        return productosPedidoService.updateProductosPedido(productosPedidoDTO);
+    @Parameter(description = "ID del reabastecimiento", example = "2")
+    public ResponseEntity<EntityModel<ProductosPedido>> getProductoPedidoByID(@PathVariable int id) {
+        Optional<ProductosPedido> productosPedido = productosPedidoService.getProductoPedidoByID(id);
+        if (productosPedido.isPresent()) {
+            return new ResponseEntity<>(assembler.toModel(productosPedido.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // U
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar producto en pedido", description = "Permite actualizar los datos de un producto en pedido según su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Producto en pedido modificado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ProductosPedido.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenido en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
+    })
+    @Parameter(description = "El ID del producto en pedido", example = "1")
+    public ResponseEntity<ProductosPedido> updateProductosPedido(@PathVariable int id, @RequestBody ProductosPedidoDTO productosPedidoDTO) {
+        Optional<ProductosPedido> productosPedidoOptional = productosPedidoService.getProductoPedidoByID(id);
+        if (productosPedidoOptional.isPresent()) {
+            ProductosPedido productosPedido = productosPedidoService.updateProductosPedido(productosPedidoDTO, id);
+            return new ResponseEntity<>(productosPedido, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary= "Parchar productoPedido", description = "Servicio PATCH para modificar información sobre un producto pedido específico")
+    @Operation(summary = "Parchar producto en pedido", description = "Permite actualizar parcialmente los datos de un producto en pedido según su ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de modificación exitosa o información sobre inexistencia de atributos"),
-            //@ApiResponse(responseCode = "404", description="Producto pedido no encontrado")
+            @ApiResponse(responseCode = "200", description = "Producto en pedido modificado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ProductosPedido.class))),
+            @ApiResponse(responseCode = "204", description = "No hay contenido en la solicitud"),
+            @ApiResponse(responseCode = "400", description = "JSON con mal formato")
     })
-    public String parcharProductosPedido(@RequestBody ProductosPedidoDTO productosPedidoDTO, @PathVariable Integer id) {
-        return productosPedidoService.patchProductosPedido(productosPedidoDTO, id);
+    @Parameter(description = "El ID del producto en pedido", example = "1")
+    public ResponseEntity<ProductosPedido> patchProductosPedido(@PathVariable int id, @RequestBody ProductosPedidoDTO productosPedidoDTO) {
+        Optional<ProductosPedido> productosPedidoOptional = productosPedidoService.getProductoPedidoByID(id);
+        if (productosPedidoOptional.isPresent()) {
+            ProductosPedido productosPedido = productosPedidoService.patchProductosPedido(productosPedidoDTO, id);
+            return new ResponseEntity<>(productosPedido, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    //deletear productosPedido
+    // D
     @DeleteMapping("/{id}")
-    @Operation(summary= "Eliminar productoPedido", description = "Servicio DELETE para eliminar registro de un producto pedido específico")
+    @Operation(summary= "Eliminar producto en pedido", description = "Elimina un producto en pedido específico")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description="Confirmación de eliminación exitosa"),
-            //@ApiResponse(responseCode = "404", description="Producto pedido no encontrado")
+            @ApiResponse(responseCode = "200", description="Retorna el producto en pedido eliminado"),
+            @ApiResponse(responseCode = "404", description="Producto en pedido no encontrado")
     })
-    public String deleteProductosPedido(@PathVariable int id) {
-        return productosPedidoService.deleteProductosPedido(id);
+    @Parameter(description = "La ID del producto en pedido", example = "1")
+    public ResponseEntity<EntityModel<ProductosPedido>> eliminarProductosPedido(@PathVariable int id) {
+        Optional<ProductosPedido> productosPedidoOptional = productosPedidoService.getProductoPedidoByID(id);
+        if (productosPedidoOptional.isPresent()) {
+            ProductosPedido productosPedido = productosPedidoOptional.get();
+            productosPedidoService.deleteProductosPedido(id);
+            return new ResponseEntity<>(assembler.toModel(productosPedido), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
+
 }

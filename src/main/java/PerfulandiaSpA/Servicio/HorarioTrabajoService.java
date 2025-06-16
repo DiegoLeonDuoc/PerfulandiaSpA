@@ -1,127 +1,76 @@
 package PerfulandiaSpA.Servicio;
 
+import PerfulandiaSpA.DTO.HorarioTrabajoDTO;
+import PerfulandiaSpA.Entidades.Producto;
 import PerfulandiaSpA.Entidades.HorarioTrabajo;
+
+import PerfulandiaSpA.Entidades.Sucursal;
+import PerfulandiaSpA.Repositorio.ProductoRepository;
 import PerfulandiaSpA.Repositorio.HorarioTrabajoRepository;
 import PerfulandiaSpA.Repositorio.SucursalRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HorarioTrabajoService {
 
-
     @Autowired
     HorarioTrabajoRepository horarioTrabajoRepository;
 
-    // Inyección del repositorio de sucursales (necesaria para asociar la sucursal al horario)
     @Autowired
-     SucursalRepository sucursalRepository;
+    ProductoRepository productoRepository;
 
-    // MÉTODO CREATE
-    // Guardar new horario de trabajo
-    public String saveHorarioTrabajo(HorarioTrabajo horario, int id_sucursal) {
-        if (sucursalRepository.existsById(id_sucursal)){
-            horario.setSucursal(sucursalRepository.findById(id_sucursal).get());
-            horarioTrabajoRepository.save(horario); // Guardao
-            return "Horario de trabajo agregado con éxito";
+    @Autowired
+    SucursalRepository sucursalRepository;
+
+    public HorarioTrabajo saveHorarioTrabajo(HorarioTrabajoDTO horarioTrabajoDTO) {
+        HorarioTrabajo horarioTrabajo = new HorarioTrabajo();
+        horarioTrabajo.setDiaSemana(horarioTrabajoDTO.getDiaSemana());
+        horarioTrabajo.setHorarioApertura(horarioTrabajoDTO.getHorarioApertura());
+        horarioTrabajo.setHorarioCierre(horarioTrabajoDTO.getHorarioCierre());
+
+        Optional<Sucursal> sucursal = sucursalRepository.findById(horarioTrabajoDTO.getIdSucursal());
+
+        if (sucursal.isPresent()) {
+            horarioTrabajo.setSucursal(sucursal.get());
+            return horarioTrabajoRepository.save(horarioTrabajo);
         } else {
-            return "La sucursal no existe";
+            throw new EntityNotFoundException("Sucursal no encontrada");
         }
     }
 
-    // MÉTODO DELETE
-    // Elimina horario de trabajo por ID
-    public String deleteHorarioTrabajo(int id) {
-        if (horarioTrabajoRepository.existsById(id)) {
-            horarioTrabajoRepository.deleteById(id);
-            return "Horario de trabajo eliminado con éxito";
-        }
-        return "Horario de trabajo no encontrado";
-    }
-
-    // MÉTODO UPDATE
-    // Actualizar horario de trabajo por ID
-    public String updateHorarioTrabajo(HorarioTrabajo horario, int id_sucursal) {
-        if (horarioTrabajoRepository.existsById(horario.getId())) {
-            horario.setSucursal(sucursalRepository.getReferenceById(id_sucursal)); //posiciona en bd antes de la actualizacion
-            horarioTrabajoRepository.save(horario);
-            return "Horario de trabajo actualizado con éxito";
-        }
-        return "Horario de trabajo no encontrado";
-    }
-
-    // MÉTODO READ (LISTAR TODOS en ToString)
-    public String getHorariosTrabajo() {
-        String output = "";
-        for (HorarioTrabajo horario : horarioTrabajoRepository.findAll()) {
-            output = datosHorario(output, horario); // Formateo d datos
-        }
-
-        if (output.isEmpty()) {
-            return "No hay horarios de trabajo registrados";
-        } else {
-            return output;
-        }
-    }
-
-    // MÉTODO READ (LISTAR TODOS EN JSON)
-    // Ideal para REST (retorna lista cruda/paraOcupar)
-    public List<HorarioTrabajo> getHorariosTrabajoJSON() {
+    public List<HorarioTrabajo> getHorariosTrabajo() {
         return horarioTrabajoRepository.findAll();
     }
 
-    // MÉTODO READ (BUSCAR POR ID)
-    public String getHorarioTrabajoById(int id) {
-        if (horarioTrabajoRepository.existsById(id)) {
-            HorarioTrabajo horario = horarioTrabajoRepository.findById(id).get();
-            return datosHorario("", horario); // Retorna los datos formateados
-        }
-        return "Horario de trabajo no encontrado";
+    public Optional<HorarioTrabajo> getHorarioTrabajoByID(int id) {
+        return horarioTrabajoRepository.findById(id);
     }
 
-    // MÉTODO READ (BUSCAR POR SUCURSAL)
-    public List<HorarioTrabajo> getHorarioTrabajoBySucursalJSON(int id) {
-        List<HorarioTrabajo> horariosSucursal = new ArrayList<>();
-        for (HorarioTrabajo horario: horarioTrabajoRepository.findAll()){
-            if (horario.getSucursal().getId().equals(id)) {
-                horariosSucursal.add(horario);
-            }
+    public HorarioTrabajo updateHorarioTrabajo(Integer id, HorarioTrabajoDTO horarioTrabajoDTO) {
+        HorarioTrabajo horarioTrabajoExistente = horarioTrabajoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("HorarioTrabajo no encontrado"));
+        horarioTrabajoExistente.setDiaSemana(horarioTrabajoDTO.getDiaSemana());
+        horarioTrabajoExistente.setHorarioApertura(horarioTrabajoDTO.getHorarioApertura());
+        horarioTrabajoExistente.setHorarioCierre(horarioTrabajoDTO.getHorarioCierre());
+        Optional<Sucursal> sucursal = sucursalRepository.findById(horarioTrabajoDTO.getIdSucursal());
+
+        if (sucursal.isPresent()) {
+            horarioTrabajoExistente.setId(id);
+            horarioTrabajoExistente.setSucursal(sucursal.get());
+        } else {
+            throw new EntityNotFoundException("Sucursal no encontrada");
         }
-        return horariosSucursal;
+
+        return horarioTrabajoRepository.save(horarioTrabajoExistente);
     }
 
-    // MÉTODO toString/formateo de datos
-    private String datosHorario(String output, HorarioTrabajo horario) {
-        // Formateador para hora legible (HH:mm)
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        String horaApertura = horario.getHorarioApertura() != null
-                ? horario.getHorarioApertura().format(timeFormatter)
-                : "No definida";
-        String horaCierre = horario.getHorarioCierre() != null
-                ? horario.getHorarioCierre().format(timeFormatter)
-                : "No definida";
-        String diaSemana = HorarioTrabajo.diasSemana != null && HorarioTrabajo.diasSemana.get(horario.getDiaSemana()) != null
-                ? HorarioTrabajo.diasSemana.get(horario.getDiaSemana())
-                : "No definido";
-        Integer idSucursal = horario.getSucursal() != null ? horario.getSucursal().getId() : null;
-        String nombreSucursal = horario.getSucursal() != null ? horario.getSucursal().getNombreSucursal() : "No asignada";
-        String direccionSucursal = horario.getSucursal() != null ? horario.getSucursal().getDireccionSucursal() : "No asignada";
-
-        output += "ID Horario: " + horario.getId() + "\n";
-        output += "Día semana: " + diaSemana + "\n";
-        output += "Hora apertura: " + horaApertura + "\n";
-        output += "Hora cierre: " + horaCierre + "\n";
-        output += "ID Sucursal: " + (idSucursal != null ? idSucursal : "No asignada") + "\n";
-        output += "Nombre Sucursal: " + nombreSucursal + "\n";
-        output += "Dirección Sucursal: " + direccionSucursal + "\n";
-        output += "\n";
-        return output;
+    public void deleteHorarioTrabajo(int id) {
+        horarioTrabajoRepository.deleteById(id);
     }
 
 }

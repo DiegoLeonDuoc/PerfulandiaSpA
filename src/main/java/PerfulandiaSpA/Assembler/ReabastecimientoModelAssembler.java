@@ -16,7 +16,7 @@ public class ReabastecimientoModelAssembler implements RepresentationModelAssemb
     public EntityModel<Reabastecimiento> toModel(Reabastecimiento reabastecimiento) {
         return EntityModel.of(reabastecimiento,
                 linkTo(methodOn(ReabastecimientoController.class).getReabastecimientoById(reabastecimiento.getId())).withSelfRel(),
-                linkTo(methodOn(ReabastecimientoController.class).getReabastecimientos()).withRel("reabastecimientoes"),
+                linkTo(methodOn(ReabastecimientoController.class).getReabastecimientos()).withRel("reabastecimientos"),
                 linkTo(methodOn(ReabastecimientoController.class).updateReabastecimiento(reabastecimiento.getId(), null)).withRel("PUT"),
                 linkTo(methodOn(ReabastecimientoController.class).eliminarReabastecimiento(reabastecimiento.getId())).withRel("DELETE")
         );
