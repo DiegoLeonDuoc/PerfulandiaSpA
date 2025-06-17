@@ -1,5 +1,6 @@
 package PerfulandiaSpA.API;
 
+import PerfulandiaSpA.DTO.StockDTO;
 import PerfulandiaSpA.Entidades.Producto;
 import PerfulandiaSpA.Entidades.Stock;
 import PerfulandiaSpA.Entidades.Sucursal;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,27 +33,25 @@ public class StockServiceTest {
     SucursalRepository sucursalRepository;
 
     private Integer idCreado = null;
+    private Integer idProducto = 1; // Según data.sql
+    private Integer idSucursal = 1; // Según data.sql
 
     // C - Crear un stock nuevo
     @Test
     @Order(1)
     public void testSaveStock() {
-        Stock stock = new Stock();
-        stock.setCantStock(150);
+        StockDTO dto = new StockDTO();
+        dto.setCantStock(150);
+        dto.setIdProducto(idProducto);
+        dto.setIdSucursal(idSucursal);
 
-        // Buscar producto y sucursal existentes (según data.sql)
-        Producto producto = productoRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        Sucursal sucursal = sucursalRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
-
-        stock.setProducto(producto);
-        stock.setSucursal(sucursal);
-
-        String resultado = stockService.saveStock(stock);
-        assertEquals("Stock agregado con éxito", resultado);
+        Stock stock = stockService.saveStock(dto);
 
         assertNotNull(stock.getId());
+        assertEquals(150, stock.getCantStock());
+        assertEquals(idProducto, stock.getProducto().getId());
+        assertEquals(idSucursal, stock.getSucursal().getId());
+
         idCreado = stock.getId();
     }
 
@@ -59,63 +59,61 @@ public class StockServiceTest {
     @Test
     @Order(2)
     public void testGetStockById() {
-        // Buscar el stock del producto 1 en sucursal 1 (de data.sql)
-        List<Stock> stocks = stockService.getStocksJSON();
-        Integer idStock = null;
-        for (Stock s : stocks) {
-            if (s.getProducto().getId() == 1 && s.getSucursal().getId() == 1) {
-                idStock = s.getId();
-                break;
-            }
-        }
-        assertNotNull(idStock, "No se encontró el stock en la base de datos de prueba.");
+        // Busca el stock original de data.sql (Producto 1 en Sucursal 1)
+        Optional<Stock> stockOpt = stockService.getStockByID(1);
+        assertTrue(stockOpt.isPresent());
 
-        String resultado = stockService.getStockById(idStock);
-        assertTrue(resultado.contains("Cantidad en Stock: 100"));
-        assertTrue(resultado.contains("ID Producto: 1"));
-        assertTrue(resultado.contains("ID Sucursal: 1"));
+        Stock stock = stockOpt.get();
+        assertEquals(100, stock.getCantStock());
+        assertEquals(idProducto, stock.getProducto().getId());
+        assertEquals(idSucursal, stock.getSucursal().getId());
     }
 
     // R - Listar todos (precargados y el nuevo)
     @Test
     @Order(3)
     public void testGetStocks() {
-        String resultado = stockService.getStocks();
-        assertTrue(resultado.contains("Cantidad en Stock: 100")); // De data.sql
-        assertTrue(resultado.contains("Cantidad en Stock: 150")); // El creado en el test
+        List<Stock> stocks = stockService.getStocks();
+        assertFalse(stocks.isEmpty());
+
+        boolean hayOriginal = stocks.stream().anyMatch(s ->
+                s.getCantStock() == 100 &&
+                        s.getProducto().getId() == idProducto &&
+                        s.getSucursal().getId() == idSucursal
+        );
+
+        boolean hayNuevo = stocks.stream().anyMatch(s ->
+                s.getCantStock() == 150 &&
+                        s.getId().equals(idCreado)
+        );
+
+        assertTrue(hayOriginal);
+        assertTrue(hayNuevo);
     }
 
     // U - Actualizar stock creado
     @Test
     @Order(4)
     public void testUpdateStock() {
-        Stock actualizado = new Stock();
-        actualizado.setCantStock(200);
+        StockDTO dto = new StockDTO();
+        dto.setCantStock(200);
+        dto.setIdProducto(idProducto);
+        dto.setIdSucursal(idSucursal);
 
-        // Mantener las mismas relaciones
-        Producto producto = productoRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-        Sucursal sucursal = sucursalRepository.findById(1)
-                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+        Stock actualizado = stockService.updateStock(idCreado, dto);
 
-        actualizado.setProducto(producto);
-        actualizado.setSucursal(sucursal);
-
-        String resultado = stockService.updateStock(actualizado, idCreado);
-        assertEquals("Stock actualizado con éxito", resultado);
-
-        String stockActual = stockService.getStockById(idCreado);
-        assertTrue(stockActual.contains("Cantidad en Stock: 200"));
+        assertEquals(200, actualizado.getCantStock());
+        assertEquals(idProducto, actualizado.getProducto().getId());
+        assertEquals(idSucursal, actualizado.getSucursal().getId());
     }
 
     // D - Eliminar stock creado
     @Test
     @Order(5)
     public void testDeleteStock() {
-        String resultado = stockService.deleteStock(idCreado);
-        assertEquals("Stock eliminado con éxito", resultado);
+        stockService.deleteStock(idCreado);
 
-        String stockEliminado = stockService.getStockById(idCreado);
-        assertEquals("Stock no encontrado", stockEliminado);
+        Optional<Stock> stockOpt = stockService.getStockByID(idCreado);
+        assertTrue(stockOpt.isEmpty(), "El stock debería haber sido eliminado");
     }
 }

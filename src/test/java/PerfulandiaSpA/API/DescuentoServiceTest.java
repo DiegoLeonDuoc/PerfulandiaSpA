@@ -1,5 +1,6 @@
 package PerfulandiaSpA.API;
 
+import PerfulandiaSpA.DTO.DescuentoDTO;
 import PerfulandiaSpA.Entidades.Descuento;
 import PerfulandiaSpA.Entidades.Producto;
 import PerfulandiaSpA.Servicio.DescuentoService;
@@ -11,6 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,26 +29,34 @@ public class DescuentoServiceTest {
     ProductoRepository productoRepository;
 
     private Integer idCreado = null;
+    private Integer idProductoUsado = null;
 
     // C - Crear un descuento nuevo
     @Test
     @Order(1)
-    public void testSaveDescuento() {
-        Descuento descuento = new Descuento();
-        descuento.setTipoDescuento("FIJO");
-        descuento.setValorDescuento(250);
-        descuento.setFecIniDescuento(LocalDate.of(2025, 6, 1));
-        descuento.setFecFinDescuento(LocalDate.of(2025, 7, 1));
-
-        // Busca un producto existente en la base de datos (por ejemplo, el primero)
+    public void testCrearDescuento() {
         Producto producto = productoRepository.findAll().stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("No hay productos en la base de datos"));
-        descuento.setProducto(producto);
 
-        String resultado = descuentoService.saveDescuento(descuento);
-        assertEquals("Descuento agregado con éxito", resultado);
+        idProductoUsado = producto.getId();
+
+        DescuentoDTO dto = new DescuentoDTO();
+        dto.setTipoDescuento("FIJO");
+        dto.setValorDescuento(250);
+        dto.setFecIniDescuento(LocalDate.of(2025, 6, 1));
+        dto.setFecFinDescuento(LocalDate.of(2025, 7, 1));
+        dto.setIdProducto(idProductoUsado);
+
+        Descuento descuento = descuentoService.crearDescuento(dto);
 
         assertNotNull(descuento.getId());
+        assertEquals("FIJO", descuento.getTipoDescuento());
+        assertEquals(250, descuento.getValorDescuento());
+        assertEquals(LocalDate.of(2025, 6, 1), descuento.getFecIniDescuento());
+        assertEquals(LocalDate.of(2025, 7, 1), descuento.getFecFinDescuento());
+        assertNotNull(descuento.getProducto());
+        assertEquals(idProductoUsado, descuento.getProducto().getId());
+
         idCreado = descuento.getId();
     }
 
@@ -54,7 +64,7 @@ public class DescuentoServiceTest {
     @Test
     @Order(2)
     public void testGetDescuentoById_Fijo() {
-        List<Descuento> descuentos = descuentoService.getDescuentosJSON();
+        List<Descuento> descuentos = descuentoService.getDescuentos();
         Integer idFijo = null;
         for (Descuento d : descuentos) {
             if ("FIJO".equalsIgnoreCase(d.getTipoDescuento())) {
@@ -63,57 +73,61 @@ public class DescuentoServiceTest {
             }
         }
         assertNotNull(idFijo, "No se encontró el descuento FIJO en la base de datos de prueba.");
-        String resultado = descuentoService.getDescuentoById(idFijo);
-        assertTrue(resultado.contains("FIJO"));
-        assertTrue(resultado.contains("100") || resultado.contains("250")); // Puede ser el de data.sql o el creado en el test
-        assertTrue(resultado.contains("01-05-2024") || resultado.contains("01-06-2025")); // Fecha del data.sql o del test
+
+        Optional<Descuento> descuentoOpt = descuentoService.getDescuentoByID(idFijo);
+        assertTrue(descuentoOpt.isPresent());
+        Descuento descuento = descuentoOpt.get();
+        assertEquals("FIJO", descuento.getTipoDescuento());
+        assertTrue(descuento.getValorDescuento() == 100 || descuento.getValorDescuento() == 250);
+        assertNotNull(descuento.getFecIniDescuento());
     }
 
     // R - Listar todos (precargados y el nuevo)
     @Test
     @Order(3)
     public void testGetDescuentos() {
-        String resultado = descuentoService.getDescuentos();
-        assertTrue(resultado.contains("FIJO"));
-        assertTrue(resultado.contains("PORCENTUAL"));
-        assertTrue(resultado.contains("100"));
-        assertTrue(resultado.contains("10"));
-        assertTrue(resultado.contains("01-05-2024"));
-        assertTrue(resultado.contains("01-06-2025") || resultado.contains("250")); // El que creamos arriba
+        List<Descuento> descuentos = descuentoService.getDescuentos();
+        assertFalse(descuentos.isEmpty());
+        boolean hayFijo = descuentos.stream().anyMatch(d -> "FIJO".equalsIgnoreCase(d.getTipoDescuento()));
+        boolean hayPorcentual = descuentos.stream().anyMatch(d -> "PORCENTUAL".equalsIgnoreCase(d.getTipoDescuento()));
+        assertTrue(hayFijo);
+        assertTrue(hayPorcentual);
+        boolean hayValor100 = descuentos.stream().anyMatch(d -> d.getValorDescuento() == 100);
+        boolean hayValor10 = descuentos.stream().anyMatch(d -> d.getValorDescuento() == 10);
+        boolean hayValor250 = descuentos.stream().anyMatch(d -> d.getValorDescuento() == 250);
+        assertTrue(hayValor100);
+        assertTrue(hayValor10);
+        assertTrue(hayValor250);
     }
 
     // U - Actualizar descuento creado
     @Test
     @Order(4)
     public void testUpdateDescuento() {
-        Descuento actualizado = new Descuento();
-        actualizado.setTipoDescuento("PORCENTUAL");
-        actualizado.setValorDescuento(20);
-        actualizado.setFecIniDescuento(LocalDate.of(2025, 6, 15));
-        actualizado.setFecFinDescuento(LocalDate.of(2025, 7, 15));
+        DescuentoDTO dto = new DescuentoDTO();
+        dto.setTipoDescuento("PORCENTUAL");
+        dto.setValorDescuento(20);
+        dto.setFecIniDescuento(LocalDate.of(2025, 6, 15));
+        dto.setFecFinDescuento(LocalDate.of(2025, 7, 15));
+        dto.setIdProducto(idProductoUsado);
 
-        // Usa el mismo producto que antes
-        Producto producto = productoRepository.findAll().stream().findFirst()
-                .orElseThrow(() -> new RuntimeException("No hay productos en la base de datos"));
-        actualizado.setProducto(producto);
+        Descuento actualizado = descuentoService.updateDescuento(dto, idCreado);
 
-        String resultado = descuentoService.updateDescuento(actualizado, idCreado);
-        assertEquals("Descuento actualizado con éxito", resultado);
-
-        String descuentoActual = descuentoService.getDescuentoById(idCreado);
-        assertTrue(descuentoActual.contains("PORCENTUAL"));
-        assertTrue(descuentoActual.contains("20"));
-        assertTrue(descuentoActual.contains("15-06-2025"));
+        assertNotNull(actualizado);
+        assertEquals("PORCENTUAL", actualizado.getTipoDescuento());
+        assertEquals(20, actualizado.getValorDescuento());
+        assertEquals(LocalDate.of(2025, 6, 15), actualizado.getFecIniDescuento());
+        assertEquals(LocalDate.of(2025, 7, 15), actualizado.getFecFinDescuento());
+        assertEquals(idProductoUsado, actualizado.getProducto().getId());
     }
 
     // D - Eliminar descuento creado
     @Test
     @Order(5)
     public void testDeleteDescuento() {
-        String resultado = descuentoService.deleteDescuento(idCreado);
-        assertEquals("Descuento eliminado con éxito", resultado);
+        descuentoService.deleteDescuento(idCreado);
 
-        String descuentoEliminado = descuentoService.getDescuentoById(idCreado);
-        assertEquals("Descuento no encontrado", descuentoEliminado);
+        Optional<Descuento> descuentoEliminado = descuentoService.getDescuentoByID(idCreado);
+        assertTrue(descuentoEliminado.isEmpty(), "El descuento debería haber sido eliminado.");
     }
 }

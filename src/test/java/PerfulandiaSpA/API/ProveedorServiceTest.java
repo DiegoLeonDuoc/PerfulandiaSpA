@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,18 +32,22 @@ public class ProveedorServiceTest {
         proveedor.setTelefonoProveedor("912000003");
         proveedor.setEmailProveedor("prov3@correo.com");
 
-        String resultado = proveedorService.saveProveedor(proveedor);
-        assertEquals("Proveedor agregado con éxito", resultado);
+        proveedorService.saveProveedor(proveedor);
 
         assertNotNull(proveedor.getId());
         idCreado = proveedor.getId();
+
+        // Verifica que el proveedor se guardó correctamente
+        Optional<Proveedor> provOpt = proveedorService.getProveedorByID(idCreado);
+        assertTrue(provOpt.isPresent());
+        assertEquals("Proveedor Tres", provOpt.get().getNombreProveedor());
     }
 
     // R - Buscar por ID (busca el proveedor "Proveedor Uno" de data.sql)
     @Test
     @Order(2)
     public void testGetProveedorById_Uno() {
-        List<Proveedor> proveedores = proveedorService.getProveedoresJSON();
+        List<Proveedor> proveedores = proveedorService.getProveedores();
         Integer idUno = null;
         for (Proveedor p : proveedores) {
             if ("Proveedor Uno".equalsIgnoreCase(p.getNombreProveedor())) {
@@ -51,20 +56,29 @@ public class ProveedorServiceTest {
             }
         }
         assertNotNull(idUno, "No se encontró el proveedor Uno en la base de datos de prueba.");
-        String resultado = proveedorService.getProveedorById(idUno);
-        assertTrue(resultado.contains("Proveedor Uno"));
-        assertTrue(resultado.contains("912000001"));
-        assertTrue(resultado.contains("prov1@correo.com"));
+
+        Optional<Proveedor> provOpt = proveedorService.getProveedorByID(idUno);
+        assertTrue(provOpt.isPresent());
+        Proveedor proveedor = provOpt.get();
+        assertEquals("Proveedor Uno", proveedor.getNombreProveedor());
+        assertEquals("912000001", proveedor.getTelefonoProveedor());
+        assertEquals("prov1@correo.com", proveedor.getEmailProveedor());
     }
 
     // R - Listar todos (precargados y el nuevo)
     @Test
     @Order(3)
     public void testGetProveedores() {
-        String resultado = proveedorService.getProveedores();
-        assertTrue(resultado.contains("Proveedor Uno"));
-        assertTrue(resultado.contains("Proveedor Dos"));
-        assertTrue(resultado.contains("Proveedor Tres")); // El que creamos arriba
+        List<Proveedor> proveedores = proveedorService.getProveedores();
+        assertFalse(proveedores.isEmpty());
+
+        boolean hayUno = proveedores.stream().anyMatch(p -> "Proveedor Uno".equalsIgnoreCase(p.getNombreProveedor()));
+        boolean hayDos = proveedores.stream().anyMatch(p -> "Proveedor Dos".equalsIgnoreCase(p.getNombreProveedor()));
+        boolean hayTres = proveedores.stream().anyMatch(p -> "Proveedor Tres".equalsIgnoreCase(p.getNombreProveedor()));
+
+        assertTrue(hayUno);
+        assertTrue(hayDos);
+        assertTrue(hayTres);
     }
 
     // U - Actualizar proveedor creado
@@ -76,23 +90,23 @@ public class ProveedorServiceTest {
         actualizado.setTelefonoProveedor("912000999");
         actualizado.setEmailProveedor("prov3editado@correo.com");
 
-        String resultado = proveedorService.updateProveedor(actualizado, idCreado);
-        assertEquals("Proveedor actualizado con éxito", resultado);
+        proveedorService.updateProveedor(actualizado, idCreado);
 
-        String proveedorActual = proveedorService.getProveedorById(idCreado);
-        assertTrue(proveedorActual.contains("Proveedor Tres Editado"));
-        assertTrue(proveedorActual.contains("912000999"));
-        assertTrue(proveedorActual.contains("prov3editado@correo.com"));
+        Optional<Proveedor> provOpt = proveedorService.getProveedorByID(idCreado);
+        assertTrue(provOpt.isPresent());
+        Proveedor proveedor = provOpt.get();
+        assertEquals("Proveedor Tres Editado", proveedor.getNombreProveedor());
+        assertEquals("912000999", proveedor.getTelefonoProveedor());
+        assertEquals("prov3editado@correo.com", proveedor.getEmailProveedor());
     }
 
     // D - Eliminar proveedor creado
     @Test
     @Order(5)
     public void testDeleteProveedor() {
-        String resultado = proveedorService.deleteProveedor(idCreado);
-        assertEquals("Proveedor eliminado con éxito", resultado);
+        proveedorService.deleteProveedor(idCreado);
 
-        String proveedorEliminado = proveedorService.getProveedorById(idCreado);
-        assertEquals("Proveedor no encontrado", proveedorEliminado);
+        Optional<Proveedor> provOpt = proveedorService.getProveedorByID(idCreado);
+        assertTrue(provOpt.isEmpty(), "El proveedor debería haber sido eliminado.");
     }
 }
