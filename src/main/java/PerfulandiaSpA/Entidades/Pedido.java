@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,9 +51,11 @@ public class Pedido {
     @JoinColumn(name = "RUT_USUARIO", nullable = false)
     private Cliente cliente;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductosPedido> productosEnPedido = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "pedidoAsociado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Envio> pedidosEnviados = new ArrayList<>();
 

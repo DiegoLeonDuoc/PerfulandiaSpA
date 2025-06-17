@@ -6,11 +6,13 @@ import PerfulandiaSpA.Entidades.Producto;
 import PerfulandiaSpA.Entidades.ProductosPedido;
 import PerfulandiaSpA.Entidades.Pedido;
 import PerfulandiaSpA.Repositorio.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductosPedidoService {
@@ -30,7 +32,7 @@ public class ProductosPedidoService {
     DescuentoRepository descuentoRepository;
 
     // C
-    public String crearProductosPedido(ProductosPedidoDTO productosPedido) {
+    public ProductosPedido crearProductosPedido(ProductosPedidoDTO productosPedido) {
         ProductosPedido newProductosPedido = new ProductosPedido();
         Pedido pedido;
         Producto producto;
@@ -39,13 +41,13 @@ public class ProductosPedidoService {
             pedido = pedidoRepository.findById(productosPedido.getIdPedido()).get();
             newProductosPedido.setPedido(pedido);
         } else {
-            return "No existe un pedido asociado a ese ID";
+            throw new EntityNotFoundException("Pedido no encontrado");
         }
         if (productoRepository.existsById(productosPedido.getIdProducto())) {
             producto = productoRepository.findById(productosPedido.getIdProducto()).get();
             newProductosPedido.setProducto(producto);
         } else {
-            return "No existe un producto asociado a ese ID";
+            throw new EntityNotFoundException("Producto no encontrado");
         }
         if (productosPedido.getIdDescuento() == null) {
             newProductosPedido.setDescuentoUnitario(0);
@@ -65,208 +67,155 @@ public class ProductosPedidoService {
                 newProductosPedido.setPrecioUnitario(producto.getPrecioProd() - descuentoProducto);
             }
         } else {
-            return "No existe un descuento asociado a ese ID";
+            throw new EntityNotFoundException("Descuento no encontrado");
         }
         newProductosPedido.setCantProd(productosPedido.getCantProd());
         newProductosPedido.setPrecioTotalProd(newProductosPedido.getPrecioUnitario() * productosPedido.getCantProd());
-        productosPedidoRepository.save(newProductosPedido);
-        return "ProductosPedido agregado con éxito";
+        return productosPedidoRepository.save(newProductosPedido);
     }
     // R
-    public String getProductosPedidos() {
-        String output = "";
-        for (ProductosPedido productosPedido : productosPedidoRepository.findAll()) {
-            output = datosProductosPedido(output, productosPedido);
-        }
-        if (output.isEmpty()) {
-            return "No hay productosPedidos registrados";
-        } else {
-            return output;
-        }
-    }
-
-    public String getProductosPedidosByRut(Integer rut) {
-        String output = "";
-        List<Integer> productosPedidosIds = new ArrayList<>();
-        if (clienteRepository.existsById(rut)) {
-            for (ProductosPedido productosPedido : productosPedidoRepository.findAll()) {
-                if (productosPedido.getPedido().getCliente().getRutUsuario().equals(rut)) {
-                    productosPedidosIds.add(productosPedido.getId());
-                }
-            }
-            if (productosPedidosIds.isEmpty()) {
-                return "Este cliente no tiene productosPedidos registrados";
-            } else {
-                for (Integer id: productosPedidosIds) {
-                    output += datosProductosPedido("", productosPedidoRepository.findById(id).get());
-                }
-                return output;
-            }
-        } else {
-            return "Este cliente no existe";
-        }
-    }
-
-    public List<ProductosPedido> getProductosPedidosJSON() {
+    public List<ProductosPedido> getProductosPedidos() {
         return productosPedidoRepository.findAll();
     }
-//
 
-//
+    public Optional<ProductosPedido> getProductoPedidoByID(Integer id) {
+        Optional<ProductosPedido> productosPedido = productosPedidoRepository.findById(id);
+        if (productosPedido.isPresent()) {
+            return productosPedido;
+        } else {
+            throw new EntityNotFoundException("Producto en pedido no encontrado");
+        }
+    }
+
+//    public List<ProductosPedido> getProductosPedidosByRut(Integer rut) {
+//        List<ProductosPedido> productosCliente = new ArrayList<>();
+//        if (clienteRepository.existsById(rut)) {
+//            for (ProductosPedido productosPedido : productosPedidoRepository.findAll()) {
+//                if (productosPedido.getPedido().getCliente().getRutUsuario().equals(rut)) {
+//                    productosCliente.add(productosPedido);
+//                }
+//            }
+//            return productosCliente;
+//        } else {
+//            throw new EntityNotFoundException("Cliente no encontrado");
+//        }
+//    }
+
     // U
 
-    public String updateProductosPedido(ProductosPedidoDTO productosPedidoDTO) {
+    public ProductosPedido updateProductosPedido(ProductosPedidoDTO productosPedidoDTO, int id) {
         ProductosPedido productosPedidoParchado;
-        if (productosPedidoRepository.existsById(productosPedidoDTO.getId())) {
-            productosPedidoParchado = productosPedidoRepository.findById(productosPedidoDTO.getId()).get();
-        } else {
-            return "El ProductosPedido a actualizar no existe";
-        }
+        Optional<ProductosPedido> productoPedido = productosPedidoRepository.findById(id);
+        if (productoPedido.isPresent()) {
+            productosPedidoParchado = productoPedido.get();
+            productosPedidoParchado.setCantProd(productosPedidoDTO.getCantProd());
 
-        productosPedidoParchado.setCantProd(productosPedidoDTO.getCantProd());
-
-        Pedido pedido;
-        if (pedidoRepository.existsById(productosPedidoDTO.getIdPedido())) {
-            pedido = pedidoRepository.findById(productosPedidoDTO.getIdPedido()).get();
-            productosPedidoParchado.setPedido(pedido);
-        } else {
-            return "No existe un pedido asociado a ese ID";
-        }
-
-        Producto producto;
-        if (productoRepository.existsById(productosPedidoDTO.getIdProducto())) {
-            producto = productoRepository.findById(productosPedidoDTO.getIdProducto()).get();
-            productosPedidoParchado.setProducto(producto);
-        } else {
-            return "No existe un producto asociado a ese ID";
-        }
-
-        if (productosPedidoDTO.getIdDescuento() == null) {
-            productosPedidoParchado.setDescuento(null);
-            productosPedidoParchado.setDescuentoUnitario(0);
-            productosPedidoParchado.setPrecioUnitario(producto.getPrecioProd());
-        } else if (descuentoRepository.existsById(productosPedidoDTO.getIdDescuento())) {
-            Descuento descuento = descuentoRepository.findById(productosPedidoDTO.getIdDescuento()).get();
-            productosPedidoParchado.setDescuento(descuento);
-            if (descuento.getTipoDescuento().equals("FIJO")) {
-                Integer montoDescuento = descuento.getValorDescuento();
-                productosPedidoParchado.setDescuentoUnitario(montoDescuento);
-                productosPedidoParchado.setPrecioUnitario(producto.getPrecioProd() - montoDescuento);
-            } else if (descuento.getTipoDescuento().equals("PORCENTUAL")) {
-                Integer montoDescuento = descuento.getValorDescuento();
-                Integer descuentoProducto = Math.round(producto.getPrecioProd() * ((float) montoDescuento / 100));
-                productosPedidoParchado.setDescuentoUnitario(descuentoProducto);
-                productosPedidoParchado.setPrecioUnitario(producto.getPrecioProd() - descuentoProducto);
+            Optional<Pedido> pedido =  pedidoRepository.findById(productosPedidoDTO.getIdPedido());
+            if (pedido.isPresent()) {
+                productosPedidoParchado.setPedido(pedido.get());
+            } else {
+                throw new EntityNotFoundException("Pedido no encontrado");
             }
-        } else {
-            return "No existe un descuento asociado a ese ID";
-        }
 
-        productosPedidoParchado.setPrecioTotalProd(productosPedidoParchado.getPrecioUnitario() * productosPedidoParchado.getCantProd());
-        productosPedidoRepository.save(productosPedidoParchado);
-        return "ProductosPedido actualizado con éxito";
-    }
-
-//
-//
-public String patchProductosPedido(ProductosPedidoDTO productosPedidoDTO, int id) {
-    if (!productosPedidoRepository.existsById(id)) {
-        return "El ProductosPedido a actualizar no existe";
-    }
-
-    ProductosPedido productosPedidoParchado = productosPedidoRepository.findById(id).get();
-    productosPedidoParchado.setId(id);
-
-    if (productosPedidoDTO.getCantProd() != null) {
-        productosPedidoParchado.setCantProd(productosPedidoDTO.getCantProd());
-    }
-
-    if (productosPedidoDTO.getIdPedido() != null) {
-        if (pedidoRepository.existsById(productosPedidoDTO.getIdPedido())) {
-            Pedido pedido = pedidoRepository.findById(productosPedidoDTO.getIdPedido()).get();
-            productosPedidoParchado.setPedido(pedido);
-        } else {
-            return "No existe un pedido asociado a ese ID";
-        }
-    }
-
-    if (productosPedidoDTO.getIdProducto() != null) {
-        if (productoRepository.existsById(productosPedidoDTO.getIdProducto())) {
-            Producto producto = productoRepository.findById(productosPedidoDTO.getIdProducto()).get();
-            productosPedidoParchado.setProducto(producto);
-        } else {
-            return "No existe un producto asociado a ese ID";
-        }
-    }
-
-    if (productosPedidoDTO.getIdDescuento() != null) {
-        if (descuentoRepository.existsById(productosPedidoDTO.getIdDescuento())) {
-            Descuento descuento = descuentoRepository.findById(productosPedidoDTO.getIdDescuento()).get();
-            productosPedidoParchado.setDescuento(descuento);
-            if (descuento.getTipoDescuento().equals("FIJO")) {
-                Integer montoDescuento = descuento.getValorDescuento();
-                productosPedidoParchado.setDescuentoUnitario(montoDescuento);
-                productosPedidoParchado.setPrecioUnitario(productosPedidoParchado.getProducto().getPrecioProd() - montoDescuento);
-            } else if (descuento.getTipoDescuento().equals("PORCENTUAL")) {
-                Integer montoDescuento = descuento.getValorDescuento();
-                Integer descuentoProducto = Math.round(productosPedidoParchado.getProducto().getPrecioProd() * ((float) montoDescuento / 100));
-                productosPedidoParchado.setDescuentoUnitario(descuentoProducto);
-                productosPedidoParchado.setPrecioUnitario(productosPedidoParchado.getProducto().getPrecioProd() - descuentoProducto);
+            Optional<Producto> producto = productoRepository.findById(productosPedidoDTO.getIdProducto());
+            if (producto.isPresent()) {
+                productosPedidoParchado.setProducto(producto.get());
+            } else {
+                throw new EntityNotFoundException("Producto no encontrado");
             }
+
+            Optional<Descuento> descuentoOp = descuentoRepository.findById(productosPedidoDTO.getIdDescuento());
+            if (productosPedidoDTO.getIdDescuento() == null) {
+                productosPedidoParchado.setDescuento(null);
+                productosPedidoParchado.setDescuentoUnitario(0);
+                productosPedidoParchado.setPrecioUnitario(producto.get().getPrecioProd());
+            } else if (descuentoOp.isPresent()) {
+                Descuento descuento = descuentoOp.get();
+                productosPedidoParchado.setDescuento(descuento);
+                if (descuento.getTipoDescuento().equals("FIJO")) {
+                    Integer montoDescuento = descuento.getValorDescuento();
+                    productosPedidoParchado.setDescuentoUnitario(montoDescuento);
+                    productosPedidoParchado.setPrecioUnitario(producto.get().getPrecioProd() - montoDescuento);
+                } else if (descuento.getTipoDescuento().equals("PORCENTUAL")) {
+                    Integer montoDescuento = descuento.getValorDescuento();
+                    Integer descuentoProducto = Math.round(producto.get().getPrecioProd() * ((float) montoDescuento / 100));
+                    productosPedidoParchado.setDescuentoUnitario(descuentoProducto);
+                    productosPedidoParchado.setPrecioUnitario(producto.get().getPrecioProd() - descuentoProducto);
+                }
+            } else {
+                throw new EntityNotFoundException("Descuento no encontrado");
+            }
+            productosPedidoParchado.setPrecioTotalProd(productosPedidoParchado.getPrecioUnitario() * productosPedidoParchado.getCantProd());
+            return productosPedidoRepository.save(productosPedidoParchado);
         } else {
-            return "No existe un descuento asociado a ese ID";
+            throw new EntityNotFoundException("Producto en pedido no encontrado");
         }
-    } else {
-        productosPedidoParchado.setDescuento(null);
-        productosPedidoParchado.setDescuentoUnitario(0);
-        productosPedidoParchado.setPrecioUnitario(productosPedidoParchado.getProducto().getPrecioProd());
     }
 
-    productosPedidoRepository.save(productosPedidoParchado);
-    return "ProductosPedido actualizado con éxito";
-}
-//
+    public ProductosPedido patchProductosPedido(ProductosPedidoDTO productosPedidoDTO, int id) {
+        Optional<ProductosPedido> productoPedidoOpt = productosPedidoRepository.findById(id);
+
+        if (productoPedidoOpt.isPresent()) {
+            ProductosPedido productosPedidoParchado = productoPedidoOpt.get();
+
+            if (productosPedidoDTO.getCantProd() != null) {
+                productosPedidoParchado.setCantProd(productosPedidoDTO.getCantProd());
+            }
+
+            if (productosPedidoDTO.getIdPedido() != null) {
+                Optional<Pedido> pedidoOpt = pedidoRepository.findById(productosPedidoDTO.getIdPedido());
+                if (pedidoOpt.isPresent()) {
+                    productosPedidoParchado.setPedido(pedidoOpt.get());
+                } else {
+                    throw new EntityNotFoundException("Pedido no encontrado");
+                }
+            }
+
+            if (productosPedidoDTO.getIdProducto() != null) {
+                Optional<Producto> productoOpt = productoRepository.findById(productosPedidoDTO.getIdProducto());
+                if (productoOpt.isPresent()) {
+                    productosPedidoParchado.setProducto(productoOpt.get());
+                } else {
+                    throw new EntityNotFoundException("Producto no encontrado");
+                }
+            }
+
+            if (productosPedidoDTO.getIdDescuento() != null) {
+                Optional<Descuento> descuentoOpt = descuentoRepository.findById(productosPedidoDTO.getIdDescuento());
+                if (descuentoOpt.isPresent()) {
+                    Descuento descuento = descuentoOpt.get();
+                    productosPedidoParchado.setDescuento(descuento);
+                    Integer montoDescuento = descuento.getValorDescuento();
+
+                    if (descuento.getTipoDescuento().equals("FIJO")) {
+                        productosPedidoParchado.setDescuentoUnitario(montoDescuento);
+                        productosPedidoParchado.setPrecioUnitario(productosPedidoParchado.getProducto().getPrecioProd() - montoDescuento);
+                    } else if (descuento.getTipoDescuento().equals("PORCENTUAL")) {
+                        Integer descuentoProducto = Math.round(productosPedidoParchado.getProducto().getPrecioProd() * ((float) montoDescuento / 100));
+                        productosPedidoParchado.setDescuentoUnitario(descuentoProducto);
+                        productosPedidoParchado.setPrecioUnitario(productosPedidoParchado.getProducto().getPrecioProd() - descuentoProducto);
+                    }
+                } else {
+                    throw new EntityNotFoundException("Descuento no encontrado");
+                }
+            } else {
+                productosPedidoParchado.setDescuento(null);
+                productosPedidoParchado.setDescuentoUnitario(0);
+                productosPedidoParchado.setPrecioUnitario(productosPedidoParchado.getProducto().getPrecioProd());
+            }
+
+            productosPedidoParchado.setPrecioTotalProd(productosPedidoParchado.getPrecioUnitario() * productosPedidoParchado.getCantProd());
+            return productosPedidoRepository.save(productosPedidoParchado);
+
+        } else {
+            throw new EntityNotFoundException("Producto en pedido no encontrado");
+        }
+    }
+
     // D
 
-    public String deleteProductosPedido(int id) {
-        for (ProductosPedido productosPedido : productosPedidoRepository.findAll()) {
-            if (productosPedido.getId() == id) {
-                productosPedidoRepository.delete(productosPedido);
-                return "ProductosPedido eliminado con éxito";
-            }
-        }
-        return "ProductosPedido no existente";
-    }
-
-    // Funciones no CRUD
-//
-    public String datosProductosPedido(String output, ProductosPedido productosPedido) {
-        output += "ID ProductosPedido: " + productosPedido.getId() + "\n";
-        output += "Cantidad de Producto: " + productosPedido.getCantProd() + "\n";
-        output += "Precio Unitario: " + productosPedido.getPrecioUnitario() + "\n";
-        output += "Descuento Unitario: " + (productosPedido.getDescuentoUnitario() != null ? productosPedido.getDescuentoUnitario() : "No disponible") + "\n";
-        output += "Precio Total Producto: " + productosPedido.getPrecioTotalProd() + "\n";
-
-        if (productosPedido.getDescuento() != null) {
-            output += "ID Descuento: " + productosPedido.getDescuento().getId() + "\n";
-        } else {
-            output += "Descuento: No asociado\n";
-        }
-
-        if (productosPedido.getPedido() != null) {
-            output += "ID Pedido asociado: " + productosPedido.getPedido().getId() + "\n";
-        } else {
-            output += "Pedido: No asociado\n";
-        }
-
-        if (productosPedido.getProducto() != null) {
-            output += "ID Producto: " + productosPedido.getProducto().getId() + "\n";
-        } else {
-            output += "Producto: No asociado\n";
-        }
-        output += "\n";
-
-        return output;
+    public void deleteProductosPedido(int id) {
+        productosPedidoRepository.deleteById(id);
     }
 
 }

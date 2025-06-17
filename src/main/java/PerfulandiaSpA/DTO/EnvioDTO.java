@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class EnvioDTO {
-    private Integer id;
     private Long codigoEnvio;
     private Integer idPedido;
     private LocalDate fechaEnvio;
@@ -18,5 +17,4 @@ public class EnvioDTO {
     private String transportista;
     private Long numSeguimiento;
     private String metodoEnvio;
-    private String anotaciones;
 }

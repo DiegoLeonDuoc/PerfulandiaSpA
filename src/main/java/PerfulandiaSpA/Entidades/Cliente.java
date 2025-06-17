@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,13 +18,15 @@ import java.util.List;
 @DiscriminatorValue("CLIENTE")
 public class Cliente extends Usuario{
 
-    @Column(name = "ESTADO_CUENTA", nullable = false, length = 20, columnDefinition = "")
+    @Column(name = "ESTADO_CUENTA", nullable = false, length = 20)
     private String estadoCuenta;
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Pedido> pedidos = new ArrayList<>();
 
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Carrito> carritos = new ArrayList<>();
 
 }

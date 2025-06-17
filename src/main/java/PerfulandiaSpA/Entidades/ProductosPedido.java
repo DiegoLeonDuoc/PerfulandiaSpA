@@ -1,5 +1,6 @@
 package PerfulandiaSpA.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -45,6 +46,7 @@ public class ProductosPedido {
     @JoinColumn(name = "ID_PRODUCTO")
     private Producto producto;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "productoPedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Devolucion> devoluciones = new ArrayList<>();
 
