@@ -1,95 +1,110 @@
 package PerfulandiaSpA.Servicio;
 
+import PerfulandiaSpA.DTO.DescuentoDTO;
 import PerfulandiaSpA.Entidades.Descuento;
+import PerfulandiaSpA.Entidades.Producto;
 import PerfulandiaSpA.Repositorio.DescuentoRepository;
+import PerfulandiaSpA.Repositorio.ProductoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DescuentoService {
 
     @Autowired
     private DescuentoRepository descuentoRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
     // CREATE
-    public String saveDescuento(Descuento descuento) {
-        if (descuento.getId() == null) {
-            descuentoRepository.save(descuento);
-            return "Descuento agregado con éxito";
-        } else {
-            if (descuentoRepository.existsById(descuento.getId())) {
-                return "Descuento ya existe";
-            } else {
-                descuentoRepository.save(descuento);
-                return "Descuento agregado con éxito";
-            }
-        }
-    }
+    public Descuento crearDescuento(DescuentoDTO descuentoDTO) {
+        Descuento descuento = new Descuento();
+        descuento.setTipoDescuento(descuentoDTO.getTipoDescuento());
+        descuento.setValorDescuento(descuentoDTO.getValorDescuento());
+        descuento.setFecIniDescuento(descuentoDTO.getFecIniDescuento());
+        descuento.setFecFinDescuento(descuentoDTO.getFecFinDescuento());
 
-    // READ (Formato toString)
-    public String getDescuentos() {
-        String output = "";
-        for (Descuento d : descuentoRepository.findAll()) {
-            output = datosDescuento(output, d);
+        Optional<Producto> producto = productoRepository.findById(descuentoDTO.getIdProducto());
+
+        if (producto.isPresent()) {
+            descuento.setProducto(producto.get());
+        } else {
+            descuento.setProducto(null);
         }
 
-        if (output.isEmpty()) {
-            return "No hay descuentos registrados";
-        } else {
-            return output;
-        }
+        return descuentoRepository.save(descuento);
     }
 
     // READ (JSON)
-    public List<Descuento> getDescuentosJSON() {
+    public List<Descuento> getDescuentos() {
         return descuentoRepository.findAll();
     }
 
     // READ (por ID)
-    public String getDescuentoById(Integer id) {
-        if (descuentoRepository.existsById(id)) {
-            Descuento d = descuentoRepository.findById(id).get();
-            return datosDescuento("", d);
-        }
-        return "Descuento no encontrado";
+    public Optional<Descuento> getDescuentoByID(Integer id) {
+        return descuentoRepository.findById(id);
     }
 
     // UPDATE
-    public String updateDescuento(Descuento d, Integer id) {
-        if (descuentoRepository.existsById(id)) {
-            d.setId(id);
-            descuentoRepository.save(d);
-            return "Descuento actualizado con éxito";
+    public Descuento updateDescuento(DescuentoDTO descuentoDTO, Integer id) {
+        Descuento descuentoExistente = descuentoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Descuento no encontrado"));
+
+        descuentoExistente.setId(id);
+        descuentoExistente.setTipoDescuento(descuentoDTO.getTipoDescuento());
+        descuentoExistente.setValorDescuento(descuentoDTO.getValorDescuento());
+        descuentoExistente.setFecIniDescuento(descuentoDTO.getFecIniDescuento());
+        descuentoExistente.setFecFinDescuento(descuentoDTO.getFecFinDescuento());
+
+        Optional<Producto> producto = productoRepository.findById(descuentoDTO.getIdProducto());
+
+        if (producto.isPresent()) {
+            descuentoExistente.setProducto(producto.get());
+        } else {
+            descuentoExistente.setProducto(null);
         }
-        return "Descuento no encontrado";
+
+        return descuentoRepository.save(descuentoExistente);
     }
+
+    public Descuento patchDescuento(DescuentoDTO descuentoDTO, Integer id) {
+        Descuento descuentoExistente = descuentoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Descuento no encontrado"));
+
+        if (descuentoDTO.getTipoDescuento() != null) {
+            descuentoExistente.setTipoDescuento(descuentoDTO.getTipoDescuento());
+        }
+        if (descuentoDTO.getValorDescuento() != null) {
+            descuentoExistente.setValorDescuento(descuentoDTO.getValorDescuento());
+        }
+        if (descuentoDTO.getFecIniDescuento() != null) {
+            descuentoExistente.setFecIniDescuento(descuentoDTO.getFecIniDescuento());
+        }
+        if (descuentoDTO.getFecFinDescuento() != null) {
+            descuentoExistente.setFecFinDescuento(descuentoDTO.getFecFinDescuento());
+        }
+
+        if (descuentoDTO.getIdProducto() != null) {
+            Optional<Producto> producto = productoRepository.findById(descuentoDTO.getIdProducto());
+            if (producto.isPresent()) {
+                descuentoExistente.setProducto(producto.get());
+            } else {
+                descuentoExistente.setProducto(null);
+            }
+        }
+
+        return descuentoRepository.save(descuentoExistente);
+    }
+
 
     // DELETE
-    public String deleteDescuento(Integer id) {
-        if (descuentoRepository.existsById(id)) {
-            descuentoRepository.deleteById(id);
-            return "Descuento eliminado con éxito";
-        }
-        return "Descuento no encontrado";
-    }
-
-    // Formatear texto
-    private String datosDescuento(String output, Descuento d) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String fecIni = d.getFecIniDescuento() != null ? d.getFecIniDescuento().format(formatter) : "No definida";
-        String fecFin = d.getFecFinDescuento() != null ? d.getFecFinDescuento().format(formatter) : "No definida";
-        Integer idProducto = d.getProducto() != null ? d.getProducto().getId() : null;
-
-        output += "ID Descuento: " + d.getId() + "\n";
-        output += "Tipo: " + d.getTipoDescuento() + "\n";
-        output += "Valor: " + d.getValorDescuento() + "\n";
-        output += "Fecha de inicio: " + fecIni + "\n";
-        output += "Fecha de fin: " + fecFin + "\n";
-        output += "ID Producto: " + (idProducto != null ? idProducto : "No asignado") + "\n\n";
-        return output;
+    public void deleteDescuento(Integer id) {
+        descuentoRepository.deleteById(id);
     }
 
 }

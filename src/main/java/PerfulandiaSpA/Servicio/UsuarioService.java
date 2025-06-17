@@ -1,15 +1,13 @@
 package PerfulandiaSpA.Servicio;
 
-import PerfulandiaSpA.Entidades.Cliente;
-import PerfulandiaSpA.Entidades.Empleado;
 import PerfulandiaSpA.Entidades.Usuario;
-import PerfulandiaSpA.Repositorio.ClienteRepository;
-import PerfulandiaSpA.Repositorio.EmpleadoRepository;
 import PerfulandiaSpA.Repositorio.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -17,54 +15,39 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    @Autowired
-    ClienteRepository clienteRepository;
-
-    @Autowired
-    EmpleadoRepository empleadoRepository;
-
     // C
-//    public String crearUsuario(Usuario usuario) {
-//        if (usuarioRepository.existsById(usuario.getRutUsuario())) {
-//            return "Ya existe un usuario con ese rut";
-//        } else {
-//            String password = new BCryptPasswordEncoder(10).encode(usuario.getPassUsuario());
-//            usuario.setPassUsuario(password);
-//            usuarioRepository.save(usuario);
-//            return "Usuario agregado con éxito";
-//        }
+//    public void crearUsuario(Usuario usuario) {
+//        String password = new BCryptPasswordEncoder(10).encode(usuario.getPassUsuario());
+//        usuario.setPassUsuario(password);
+//        usuarioRepository.save(usuario);
 //    }
 
     // R
-    public String getUsuarios() {
-        String output = "";
-        for (Usuario usuario : usuarioRepository.findAll()) {
-            output = datosUsuario(output, usuario);
-        }
-        if (output.isEmpty()) {
-            return "No hay usuarios registrados";
-        } else {
-            return output;
-        }
-    }
-
-    public String getUsuarioByRut(int id) {
-        String output = "";
-        if (usuarioRepository.existsById(id)) {
-            Usuario usuario = usuarioRepository.findById(id).get();
-            output = datosUsuario(output, usuario);
-            return output;
-        }else{
-            return "Cliente no encontrado";
-        }
-    }
-
-    public List<Usuario> getUsuariosJSON() {
+    public List<Usuario> getUsuarios() {
         return usuarioRepository.findAll();
     }
 
-//    public String updateUsuario(Usuario usuario, int rut) {
-//        if (usuarioRepository.existsById(rut)) {
+    public Optional<Usuario> getUsuarioByRut(int rut) {
+        return usuarioRepository.findById(rut);
+    }
+
+    //U
+//    public void updateUsuario(int id, Usuario usuario) {
+//        Usuario us = usuarioRepository.findById(id).get();
+//        us.setRutUsuario(usuario.getRutUsuario());
+//        us.setDvUsuario(usuario.getDvUsuario());
+//        us.setDirUsuario(usuario.getDirUsuario());
+//        us.setSexoUsuario(usuario.getSexoUsuario());
+//        us.setTelefonoUsuario(usuario.getTelefonoUsuario());
+//        us.setFechaNacimiento(usuario.getFechaNacimiento());
+//        us.setTipoUsuario(usuario.getTipoUsuario());
+//        us.setNomUsuario(usuario.getNomUsuario());
+//        us.setPassUsuario(usuario.getPassUsuario());
+//        us.setEmailUsuario(usuario.getEmailUsuario());
+//        usuarioRepository.save(us);
+//    }
+
+    //    public void updateUsuario(Usuario usuario, int rut) {
 //            Usuario usuarioUpdate = usuarioRepository.findById(rut).get();
 //            usuarioUpdate.setRutUsuario(usuario.getRutUsuario());
 //            usuarioUpdate.setDvUsuario(usuario.getDvUsuario());
@@ -81,10 +64,6 @@ public class UsuarioService {
 //            String newPass = new BCryptPasswordEncoder(10).encode(usuario.getPassUsuario());
 //            usuarioUpdate.setPassUsuario(newPass);
 //            usuarioRepository.save(usuarioUpdate);
-//            return "Usuario actualizado con éxito";
-//        } else {
-//            return "Usuario no encontrado";
-//        }
 //    }
 
 //    public String parcharUsuario(Usuario usuario, int rut) {
@@ -127,58 +106,9 @@ public class UsuarioService {
 //        return "Usuario no encontrado";
 //    }
 
-    public String deleteUsuario(int rut) {
-        for (Usuario usuario : usuarioRepository.findAll()) {
-            if (usuario.getRutUsuario() == rut) {
-                usuarioRepository.delete(usuario);
-                return "Usuario eliminado con éxito";
-            }
-        }
-        return "Usuario no eliminado";
+    // D
+    public void deleteUsuario(int rut) {
+        usuarioRepository.deleteById(rut);
     }
-
-    private String datosUsuario(String output, Usuario usuario) {
-        output += "RUT: " + usuario.getRutUsuario() + "-" + usuario.getDvUsuario() + "\n";
-        output += "Nombre completo: " + usuario.getNomUsuario() + " ";
-        if (usuario.getNom2Usuario() != null) {
-            output += usuario.getNom2Usuario() + " ";
-        }
-        output += usuario.getApellidoPaterno();
-        if (usuario.getNom2Usuario() != null) {
-            output += " " + usuario.getApellidoMaterno() + "\n";
-        } else {
-            output += "\n";
-        }
-        output += "Sexo: " + usuario.getSexoUsuario() + "\n";
-        output += "Fecha de nacimiento: " + usuario.getFechaNacimiento().toString() + "\n";
-        output += "Dirección: " + usuario.getDirUsuario() + "\n";
-        output += "Número de teléfono: +569" + usuario.getTelefonoUsuario() + "\n";
-        if (usuario.getTel2Usuario() != null) {
-            output += "Teléfono extra: +569" + usuario.getTel2Usuario() + "\n";
-        }
-        output += "Email: " + usuario.getEmailUsuario() + "\n";
-        if (usuario.getTipoUsuario().equals("CLIENTE")) {
-            for (Cliente cliente : clienteRepository.findAll()) {
-                if (cliente.getRutUsuario() == usuario.getRutUsuario()) {
-                    output += "Estado de cuenta: " + cliente.getEstadoCuenta() + "\n";
-                    break;
-                }
-            }
-        } else if (usuario.getTipoUsuario().equals("EMPLEADO")) {
-            for (Empleado empleado : empleadoRepository.findAll()) {
-                if (empleado.getRutUsuario() == usuario.getRutUsuario()) {
-                    output += "ID Sucursal: " + empleado.getSucursalAsociada().getId() + "\n";
-                    output += "Nombre Sucursal: " + empleado.getSucursalAsociada().getNombreSucursal() + "\n";
-                    output += "Dirección Sucursal: " + empleado.getSucursalAsociada().getDireccionSucursal() + "\n";
-                    break;
-                }
-            }
-        }
-        output += "\n";
-        return output;
-    }
-
-
-
 
 }
