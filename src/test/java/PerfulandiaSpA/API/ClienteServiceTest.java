@@ -24,22 +24,23 @@ public class ClienteServiceTest {
     ClienteService clienteService;
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
-    private final Integer RUT_TEST = 99999999;
+    private final Integer RUT_TEST = 88888888;
     private final String PASS_PLANA = "cliente123";
 
+    // C - Crear cliente
     @Test
     @Order(1)
     public void testCrearCliente() {
         Cliente cliente = new Cliente();
         cliente.setRutUsuario(RUT_TEST);
-        cliente.setDvUsuario('9');
-        cliente.setNomUsuario("Juan");
-        cliente.setApellidoPaterno("Pérez");
+        cliente.setDvUsuario('8');
+        cliente.setNomUsuario("Pedro");
+        cliente.setApellidoPaterno("García");
         cliente.setSexoUsuario('M');
-        cliente.setDirUsuario("Calle Test 123");
-        cliente.setFechaNacimiento(LocalDate.of(1990, 1, 1));
+        cliente.setDirUsuario("Calle Cliente 123");
+        cliente.setFechaNacimiento(LocalDate.of(1992, 3, 10));
         cliente.setTelefonoUsuario("912345678");
-        cliente.setEmailUsuario("juan@test.com");
+        cliente.setEmailUsuario("pedro@correo.com");
         cliente.setPassUsuario(PASS_PLANA);
 
         clienteService.crearCliente(cliente);
@@ -51,6 +52,7 @@ public class ClienteServiceTest {
         assertTrue(encoder.matches(PASS_PLANA, clienteOpt.get().getPassUsuario()));
     }
 
+    // R - Obtener todos
     @Test
     @Order(2)
     public void testGetClientes() {
@@ -59,61 +61,68 @@ public class ClienteServiceTest {
         assertTrue(clientes.stream().anyMatch(c -> c.getRutUsuario().equals(RUT_TEST)));
     }
 
+    // R - Obtener por RUT
     @Test
     @Order(3)
     public void testGetClienteByRut() {
         Optional<Cliente> clienteOpt = clienteService.getClienteByRut(RUT_TEST);
         assertTrue(clienteOpt.isPresent(), "El cliente debe existir");
-        assertEquals("Juan", clienteOpt.get().getNomUsuario());
-        assertEquals("Pérez", clienteOpt.get().getApellidoPaterno());
+        assertEquals("Pedro", clienteOpt.get().getNomUsuario());
+        assertEquals("García", clienteOpt.get().getApellidoPaterno());
     }
 
+    // U - Actualización completa (PUT)
     @Test
     @Order(4)
     public void testUpdateCliente() {
         Cliente actualizado = new Cliente();
         actualizado.setDvUsuario('K');
-        actualizado.setNomUsuario("Juan Carlos");
-        actualizado.setApellidoPaterno("Gómez");
+        actualizado.setNomUsuario("Pedro Actualizado");
+        actualizado.setApellidoPaterno("González");
         actualizado.setApellidoMaterno("López");
         actualizado.setSexoUsuario('F');
         actualizado.setDirUsuario("Nueva Dirección 456");
-        actualizado.setFechaNacimiento(LocalDate.of(1985, 5, 15));
-        actualizado.setTelefonoUsuario("987654321");
-        actualizado.setTel2Usuario("912345679");
-        actualizado.setEmailUsuario("juan.nuevo@test.com");
+        actualizado.setFechaNacimiento(LocalDate.of(1990, 12, 15));
+        actualizado.setTelefonoUsuario("998877665");
+        actualizado.setTel2Usuario("911223344");
+        actualizado.setEmailUsuario("pedro.actualizado@correo.com");
         actualizado.setEstadoCuenta("INACTIVO");
-        actualizado.setPassUsuario("nuevaPassword123");
+        actualizado.setPassUsuario("nuevaClave123");
 
         clienteService.updateCliente(actualizado, RUT_TEST);
 
         Optional<Cliente> clienteOpt = clienteService.getClienteByRut(RUT_TEST);
         assertTrue(clienteOpt.isPresent(), "Cliente actualizado debe existir");
-        assertEquals("Juan Carlos", clienteOpt.get().getNomUsuario());
-        assertEquals("Gómez", clienteOpt.get().getApellidoPaterno());
+        assertEquals("Pedro Actualizado", clienteOpt.get().getNomUsuario());
+        assertEquals("González", clienteOpt.get().getApellidoPaterno());
         assertEquals("INACTIVO", clienteOpt.get().getEstadoCuenta());
-        assertTrue(encoder.matches("nuevaPassword123", clienteOpt.get().getPassUsuario()));
+        assertTrue(encoder.matches("nuevaClave123", clienteOpt.get().getPassUsuario()));
     }
 
+    // U - Actualización parcial (PATCH)
     @Test
     @Order(5)
     public void testPatchCliente() {
         Cliente parche = new Cliente();
-        parche.setEmailUsuario("juan.parche@test.com");
-        parche.setTelefonoUsuario("998877665");
+        parche.setEmailUsuario("parche.cliente@correo.com");
+        parche.setTelefonoUsuario("900000000");
         parche.setEstadoCuenta("SUSPENDIDO");
+        parche.setPassUsuario("parcheClave");
 
         clienteService.patchCliente(parche, RUT_TEST);
 
         Optional<Cliente> clienteOpt = clienteService.getClienteByRut(RUT_TEST);
         assertTrue(clienteOpt.isPresent(), "Cliente parchado debe existir");
-        assertEquals("juan.parche@test.com", clienteOpt.get().getEmailUsuario());
-        assertEquals("998877665", clienteOpt.get().getTelefonoUsuario());
+        assertEquals("parche.cliente@correo.com", clienteOpt.get().getEmailUsuario());
+        assertEquals("900000000", clienteOpt.get().getTelefonoUsuario());
         assertEquals("SUSPENDIDO", clienteOpt.get().getEstadoCuenta());
-        assertEquals("Juan Carlos", clienteOpt.get().getNomUsuario());
-        assertEquals("Gómez", clienteOpt.get().getApellidoPaterno());
+        assertTrue(encoder.matches("parcheClave", clienteOpt.get().getPassUsuario()));
+        // Campos no modificados
+        assertEquals("Pedro Actualizado", clienteOpt.get().getNomUsuario());
+        assertEquals("González", clienteOpt.get().getApellidoPaterno());
     }
 
+    // D - Eliminar cliente
     @Test
     @Order(6)
     public void testDeleteCliente() {
