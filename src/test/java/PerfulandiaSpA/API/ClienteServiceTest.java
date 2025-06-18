@@ -71,7 +71,7 @@ public class ClienteServiceTest {
         assertEquals("García", clienteOpt.get().getApellidoPaterno());
     }
 
-    // U - Actualización completa (PUT)
+    // U - PUT: Actualización completa (sobrescribe todo, incluso nulls)
     @Test
     @Order(4)
     public void testUpdateCliente() {
@@ -79,27 +79,32 @@ public class ClienteServiceTest {
         actualizado.setDvUsuario('K');
         actualizado.setNomUsuario("Pedro Actualizado");
         actualizado.setApellidoPaterno("González");
-        actualizado.setApellidoMaterno("López");
         actualizado.setSexoUsuario('F');
         actualizado.setDirUsuario("Nueva Dirección 456");
         actualizado.setFechaNacimiento(LocalDate.of(1990, 12, 15));
         actualizado.setTelefonoUsuario("998877665");
-        actualizado.setTel2Usuario("911223344");
         actualizado.setEmailUsuario("pedro.actualizado@correo.com");
         actualizado.setEstadoCuenta("INACTIVO");
         actualizado.setPassUsuario("nuevaClave123");
+        // Campos omitidos: apellidoMaterno, tel2Usuario (deben quedar null)
 
         clienteService.updateCliente(actualizado, RUT_TEST);
 
         Optional<Cliente> clienteOpt = clienteService.getClienteByRut(RUT_TEST);
         assertTrue(clienteOpt.isPresent(), "Cliente actualizado debe existir");
+
+        // Campos actualizados
         assertEquals("Pedro Actualizado", clienteOpt.get().getNomUsuario());
         assertEquals("González", clienteOpt.get().getApellidoPaterno());
         assertEquals("INACTIVO", clienteOpt.get().getEstadoCuenta());
         assertTrue(encoder.matches("nuevaClave123", clienteOpt.get().getPassUsuario()));
+
+        // Campos no enviados (deben ser null)
+        assertNull(clienteOpt.get().getApellidoMaterno(), "apellidoMaterno debe quedar null");
+        assertNull(clienteOpt.get().getTel2Usuario(), "tel2Usuario debe quedar null");
     }
 
-    // U - Actualización parcial (PATCH)
+    // U - PATCH: Actualización parcial (solo campos enviados)
     @Test
     @Order(5)
     public void testPatchCliente() {
@@ -113,13 +118,17 @@ public class ClienteServiceTest {
 
         Optional<Cliente> clienteOpt = clienteService.getClienteByRut(RUT_TEST);
         assertTrue(clienteOpt.isPresent(), "Cliente parchado debe existir");
+
+        // Campos actualizados
         assertEquals("parche.cliente@correo.com", clienteOpt.get().getEmailUsuario());
         assertEquals("900000000", clienteOpt.get().getTelefonoUsuario());
         assertEquals("SUSPENDIDO", clienteOpt.get().getEstadoCuenta());
         assertTrue(encoder.matches("parcheClave", clienteOpt.get().getPassUsuario()));
+
         // Campos no modificados
         assertEquals("Pedro Actualizado", clienteOpt.get().getNomUsuario());
         assertEquals("González", clienteOpt.get().getApellidoPaterno());
+        assertNull(clienteOpt.get().getApellidoMaterno()); // Mantiene null del PUT anterior
     }
 
     // D - Eliminar cliente

@@ -70,7 +70,7 @@ public class AdministradorServiceTest {
         assertEquals("Pérez", adminOpt.get().getApellidoPaterno());
     }
 
-    // U - Actualización completa (PUT)
+    // U - Actualización completa (PUT, reemplazo total)
     @Test
     @Order(4)
     public void testUpdateAdministrador() {
@@ -85,6 +85,7 @@ public class AdministradorServiceTest {
         actualizado.setTelefonoUsuario("987654320");
         actualizado.setEmailUsuario("nuevo.admin@correo.com");
         actualizado.setPassUsuario("nuevaClaveAdmin");
+        // No seteamos tel2Usuario a propósito para ver que quede en null
 
         administradorService.updateAdministrador(actualizado, RUT_TEST);
 
@@ -92,7 +93,15 @@ public class AdministradorServiceTest {
         assertTrue(adminOpt.isPresent(), "Administrador actualizado debe existir");
         assertEquals("Admin Actualizado", adminOpt.get().getNomUsuario());
         assertEquals("Gómez", adminOpt.get().getApellidoPaterno());
+        assertEquals("López", adminOpt.get().getApellidoMaterno());
+        assertEquals("F", String.valueOf(adminOpt.get().getSexoUsuario()));
+        assertEquals("Nueva Dirección 789", adminOpt.get().getDirUsuario());
+        assertEquals(LocalDate.of(1985, 10, 20), adminOpt.get().getFechaNacimiento());
+        assertEquals("987654320", adminOpt.get().getTelefonoUsuario());
+        assertEquals("nuevo.admin@correo.com", adminOpt.get().getEmailUsuario());
         assertTrue(encoder.matches("nuevaClaveAdmin", adminOpt.get().getPassUsuario()));
+        // tel2Usuario debe quedar null tras el PUT, porque no se envió
+        assertNull(adminOpt.get().getTel2Usuario(), "tel2Usuario debe quedar null tras PUT si no se envía");
     }
 
     // U - Actualización parcial (PATCH)
@@ -111,7 +120,7 @@ public class AdministradorServiceTest {
         assertEquals("parche.admin@correo.com", adminOpt.get().getEmailUsuario());
         assertEquals("900000001", adminOpt.get().getTelefonoUsuario());
         assertTrue(encoder.matches("parcheClaveAdmin", adminOpt.get().getPassUsuario()));
-        // Campos no modificados
+        // Campos no modificados por el PATCH se mantienen igual
         assertEquals("Admin Actualizado", adminOpt.get().getNomUsuario());
         assertEquals("Gómez", adminOpt.get().getApellidoPaterno());
     }

@@ -41,25 +41,30 @@ public class AdministradorService {
         Administrador adminExistente = administradorRepository.findById(rut)
                 .orElseThrow(() -> new EntityNotFoundException("Administrador no encontrado"));
 
-        // Solo actualiza los campos que no son null (PUT seguro)
-        if (administrador.getDvUsuario() != null) adminExistente.setDvUsuario(administrador.getDvUsuario());
-        if (administrador.getNomUsuario() != null) adminExistente.setNomUsuario(administrador.getNomUsuario());
-        if (administrador.getNom2Usuario() != null) adminExistente.setNom2Usuario(administrador.getNom2Usuario());
-        if (administrador.getApellidoPaterno() != null) adminExistente.setApellidoPaterno(administrador.getApellidoPaterno());
-        if (administrador.getApellidoMaterno() != null) adminExistente.setApellidoMaterno(administrador.getApellidoMaterno());
-        if (administrador.getSexoUsuario() != null) adminExistente.setSexoUsuario(administrador.getSexoUsuario());
-        if (administrador.getDirUsuario() != null) adminExistente.setDirUsuario(administrador.getDirUsuario());
-        if (administrador.getFechaNacimiento() != null) adminExistente.setFechaNacimiento(administrador.getFechaNacimiento());
-        if (administrador.getTelefonoUsuario() != null) adminExistente.setTelefonoUsuario(administrador.getTelefonoUsuario());
-        if (administrador.getTel2Usuario() != null) adminExistente.setTel2Usuario(administrador.getTel2Usuario());
-        if (administrador.getEmailUsuario() != null) adminExistente.setEmailUsuario(administrador.getEmailUsuario());
+        // Sobrescribe TODOS los campos, incluso si son null
+        adminExistente.setDvUsuario(administrador.getDvUsuario());
+        adminExistente.setNomUsuario(administrador.getNomUsuario());
+        adminExistente.setNom2Usuario(administrador.getNom2Usuario());
+        adminExistente.setApellidoPaterno(administrador.getApellidoPaterno());
+        adminExistente.setApellidoMaterno(administrador.getApellidoMaterno());
+        adminExistente.setSexoUsuario(administrador.getSexoUsuario());
+        adminExistente.setDirUsuario(administrador.getDirUsuario());
+        adminExistente.setFechaNacimiento(administrador.getFechaNacimiento());
+        adminExistente.setTelefonoUsuario(administrador.getTelefonoUsuario());
+        adminExistente.setTel2Usuario(administrador.getTel2Usuario());
+        adminExistente.setEmailUsuario(administrador.getEmailUsuario());
+
+        // Contraseña: si es null, se borra (queda null en la base)
         if (administrador.getPassUsuario() != null) {
             String newPass = new BCryptPasswordEncoder(10).encode(administrador.getPassUsuario());
             adminExistente.setPassUsuario(newPass);
+        } else {
+            adminExistente.setPassUsuario(null);
         }
 
         administradorRepository.save(adminExistente);
     }
+
 
     // U/P - PATCH: Actualización parcial (solo actualiza los campos enviados, deja intactos los demás)
     // Es igual en este patrón, pero semánticamente se usa para updates parciales

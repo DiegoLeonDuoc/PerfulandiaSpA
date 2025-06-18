@@ -35,27 +35,31 @@ public class ClienteService {
         return clienteRepository.findById(rut);
     }
 
-    // U - Actualización completa (PUT)
+    // U - PUT: Actualización completa (sobrescribe todos los campos)
     public void updateCliente(Cliente cliente, Integer rut) {
         Cliente clienteExistente = clienteRepository.findById(rut)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
 
-        // Actualiza solo campos no nulos
-        if (cliente.getDvUsuario() != null) clienteExistente.setDvUsuario(cliente.getDvUsuario());
-        if (cliente.getNomUsuario() != null) clienteExistente.setNomUsuario(cliente.getNomUsuario());
-        if (cliente.getNom2Usuario() != null) clienteExistente.setNom2Usuario(cliente.getNom2Usuario());
-        if (cliente.getApellidoPaterno() != null) clienteExistente.setApellidoPaterno(cliente.getApellidoPaterno());
-        if (cliente.getApellidoMaterno() != null) clienteExistente.setApellidoMaterno(cliente.getApellidoMaterno());
-        if (cliente.getSexoUsuario() != null) clienteExistente.setSexoUsuario(cliente.getSexoUsuario());
-        if (cliente.getDirUsuario() != null) clienteExistente.setDirUsuario(cliente.getDirUsuario());
-        if (cliente.getFechaNacimiento() != null) clienteExistente.setFechaNacimiento(cliente.getFechaNacimiento());
-        if (cliente.getTelefonoUsuario() != null) clienteExistente.setTelefonoUsuario(cliente.getTelefonoUsuario());
-        if (cliente.getTel2Usuario() != null) clienteExistente.setTel2Usuario(cliente.getTel2Usuario());
-        if (cliente.getEmailUsuario() != null) clienteExistente.setEmailUsuario(cliente.getEmailUsuario());
-        if (cliente.getEstadoCuenta() != null) clienteExistente.setEstadoCuenta(cliente.getEstadoCuenta());
+        // Sobrescribe TODOS los campos, incluso si son null
+        clienteExistente.setDvUsuario(cliente.getDvUsuario());
+        clienteExistente.setNomUsuario(cliente.getNomUsuario());
+        clienteExistente.setNom2Usuario(cliente.getNom2Usuario());
+        clienteExistente.setApellidoPaterno(cliente.getApellidoPaterno());
+        clienteExistente.setApellidoMaterno(cliente.getApellidoMaterno());
+        clienteExistente.setSexoUsuario(cliente.getSexoUsuario());
+        clienteExistente.setDirUsuario(cliente.getDirUsuario());
+        clienteExistente.setFechaNacimiento(cliente.getFechaNacimiento());
+        clienteExistente.setTelefonoUsuario(cliente.getTelefonoUsuario());
+        clienteExistente.setTel2Usuario(cliente.getTel2Usuario());
+        clienteExistente.setEmailUsuario(cliente.getEmailUsuario());
+        clienteExistente.setEstadoCuenta(cliente.getEstadoCuenta());
+
+        // Contraseña: si es null, se borra (queda null en la base)
         if (cliente.getPassUsuario() != null) {
             String newPass = new BCryptPasswordEncoder(10).encode(cliente.getPassUsuario());
             clienteExistente.setPassUsuario(newPass);
+        } else {
+            clienteExistente.setPassUsuario(null);
         }
 
         clienteRepository.save(clienteExistente);
