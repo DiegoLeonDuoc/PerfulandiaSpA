@@ -71,18 +71,24 @@ public class CarritoServiceTest {
     @Test
     @Order(1)
     public void testSaveCarrito() {
+        // Prueba crear un nuevo carrito asociado a un cliente
         Carrito carrito = new Carrito();
         carrito.setCliente(clienteRepository.findById(clienteId).orElseThrow());
         carritoService.saveCarrito(carrito);
+
+        // Verificamos que se generó un ID automáticamente
         assertNotNull(carrito.getId(), "El carrito debe tener ID después de guardarse");
-        idCreado = carrito.getId();
+        idCreado = carrito.getId(); // Guardamos el ID para usar en otros tests
     }
 
     @Test
     @Order(2)
     public void testGetCarritoById() {
+        // Buscamos el carrito por su ID y verificamos que existe
         assertNotNull(idCreado, "El ID del carrito debe estar inicializado");
         Optional<Carrito> carritoOpt = carritoService.getCarritoByID(idCreado);
+
+        // Confirmamos que el cliente asociado es correcto
         assertTrue(carritoOpt.isPresent(), "El carrito creado debe existir");
         assertEquals(clienteId, carritoOpt.get().getCliente().getRutUsuario());
     }
@@ -90,8 +96,10 @@ public class CarritoServiceTest {
     @Test
     @Order(3)
     public void testGetCarritos() {
+        // Obtenemos todos los carritos y verificamos que el creado está en la lista
         assertNotNull(idCreado, "El ID del carrito debe estar inicializado");
         List<Carrito> carritos = carritoService.getCarritos();
+
         assertFalse(carritos.isEmpty(), "Debe haber carritos en la base");
         assertTrue(carritos.stream().anyMatch(c -> c.getId().equals(idCreado)), "Debe existir el carrito creado");
     }
@@ -99,11 +107,14 @@ public class CarritoServiceTest {
     @Test
     @Order(4)
     public void testUpdateCarrito() {
+        // Actualizamos el carrito cambiando su cliente asociado
         assertNotNull(idCreado, "El ID del carrito debe estar inicializado");
         Carrito actualizado = new Carrito();
         actualizado.setCliente(clienteRepository.findById(nuevoClienteId).orElseThrow());
+
         carritoService.updateCarrito(actualizado, idCreado);
 
+        // Verificamos que el cambio se aplicó correctamente
         Optional<Carrito> carritoOpt = carritoService.getCarritoByID(idCreado);
         assertTrue(carritoOpt.isPresent(), "Carrito actualizado debe existir");
         assertEquals(nuevoClienteId, carritoOpt.get().getCliente().getRutUsuario());
@@ -112,16 +123,23 @@ public class CarritoServiceTest {
     @Test
     @Order(5)
     public void testDeleteCarrito() {
+        // Eliminamos el carrito y verificamos que ya no existe
         assertNotNull(idCreado, "El ID del carrito debe estar inicializado");
         carritoService.deleteCarrito(idCreado);
+
         Optional<Carrito> carritoOpt = carritoService.getCarritoByID(idCreado);
         assertTrue(carritoOpt.isEmpty(), "El carrito debe haber sido eliminado");
     }
 }
 
-// Resumen:
-// - Se crean clientes completos solo una vez para evitar conflictos y errores de integridad.
-// - El id del carrito se mantiene entre tests usando variables de instancia.
-// - Cada test es autocontenible y sigue el flujo CRUD real.
-// - Los comentarios // explican el objetivo de cada bloque.
-// - Así se evitan errores de ciclo de vida, IDs y datos incompletos.
+// -----------------------------------------------------------------------------
+// Resumen técnico:
+// - Valida CRUD completo para CarritoService con énfasis en relaciones con Cliente
+// - Prueba creación, lectura, actualización de cliente asociado y eliminación
+// - Usa dos clientes diferentes para probar cambios en relaciones (clienteId y nuevoClienteId)
+// - Mantiene estado entre tests con variables idCreado, clienteId y nuevoClienteId
+// - Asegura integridad referencial usando @BeforeAll para creación de clientes
+// - Verifica persistencia correcta de relaciones cliente-carrito
+// - Garantiza limpieza de datos con @Sql y orden de ejecución con @Order
+// - Corrige posibles nulls verificando inicialización de IDs con assertNotNull
+// -----------------------------------------------------------------------------
