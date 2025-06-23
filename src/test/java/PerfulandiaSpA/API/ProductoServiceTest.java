@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,82 +21,99 @@ public class ProductoServiceTest {
     @Autowired
     ProductoService productoService;
 
-    private Integer idCreado = null;
+    private Integer idCreado; // Guardamos el ID del producto creado para usarlo en los siguientes tests
 
-    // C - Crear un producto nuevo
+    // C - Crear producto
     @Test
     @Order(1)
     public void testSaveProducto() {
+        // Creamos un producto nuevo y lo guardamos usando el servicio
         Producto producto = new Producto();
-        producto.setNomProd("Corrector");
-        producto.setCodBarrProd(10004L);
-        producto.setPrecioProd(900);
-        producto.setDescripProd("Corrector líquido blanco");
+        producto.setCodBarrProd(99999L);
+        producto.setNomProd("Producto Test");
+        producto.setDescripProd("Descripción de prueba");
+        producto.setPrecioProd(1234);
 
-        String resultado = productoService.saveProducto(producto);
-        assertEquals("Producto agregado con éxito", resultado);
+        productoService.saveProducto(producto);
 
-        assertNotNull(producto.getId());
-        idCreado = producto.getId();
+        // Verificamos que el producto tenga un ID luego de ser guardado (esto indica que se guardó bien en la base)
+        assertNotNull(producto.getId(), "El producto debe tener ID luego de guardarse");
+        idCreado = producto.getId(); // Guardamos el ID para los siguientes tests
     }
 
-    // R - Buscar por ID (busca el ID de "Lápiz" dinámicamente)
+    // R - Obtener por ID (sin tocar relaciones)
     @Test
     @Order(2)
-    public void testGetProductoById_Lapiz() {
-        List<Producto> productos = productoService.getProductosJSON();
-        Integer idLapiz = null;
-        for (Producto p : productos) {
-            if ("Lápiz".equalsIgnoreCase(p.getNomProd())) {
-                idLapiz = p.getId();
-                break;
-            }
-        }
-        assertNotNull(idLapiz, "No se encontró el producto Lápiz en la base de datos de prueba.");
-        String resultado = productoService.getProductoById(idLapiz);
-        assertTrue(resultado.contains("Lápiz"));
-        assertTrue(resultado.contains("grafito"));
-        assertTrue(resultado.contains("200"));
+    public void testGetProductoById() {
+        // Comprobamos que el ID guardado no sea nulo (el producto se creó correctamente antes)
+        assertNotNull(idCreado, "ID de producto creado no debe ser null");
+
+        // Buscamos el producto por su ID usando el servicio
+        Optional<Producto> productoOpt = productoService.getProductoByID(idCreado);
+
+        // Verificamos que el producto existe y que los datos principales son correctos
+        assertTrue(productoOpt.isPresent(), "Producto creado debe existir");
+        assertEquals("Producto Test", productoOpt.get().getNomProd());
+        assertEquals(99999L, productoOpt.get().getCodBarrProd());
+        assertEquals("Descripción de prueba", productoOpt.get().getDescripProd());
+        assertEquals(1234, productoOpt.get().getPrecioProd());
     }
 
-    // R - Listar todos (precargados y el nuevo)
+    // R - Listar todos (sin tocar relaciones)
     @Test
     @Order(3)
     public void testGetProductos() {
-        String resultado = productoService.getProductos();
-        assertTrue(resultado.contains("Lápiz"));
-        assertTrue(resultado.contains("Cuaderno"));
-        assertTrue(resultado.contains("Regla"));
-        assertTrue(resultado.contains("Corrector")); // El que creamos arriba
+        // Obtenemos la lista de todos los productos
+        List<Producto> productos = productoService.getProductos();
+
+        // Revisamos que la lista no esté vacía y que incluya el producto que creamos antes
+        assertFalse(productos.isEmpty(), "Debe haber productos en la base");
+        assertTrue(productos.stream().anyMatch(p -> p.getId().equals(idCreado)), "La lista debe contener el producto creado");
     }
 
-    // U - Actualizar producto creado
+    // U - Actualizar producto
     @Test
     @Order(4)
     public void testUpdateProducto() {
+        // Creamos un objeto con los nuevos datos para el producto
         Producto actualizado = new Producto();
-        actualizado.setNomProd("Corrector Mejorado");
-        actualizado.setCodBarrProd(10004L);
-        actualizado.setPrecioProd(1200);
-        actualizado.setDescripProd("Corrector líquido premium");
+        actualizado.setCodBarrProd(88888L);
+        actualizado.setNomProd("Producto Actualizado");
+        actualizado.setDescripProd("Nueva descripción");
+        actualizado.setPrecioProd(4321);
 
-        String resultado = productoService.updateProducto(actualizado, idCreado);
-        assertEquals("Producto actualizado con éxito", resultado);
+        // Actualizamos el producto usando el ID guardado
+        productoService.updateProducto(actualizado, idCreado);
 
-        String productoActual = productoService.getProductoById(idCreado);
-        assertTrue(productoActual.contains("Corrector Mejorado"));
-        assertTrue(productoActual.contains("premium"));
-        assertTrue(productoActual.contains("1200"));
+        // Buscamos el producto y verificamos que los datos se hayan actualizado correctamente
+        Optional<Producto> productoOpt = productoService.getProductoByID(idCreado);
+        assertTrue(productoOpt.isPresent(), "Producto actualizado debe existir");
+        assertEquals("Producto Actualizado", productoOpt.get().getNomProd());
+        assertEquals("Nueva descripción", productoOpt.get().getDescripProd());
+        assertEquals(4321, productoOpt.get().getPrecioProd());
+        assertEquals(88888L, productoOpt.get().getCodBarrProd());
     }
 
-    // D - Eliminar producto creado
+    // D - Eliminar producto
     @Test
     @Order(5)
     public void testDeleteProducto() {
-        String resultado = productoService.deleteProducto(idCreado);
-        assertEquals("Producto eliminado con éxito", resultado);
+        // Eliminamos el producto usando el ID guardado
+        productoService.deleteProducto(idCreado);
 
-        String productoEliminado = productoService.getProductoById(idCreado);
-        assertEquals("Producto no encontrado", productoEliminado);
+        // Buscamos el producto eliminado y verificamos que ya no exista
+        Optional<Producto> productoOpt = productoService.getProductoByID(idCreado);
+        assertTrue(productoOpt.isEmpty(), "El producto debe haber sido eliminado");
     }
 }
+
+// -----------------------------------------------------------------------------
+// Resumen técnico:
+// - Este archivo valida todas las operaciones CRUD para el servicio de productos.
+// - Se prueba crear, buscar por ID, listar todos, actualizar y eliminar productos.
+// - Cada test utiliza el ID generado en la creación para mantener la secuencia y coherencia.
+// - Los comentarios explican claramente la lógica y el objetivo de cada prueba.
+// - Se asegura que los datos se manipulan correctamente en la base de pruebas y que los cambios se reflejan como corresponde.
+// - Se corrigió y aclaró el flujo de pruebas usando anotaciones de orden y verificaciones de existencia después de cada operación.
+// - Así se garantiza que el servicio funciona correctamente y responde bien ante operaciones básicas y comunes.
+// -----------------------------------------------------------------------------

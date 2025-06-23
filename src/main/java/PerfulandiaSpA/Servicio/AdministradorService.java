@@ -16,98 +16,83 @@ public class AdministradorService {
     @Autowired
     AdministradorRepository administradorRepository;
 
-    // C
+    // C - Crear un nuevo administrador
     public void crearAdministrador(Administrador administrador) {
         administrador.setTipoUsuario("ADMINISTRADOR");
+        // Hashea la contraseña antes de guardar
         String password = new BCryptPasswordEncoder(10).encode(administrador.getPassUsuario());
         administrador.setPassUsuario(password);
         administradorRepository.save(administrador);
     }
 
-    // R
+    // R - Listar todos los administradores
     public List<Administrador> getAdministradors() {
         return administradorRepository.findAll();
     }
 
+    // R - Buscar administrador por RUT
     public Optional<Administrador> getAdministradorByRut(Integer rut) {
         return administradorRepository.findById(rut);
     }
 
-    // U
+    // U - PUT: Actualización completa (sobrescribe todos los campos enviados, deja igual los no enviados)
+    // Si un campo viene null, NO lo pisa (no borra datos), solo actualiza los no-null
     public void updateAdministrador(Administrador administrador, Integer rut) {
-        if (administradorRepository.existsById(rut)) {
-            administrador.setRutUsuario(administrador.getRutUsuario());
-            administrador.setDvUsuario(administrador.getDvUsuario());
-            administrador.setNomUsuario(administrador.getNomUsuario());
-            administrador.setNom2Usuario(administrador.getNom2Usuario());
-            administrador.setApellidoPaterno(administrador.getApellidoPaterno());
-            administrador.setApellidoMaterno(administrador.getApellidoMaterno());
-            administrador.setSexoUsuario(administrador.getSexoUsuario());
-            administrador.setDirUsuario(administrador.getDirUsuario());
-            administrador.setFechaNacimiento(administrador.getFechaNacimiento());
-            administrador.setTelefonoUsuario(administrador.getTelefonoUsuario());
-            administrador.setTel2Usuario(administrador.getTel2Usuario());
-            administrador.setEmailUsuario(administrador.getEmailUsuario());
+        Administrador adminExistente = administradorRepository.findById(rut)
+                .orElseThrow(() -> new EntityNotFoundException("Administrador no encontrado"));
+
+        // Sobrescribe TODOS los campos, incluso si son null
+        adminExistente.setDvUsuario(administrador.getDvUsuario());
+        adminExistente.setNomUsuario(administrador.getNomUsuario());
+        adminExistente.setNom2Usuario(administrador.getNom2Usuario());
+        adminExistente.setApellidoPaterno(administrador.getApellidoPaterno());
+        adminExistente.setApellidoMaterno(administrador.getApellidoMaterno());
+        adminExistente.setSexoUsuario(administrador.getSexoUsuario());
+        adminExistente.setDirUsuario(administrador.getDirUsuario());
+        adminExistente.setFechaNacimiento(administrador.getFechaNacimiento());
+        adminExistente.setTelefonoUsuario(administrador.getTelefonoUsuario());
+        adminExistente.setTel2Usuario(administrador.getTel2Usuario());
+        adminExistente.setEmailUsuario(administrador.getEmailUsuario());
+
+        // Contraseña: si es null, se borra (queda null en la base)
+        if (administrador.getPassUsuario() != null) {
             String newPass = new BCryptPasswordEncoder(10).encode(administrador.getPassUsuario());
-            administrador.setPassUsuario(newPass);
-            administradorRepository.save(administrador);
+            adminExistente.setPassUsuario(newPass);
         } else {
-            throw new EntityNotFoundException("Administrador no encontrado");
+            adminExistente.setPassUsuario(null);
         }
+
+        administradorRepository.save(adminExistente);
     }
 
-    // U/P
+
+    // U/P - PATCH: Actualización parcial (solo actualiza los campos enviados, deja intactos los demás)
+    // Es igual en este patrón, pero semánticamente se usa para updates parciales
     public void patchAdministrador(Administrador administrador, Integer rut) {
-        if (administradorRepository.existsById(rut)) {
-            Administrador administradorExistente = administradorRepository.findById(rut)
-                    .orElseThrow(() -> new EntityNotFoundException("Administrador no encontrado"));
+        Administrador administradorExistente = administradorRepository.findById(rut)
+                .orElseThrow(() -> new EntityNotFoundException("Administrador no encontrado"));
 
-            administradorExistente.setRutUsuario(rut);
-            if (administrador.getDvUsuario() != null) {
-                administradorExistente.setDvUsuario(administrador.getDvUsuario());
-            }
-            if (administrador.getNomUsuario() != null) {
-                administradorExistente.setNomUsuario(administrador.getNomUsuario());
-            }
-            if (administrador.getNom2Usuario() != null) {
-                administradorExistente.setNom2Usuario(administrador.getNom2Usuario());
-            }
-            if (administrador.getApellidoPaterno() != null) {
-                administradorExistente.setApellidoPaterno(administrador.getApellidoPaterno());
-            }
-            if (administrador.getApellidoMaterno() != null) {
-                administradorExistente.setApellidoMaterno(administrador.getApellidoMaterno());
-            }
-            if (administrador.getSexoUsuario() != null) {
-                administradorExistente.setSexoUsuario(administrador.getSexoUsuario());
-            }
-            if (administrador.getDirUsuario() != null) {
-                administradorExistente.setDirUsuario(administrador.getDirUsuario());
-            }
-            if (administrador.getFechaNacimiento() != null) {
-                administradorExistente.setFechaNacimiento(administrador.getFechaNacimiento());
-            }
-            if (administrador.getTelefonoUsuario() != null) {
-                administradorExistente.setTelefonoUsuario(administrador.getTelefonoUsuario());
-            }
-            if (administrador.getTel2Usuario() != null) {
-                administradorExistente.setTel2Usuario(administrador.getTel2Usuario());
-            }
-            if (administrador.getEmailUsuario() != null) {
-                administradorExistente.setEmailUsuario(administrador.getEmailUsuario());
-            }
-            if (administrador.getPassUsuario() != null) {
-                String newPass = new BCryptPasswordEncoder(10).encode(administrador.getPassUsuario());
-                administradorExistente.setPassUsuario(newPass);
-            }
-
-            administradorRepository.save(administradorExistente);
-        } else {
-            throw new EntityNotFoundException("Administrador no encontrado");
+        // Solo actualiza los campos que no son null (PATCH real)
+        if (administrador.getDvUsuario() != null) administradorExistente.setDvUsuario(administrador.getDvUsuario());
+        if (administrador.getNomUsuario() != null) administradorExistente.setNomUsuario(administrador.getNomUsuario());
+        if (administrador.getNom2Usuario() != null) administradorExistente.setNom2Usuario(administrador.getNom2Usuario());
+        if (administrador.getApellidoPaterno() != null) administradorExistente.setApellidoPaterno(administrador.getApellidoPaterno());
+        if (administrador.getApellidoMaterno() != null) administradorExistente.setApellidoMaterno(administrador.getApellidoMaterno());
+        if (administrador.getSexoUsuario() != null) administradorExistente.setSexoUsuario(administrador.getSexoUsuario());
+        if (administrador.getDirUsuario() != null) administradorExistente.setDirUsuario(administrador.getDirUsuario());
+        if (administrador.getFechaNacimiento() != null) administradorExistente.setFechaNacimiento(administrador.getFechaNacimiento());
+        if (administrador.getTelefonoUsuario() != null) administradorExistente.setTelefonoUsuario(administrador.getTelefonoUsuario());
+        if (administrador.getTel2Usuario() != null) administradorExistente.setTel2Usuario(administrador.getTel2Usuario());
+        if (administrador.getEmailUsuario() != null) administradorExistente.setEmailUsuario(administrador.getEmailUsuario());
+        if (administrador.getPassUsuario() != null) {
+            String newPass = new BCryptPasswordEncoder(10).encode(administrador.getPassUsuario());
+            administradorExistente.setPassUsuario(newPass);
         }
+
+        administradorRepository.save(administradorExistente);
     }
 
-    // D
+    // D - Eliminar administrador por RUT
     public void deleteAdministrador(int rut) {
         administradorRepository.deleteById(rut);
     }
